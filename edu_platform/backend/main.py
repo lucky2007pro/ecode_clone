@@ -59,6 +59,11 @@ async def serve_dashboard():
 async def serve_course_builder(course_id: str = "1"):
     return FileResponse(os.path.join(FRONTEND_DIR, "course-builder.html"))
 
+@app.get("/manage/invoices/{invoice_id}")
+@app.get("/payments")
+async def serve_payments(invoice_id: str = "1"):
+    return FileResponse(os.path.join(FRONTEND_DIR, "payments.html"))
+
 @app.get("/courses")
 async def serve_courses():
     return FileResponse(os.path.join(FRONTEND_DIR, "courses.html"))
@@ -74,10 +79,6 @@ async def serve_features():
 @app.get("/homework")
 async def serve_homework():
     return FileResponse(os.path.join(FRONTEND_DIR, "homework.html"))
-
-@app.get("/payments")
-async def serve_payments():
-    return FileResponse(os.path.join(FRONTEND_DIR, "payments.html"))
 
 @app.get("/customization")
 async def serve_customization():
