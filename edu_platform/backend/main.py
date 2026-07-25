@@ -74,6 +74,11 @@ async def serve_homework(homework_id: str = "1"):
 async def serve_analytics(user_id: str = "1"):
     return FileResponse(os.path.join(FRONTEND_DIR, "analytics.html"))
 
+@app.get("/manage/school/settings/basic")
+@app.get("/customization")
+async def serve_customization():
+    return FileResponse(os.path.join(FRONTEND_DIR, "customization.html"))
+
 @app.get("/courses")
 async def serve_courses():
     return FileResponse(os.path.join(FRONTEND_DIR, "courses.html"))
@@ -85,10 +90,6 @@ async def serve_pricing():
 @app.get("/features")
 async def serve_features():
     return FileResponse(os.path.join(FRONTEND_DIR, "features.html"))
-
-@app.get("/customization")
-async def serve_customization():
-    return FileResponse(os.path.join(FRONTEND_DIR, "customization.html"))
 
 @app.get("/messenger")
 async def serve_messenger():
