@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maktab Kastomizatsiyasi — Exode.biz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/index.css">
+  <style>
+    .dropdown-container { position: relative; display: inline-block; }
+    .dropdown-menu { display: none; position: absolute; top: 100%; left: -100px; width: 680px; padding: 1.5rem; background: #0c1322; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; grid-template-columns: 1fr 1fr; gap: 1rem; z-index: 1000; box-shadow: 0 25px 60px rgba(0,0,0,0.8); }
+    .dropdown-container:hover .dropdown-menu { display: grid; }
+    .dropdown-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: 12px; text-decoration: none; color: inherit; transition: background 0.2s; }
+    .dropdown-item:hover { background: rgba(255,255,255,0.06); }
+    .dropdown-icon { width: 42px; height: 42px; border-radius: 10px; background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <nav class="navbar">
+    <a href="index.html" class="nav-brand">
+      <div class="brand-icon">⚡</div>
+      <span>exode<span class="text-gradient">.biz</span></span>
+    </a>
+    <ul class="nav-links">
+      <li class="dropdown-container">
+        <span class="nav-link" style="cursor:pointer">Imkoniyatlar ▼</span>
+        <div class="dropdown-menu">
+          <a href="features.html" class="dropdown-item"><div class="dropdown-icon">📑</div><div><div style="font-weight:700;color:#fff">Barcha imkoniyatlar</div><div style="font-size:0.8rem;color:#94a3b8">Bitta platformada 11 ta vosita</div></div></a>
+          <a href="course-builder.html" class="dropdown-item"><div class="dropdown-icon">🎛️</div><div><div style="font-weight:700;color:#fff">Kurs konstruktori</div><div style="font-size:0.8rem;color:#94a3b8">Video, matn, testlar — vizual muharrir</div></div></a>
+          <a href="homework.html" class="dropdown-item"><div class="dropdown-icon">📝</div><div><div style="font-weight:700;color:#fff">Uy vazifalari</div><div style="font-size:0.8rem;color:#94a3b8">Testlar, topshiriqlar va avto-tekshirish</div></div></a>
+          <a href="payments.html" class="dropdown-item"><div class="dropdown-icon">💳</div><div><div style="font-weight:700;color:#fff">To'lovlarni qabul qilish</div><div style="font-size:0.8rem;color:#94a3b8">Payme, Click, Uzum va rossiya kartalari</div></div></a>
+          <a href="installments.html" class="dropdown-item"><div class="dropdown-icon">🔄</div><div><div style="font-weight:700;color:#fff">Bo'lib-bo'lib to'lash</div><div style="font-size:0.8rem;color:#94a3b8">Avto-yechib olish va bosqichma-bosqich...</div></div></a>
+          <a href="customization.html" class="dropdown-item"><div class="dropdown-icon">🎨</div><div><div style="font-weight:700;color:#fff">Maktab kastomizatsiyasi</div><div style="font-size:0.8rem;color:#94a3b8">O'z brendingiz, ranglar va domen</div></div></a>
+          <a href="analytics.html" class="dropdown-item"><div class="dropdown-icon">📈</div><div><div style="font-weight:700;color:#fff">Analitika</div><div style="font-size:0.8rem;color:#94a3b8">Daromad, faollik va o'quvchi xulqi</div></div></a>
+          <a href="messenger.html" class="dropdown-item"><div class="dropdown-icon">💬</div><div><div style="font-weight:700;color:#fff">Messendjer</div><div style="font-size:0.8rem;color:#94a3b8">Platforma ichida o'quvchilar bilan suhbat</div></div></a>
+          <a href="marketing.html" class="dropdown-item"><div class="dropdown-icon">📢</div><div><div style="font-weight:700;color:#fff">Marketing va sotuv</div><div style="font-size:0.8rem;color:#94a3b8">Piksellar, UTM, jo'natmalar va tripvayrlar</div></div></a>
+          <a href="docs.html" class="dropdown-item"><div class="dropdown-icon">💻</div><div><div style="font-weight:700;color:#fff">API hujjatlar</div><div style="font-size:0.8rem;color:#94a3b8">Hujjatlar va integratsiyalar</div></div></a>
+        </div>
+      </li>
+      <li><a href="courses.html" class="nav-link">Kurslar Catalog</a></li>
+      <li><a href="pricing.html" class="nav-link">Tariflar & Bo'lib to'lash</a></li>
+      <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+    </ul>
+    <div style="display:flex;gap:10px">
+      <a href="login.html" class="btn btn-secondary btn-sm">Kirish</a>
+      <a href="register.html" class="btn btn-primary btn-sm">Maktab ochish</a>
+    </div>
+  </nav>
+
+  
+<div class="container">
+  <div class="glass-panel" style="padding:3rem;margin-bottom:3rem">
+    <span class="badge badge-success">White-Label & Custom Domain</span>
+    <h1 style="font-size:2.8rem;margin:12px 0">Maktab Kastomizatsiyasi</h1>
+    <p style="font-size:1.2rem;color:var(--text-muted);max-width:800px">O'z brendingiz, shaxsiy domeningiz (maktabim.uz), logoniz va brend ranglaringiz bilan to'liq shaxsiy platformaga ega bo'ling.</p>
+  </div>
+</div>
+
+
+  <footer style="border-top:1px solid var(--border-glass);padding:3rem 0;margin-top:5rem;text-align:center;color:var(--text-dim)">
+    <div class="container">
+      <p>© 2026 Exode.biz — Onlayn Maktab va Kurslar Platformasi. Barcha huquqlar himoyalangan.</p>
+    </div>
+  </footer>
+</body>
+</html>
