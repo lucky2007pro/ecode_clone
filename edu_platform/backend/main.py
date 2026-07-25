@@ -1,11 +1,11 @@
-"""
-FastAPI Asosiy Ilova (Main Entrypoint).
-"""
-from contextlib import asynccontextmanager
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from db import init_db
 
-from db import engine, Base
+# DOMAIN ROUTERS
 from users.router import router as users_router
 from schools.router import router as schools_router
 from courses.router import router as courses_router
@@ -14,19 +14,13 @@ from crm.router import router as crm_router
 from payments.router import router as payments_router
 from notifications.router import router as notifications_router
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    yield
-
 app = FastAPI(
-    title="Exode Platform API",
-    description="FastAPI Clean Modular Architecture matching user design",
-    version="2.0.0",
-    lifespan=lifespan
+    title="Exode Education & ERP Platform API",
+    description="Multi-tenant online school platform backend API with Clean URLs",
+    version="2.0.0"
 )
 
+# CORS MIDDLEWARE
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -35,14 +29,75 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# INCLUDE API ROUTERS WITH /api/v1 PREFIX
 app.include_router(users_router, prefix="/api/v1/users", tags=["Users & Auth"])
-app.include_router(schools_router, prefix="/api/v1/schools", tags=["Schools"])
-app.include_router(courses_router, prefix="/api/v1/courses", tags=["Courses & Homework"])
-app.include_router(videos_router, prefix="/api/v1/videos", tags=["Kinescope Videos"])
-app.include_router(crm_router, prefix="/api/v1/crm", tags=["Kommo CRM"])
-app.include_router(payments_router, prefix="/api/v1/payments", tags=["Payments & Installments"])
-app.include_router(notifications_router, prefix="/api/v1/notifications", tags=["Notifications"])
+app.include_router(schools_router, prefix="/api/v1/schools", tags=["Schools & Multi-Tenancy"])
+app.include_router(courses_router, prefix="/api/v1/courses", tags=["Courses & Modules"])
+app.include_router(videos_router, prefix="/api/v1/videos", tags=["Kinescope Video Integration"])
+app.include_router(crm_router, prefix="/api/v1/crm", tags=["Kommo CRM Integration"])
+app.include_router(payments_router, prefix="/api/v1/payments", tags=["Telegram Admin Payments"])
+app.include_router(notifications_router, prefix="/api/v1/notifications", tags=["Gmail Free SMTP Notifications"])
 
-@app.get("/health")
-async def health_check():
-    return {"status": "ok", "app": "Exode Platform"}
+# FRONTEND CLEAN URL SERVING
+FRONTEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend"))
+
+@app.on_event("startup")
+async def on_startup():
+    await init_db()
+
+@app.get("/")
+async def root():
+    return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
+
+@app.get("/manage/dashboard")
+@app.get("/dashboard")
+async def serve_dashboard():
+    return FileResponse(os.path.join(FRONTEND_DIR, "dashboard.html"))
+
+@app.get("/courses")
+async def serve_courses():
+    return FileResponse(os.path.join(FRONTEND_DIR, "courses.html"))
+
+@app.get("/pricing")
+async def serve_pricing():
+    return FileResponse(os.path.join(FRONTEND_DIR, "pricing.html"))
+
+@app.get("/features")
+async def serve_features():
+    return FileResponse(os.path.join(FRONTEND_DIR, "features.html"))
+
+@app.get("/homework")
+async def serve_homework():
+    return FileResponse(os.path.join(FRONTEND_DIR, "homework.html"))
+
+@app.get("/payments")
+async def serve_payments():
+    return FileResponse(os.path.join(FRONTEND_DIR, "payments.html"))
+
+@app.get("/customization")
+async def serve_customization():
+    return FileResponse(os.path.join(FRONTEND_DIR, "customization.html"))
+
+@app.get("/analytics")
+async def serve_analytics():
+    return FileResponse(os.path.join(FRONTEND_DIR, "analytics.html"))
+
+@app.get("/messenger")
+async def serve_messenger():
+    return FileResponse(os.path.join(FRONTEND_DIR, "messenger.html"))
+
+@app.get("/docs")
+async def serve_docs():
+    return FileResponse(os.path.join(FRONTEND_DIR, "docs.html"))
+
+@app.get("/login")
+async def serve_login():
+    return FileResponse(os.path.join(FRONTEND_DIR, "login.html"))
+
+@app.get("/register")
+async def serve_register():
+    return FileResponse(os.path.join(FRONTEND_DIR, "register.html"))
+
+# SERVE STATIC ASSETS IF ANY
+if os.path.exists(FRONTEND_DIR):
+    app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
