@@ -13,18 +13,20 @@
       --sidebar-bg: #141414;
       --subnav-bg: #1a1a1a;
       --card-bg: #22242b;
+      --popup-bg: #1e2028;
       --card-border: rgba(255, 255, 255, 0.08);
       --accent-orange: #f97316;
       --green-active: #22c55e;
       --text-main: #f8fafc;
       --text-muted: #8e99a8;
       --input-bg: #18191e;
+      --red-logout: #ef4444;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-    body { background: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+    body { background: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; position: relative; }
 
     /* THIN PRIMARY SIDEBAR ON FAR LEFT */
-    .primary-sidebar { width: 78px; background: var(--sidebar-bg); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 0.6rem; overflow-y: auto; flex-shrink: 0; }
+    .primary-sidebar { width: 78px; background: var(--sidebar-bg); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 0.6rem; overflow-y: auto; flex-shrink: 0; position: relative; z-index: 50; }
     
     .brand-box { width: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; margin-bottom: 0.5rem; text-decoration: none; color: #fff; font-weight: 800; font-size: 0.9rem; }
     .status-dot-text { font-size: 0.55rem; color: var(--green-active); font-weight: 700; display: flex; align-items: center; gap: 2px; }
@@ -36,7 +38,28 @@
 
     .svg-icon { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-    .user-avatar-small { margin-top: auto; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; position: relative; border: 2px solid var(--green-active); }
+    .user-avatar-small { margin-top: auto; width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; font-weight: 800; font-size: 0.88rem; display: flex; align-items: center; justify-content: center; position: relative; border: 2px solid var(--green-active); cursor: pointer; transition: transform 0.2s; }
+    .user-avatar-small:hover { transform: scale(1.08); }
+
+    /* PROFILE POPUP MENU MATCHING USER SCREENSHOT */
+    .profile-popup-menu { display: none; position: absolute; bottom: 65px; left: 78px; width: 270px; background: var(--popup-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1rem; box-shadow: 0 20px 50px rgba(0,0,0,0.8); z-index: 1000; flex-direction: column; gap: 0.5rem; }
+    .profile-popup-menu.show { display: flex; }
+
+    .popup-user-header { display: flex; align-items: center; gap: 12px; padding-bottom: 0.8rem; border-bottom: 1px solid var(--card-border); margin-bottom: 0.2rem; }
+    .header-avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; }
+    .header-green-dot { width: 8px; height: 8px; background: var(--green-active); border-radius: 50%; border: 1.5px solid var(--popup-bg); position: absolute; bottom: 0; right: 0; }
+    
+    .popup-item { display: flex; align-items: center; justify-content: space-between; padding: 9px 10px; border-radius: 10px; text-decoration: none; color: var(--text-main); transition: background 0.2s; cursor: pointer; }
+    .popup-item:hover { background: rgba(255,255,255,0.05); }
+    .popup-item-left { display: flex; align-items: center; gap: 12px; }
+    .popup-icon { width: 20px; height: 20px; stroke: var(--accent-orange); fill: none; stroke-width: 2; flex-shrink: 0; }
+    
+    .item-title { font-weight: 700; font-size: 0.88rem; line-height: 1.2; }
+    .item-sub { font-size: 0.72rem; color: var(--text-muted); }
+
+    .logout-item { border-top: 1px solid var(--card-border); margin-top: 0.4rem; padding-top: 0.8rem; }
+    .logout-item .popup-icon { stroke: var(--red-logout); }
+    .logout-item .item-title { color: var(--red-logout); }
 
     /* SECONDARY SETTINGS SUB-MENU BAR */
     .settings-subnav { width: 240px; background: var(--subnav-bg); border-right: 1px solid var(--card-border); padding: 1.25rem 1rem; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; flex-shrink: 0; }
@@ -137,10 +160,101 @@
       <span>Student panel</span>
     </a>
 
-    <div class="user-avatar-small">H</div>
+    <!-- USER AVATAR BUTTON THAT TOGGLES PROFILE POPUP -->
+    <div class="user-avatar-small" id="userAvatarBtn" onclick="toggleProfilePopup(event)">
+      H
+    </div>
   </aside>
 
-  <!-- SECONDARY SETTINGS SUB-MENU BAR MATCHING USER SCREENSHOT -->
+  <!-- PROFILE POPUP MENU MATCHING EXACT USER SCREENSHOT -->
+  <div class="profile-popup-menu" id="profilePopupMenu">
+    <div class="popup-user-header">
+      <div class="header-avatar">
+        H
+        <div class="header-green-dot"></div>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;font-size:0.9rem;display:flex;align-items:center;justify-content:space-between">
+          <span>Hojiakbar Hayrullayev</span>
+          <span style="font-size:0.8rem;color:var(--text-muted)">☺+</span>
+        </div>
+        <div style="font-size:0.75rem;color:var(--text-muted)">id160021</div>
+      </div>
+    </div>
+
+    <a href="/customization" class="popup-item">
+      <div class="popup-item-left">
+        <svg class="popup-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <div>
+          <div class="item-title">Settings</div>
+          <div class="item-sub">Account Management</div>
+        </div>
+      </div>
+    </a>
+
+    <a href="#" class="popup-item">
+      <div class="popup-item-left">
+        <svg class="popup-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div>
+          <div class="item-title">Notifications</div>
+          <div class="item-sub">Your notifications</div>
+        </div>
+      </div>
+    </a>
+
+    <a href="/payments" class="popup-item">
+      <div class="popup-item-left">
+        <svg class="popup-icon" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/><line x1="12" x2="16" y1="14" y2="14"/></svg>
+        <div>
+          <div class="item-title">Payments and Bills</div>
+          <div class="item-sub">Payment Management</div>
+        </div>
+      </div>
+    </a>
+
+    <a href="#" class="popup-item">
+      <div class="popup-item-left">
+        <svg class="popup-icon" viewBox="0 0 24 24"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+        <div>
+          <div class="item-title">Partnership</div>
+          <div class="item-sub">Get the link</div>
+        </div>
+      </div>
+    </a>
+
+    <a href="#" class="popup-item">
+      <div class="popup-item-left">
+        <svg class="popup-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <div>
+          <div class="item-title">Language</div>
+          <div class="item-sub">Change language</div>
+        </div>
+      </div>
+      <span style="font-size:1.1rem">🇺🇸</span>
+    </a>
+
+    <a href="#" class="popup-item">
+      <div class="popup-item-left">
+        <svg class="popup-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" x2="12" y1="1" y2="3"/><line x1="12" x2="12" y1="21" y2="23"/><line x1="4.22" x2="5.64" y1="4.22" y2="5.64"/><line x1="18.36" x2="19.78" y1="18.36" y2="19.78"/><line x1="1" x2="3" y1="12" y2="12"/><line x1="21" x2="23" y1="12" y2="12"/></svg>
+        <div>
+          <div class="item-title">Appearance</div>
+          <div class="item-sub">Switch theme</div>
+        </div>
+      </div>
+    </a>
+
+    <a href="/login" class="popup-item logout-item">
+      <div class="popup-item-left">
+        <svg class="popup-icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        <div>
+          <div class="item-title">Sign out</div>
+          <div class="item-sub">End current session</div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <!-- SECONDARY SETTINGS SUB-MENU BAR -->
   <aside class="settings-subnav">
     <div class="settings-header">
       <svg class="svg-icon" style="stroke:var(--accent-orange)" viewBox="0 0 24 24"><line x1="4" x2="20" y1="21" y2="21"/><line x1="4" x2="20" y1="14" y2="14"/><line x1="4" x2="20" y1="7" y2="7"/><circle cx="8" cy="21" r="2"/><circle cx="16" cy="14" r="2"/><circle cx="12" cy="7" r="2"/></svg>
@@ -271,5 +385,21 @@
       </div>
     </div>
   </main>
+
+  <script>
+    function toggleProfilePopup(e) {
+      if (e) e.stopPropagation();
+      const popup = document.getElementById('profilePopupMenu');
+      popup.classList.toggle('show');
+    }
+
+    document.addEventListener('click', function(e) {
+      const popup = document.getElementById('profilePopupMenu');
+      const avatarBtn = document.getElementById('userAvatarBtn');
+      if (popup && popup.classList.contains('show') && !popup.contains(e.target) && e.target !== avatarBtn) {
+        popup.classList.remove('show');
+      }
+    });
+  </script>
 </body>
 </html>
