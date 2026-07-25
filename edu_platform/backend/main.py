@@ -38,7 +38,7 @@ app.include_router(crm_router, prefix="/api/v1/crm", tags=["Kommo CRM Integratio
 app.include_router(payments_router, prefix="/api/v1/payments", tags=["Telegram Admin Payments"])
 app.include_router(notifications_router, prefix="/api/v1/notifications", tags=["Gmail Free SMTP Notifications"])
 
-# FRONTEND CLEAN URL SERVING
+# FRONTEND CLEAN URL SERVING MATCHING EXODE.BIZ ROUTES
 FRONTEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend"))
 
 @app.on_event("startup")
@@ -53,6 +53,11 @@ async def root():
 @app.get("/dashboard")
 async def serve_dashboard():
     return FileResponse(os.path.join(FRONTEND_DIR, "dashboard.html"))
+
+@app.get("/manage/courses/{course_id}")
+@app.get("/course-builder")
+async def serve_course_builder(course_id: str = "1"):
+    return FileResponse(os.path.join(FRONTEND_DIR, "course-builder.html"))
 
 @app.get("/courses")
 async def serve_courses():
