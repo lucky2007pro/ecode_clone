@@ -79,6 +79,11 @@ async def serve_analytics(user_id: str = "1"):
 async def serve_customization():
     return FileResponse(os.path.join(FRONTEND_DIR, "customization.html"))
 
+@app.get("/chat")
+@app.get("/messenger")
+async def serve_messenger():
+    return FileResponse(os.path.join(FRONTEND_DIR, "messenger.html"))
+
 @app.get("/courses")
 async def serve_courses():
     return FileResponse(os.path.join(FRONTEND_DIR, "courses.html"))
@@ -90,10 +95,6 @@ async def serve_pricing():
 @app.get("/features")
 async def serve_features():
     return FileResponse(os.path.join(FRONTEND_DIR, "features.html"))
-
-@app.get("/messenger")
-async def serve_messenger():
-    return FileResponse(os.path.join(FRONTEND_DIR, "messenger.html"))
 
 @app.get("/docs")
 async def serve_docs():
