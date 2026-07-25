@@ -49,6 +49,11 @@ async def on_startup():
 async def root():
     return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
 
+@app.get("/training")
+@app.get("/student")
+async def serve_student_training():
+    return FileResponse(os.path.join(FRONTEND_DIR, "student.html"))
+
 @app.get("/manage/dashboard")
 @app.get("/dashboard")
 async def serve_dashboard():
