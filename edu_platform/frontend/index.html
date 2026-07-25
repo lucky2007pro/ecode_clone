@@ -6,62 +6,98 @@
   <title>Exode.biz — Onlayn Maktab Platformasi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./src/index.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    .dropdown-container { position: relative; display: inline-block; }
-    .dropdown-menu { display: none; position: absolute; top: 100%; left: -100px; width: 680px; padding: 1.5rem; background: #0c1322; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; grid-template-columns: 1fr 1fr; gap: 1rem; z-index: 1000; box-shadow: 0 25px 60px rgba(0,0,0,0.8); }
+    :root {
+      --bg-dark: #090d16;
+      --card-bg: #111827;
+      --card-border: rgba(255, 255, 255, 0.1);
+      --accent-orange: #f97316;
+      --accent-cyan: #06b6d4;
+      --text-main: #f8fafc;
+      --text-dim: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: var(--bg-dark); color: var(--text-main); line-height: 1.5; min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* NAVBAR */
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 3rem; border-bottom: 1px solid var(--card-border); background: rgba(9, 13, 22, 0.8); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
+    .nav-brand { display: flex; align-items: center; gap: 8px; font-size: 1.5rem; font-weight: 800; color: #fff; text-decoration: none; }
+    .text-gradient { background: linear-gradient(135deg, #06b6d4, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    .nav-links { display: flex; align-items: center; gap: 2rem; list-style: none; }
+    .nav-link { color: var(--text-dim); text-decoration: none; font-size: 0.95rem; font-weight: 600; transition: color 0.2s; }
+    .nav-link:hover { color: #fff; }
+
+    .dropdown-container { position: relative; }
+    .dropdown-menu { display: none; position: absolute; top: 100%; left: -100px; width: 640px; padding: 1.5rem; background: #0f172a; border: 1px solid var(--card-border); border-radius: 16px; grid-template-columns: 1fr 1fr; gap: 1rem; z-index: 1000; box-shadow: 0 25px 60px rgba(0,0,0,0.8); margin-top: 10px; }
     .dropdown-container:hover .dropdown-menu { display: grid; }
     .dropdown-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: 12px; text-decoration: none; color: inherit; transition: background 0.2s; }
     .dropdown-item:hover { background: rgba(255,255,255,0.06); }
-    .dropdown-icon { width: 42px; height: 42px; border-radius: 10px; background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+    .dropdown-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.3); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+
+    .btn { padding: 10px 22px; border-radius: 10px; font-weight: 700; text-decoration: none; font-size: 0.9rem; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-primary { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; box-shadow: 0 4px 20px rgba(249, 115, 22, 0.4); }
+    .btn-secondary { background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid var(--card-border); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(249, 115, 22, 0.6); }
+
+    /* HERO SECTION */
+    .hero { padding: 6rem 2rem 4rem; text-align: center; max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
+    .badge { background: rgba(6, 182, 212, 0.12); border: 1px solid rgba(6, 182, 212, 0.3); color: var(--accent-cyan); padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; margin-bottom: 1.5rem; }
+    
+    .hero-title { font-size: 3.2rem; font-weight: 800; line-height: 1.15; margin-bottom: 1.25rem; letter-spacing: -1px; }
+    .hero-desc { font-size: 1.15rem; color: var(--text-dim); margin-bottom: 2.5rem; max-width: 720px; line-height: 1.6; }
+
+    footer { border-top: 1px solid var(--card-border); padding: 2.5rem 0; margin-top: auto; text-align: center; color: var(--text-dim); font-size: 0.88rem; }
   </style>
 </head>
 <body>
-  <div class="bg-glow"></div>
+
+  <!-- NAVBAR WITH CLEAN URLS WITHOUT .HTML -->
   <nav class="navbar">
-    <a href="index.html" class="nav-brand">
-      <div class="brand-icon">⚡</div>
+    <a href="/" class="nav-brand">
+      <div style="font-size:1.4rem">⚡</div>
       <span>exode<span class="text-gradient">.biz</span></span>
     </a>
+
     <ul class="nav-links">
       <li class="dropdown-container">
         <span class="nav-link" style="cursor:pointer">Imkoniyatlar ▼</span>
         <div class="dropdown-menu">
-          <a href="features.html" class="dropdown-item"><div class="dropdown-icon">📑</div><div><div style="font-weight:700;color:#fff">Barcha imkoniyatlar</div><div style="font-size:0.8rem;color:#94a3b8">Bitta platformada 11 ta vosita</div></div></a>
-          <a href="course-builder.html" class="dropdown-item"><div class="dropdown-icon">🎛️</div><div><div style="font-weight:700;color:#fff">Kurs konstruktori</div><div style="font-size:0.8rem;color:#94a3b8">Video, matn, testlar — vizual muharrir</div></div></a>
-          <a href="homework.html" class="dropdown-item"><div class="dropdown-icon">📝</div><div><div style="font-weight:700;color:#fff">Uy vazifalari</div><div style="font-size:0.8rem;color:#94a3b8">Testlar, topshiriqlar va avto-tekshirish</div></div></a>
-          <a href="payments.html" class="dropdown-item"><div class="dropdown-icon">💳</div><div><div style="font-weight:700;color:#fff">To'lovlarni qabul qilish</div><div style="font-size:0.8rem;color:#94a3b8">Payme, Click, Uzum va rossiya kartalari</div></div></a>
-          <a href="installments.html" class="dropdown-item"><div class="dropdown-icon">🔄</div><div><div style="font-weight:700;color:#fff">Bo'lib-bo'lib to'lash</div><div style="font-size:0.8rem;color:#94a3b8">Avto-yechib olish va bosqichma-bosqich...</div></div></a>
-          <a href="customization.html" class="dropdown-item"><div class="dropdown-icon">🎨</div><div><div style="font-weight:700;color:#fff">Maktab kastomizatsiyasi</div><div style="font-size:0.8rem;color:#94a3b8">O'z brendingiz, ranglar va domen</div></div></a>
-          <a href="analytics.html" class="dropdown-item"><div class="dropdown-icon">📈</div><div><div style="font-weight:700;color:#fff">Analitika</div><div style="font-size:0.8rem;color:#94a3b8">Daromad, faollik va o'quvchi xulqi</div></div></a>
-          <a href="messenger.html" class="dropdown-item"><div class="dropdown-icon">💬</div><div><div style="font-weight:700;color:#fff">Messendjer</div><div style="font-size:0.8rem;color:#94a3b8">Platforma ichida o'quvchilar bilan suhbat</div></div></a>
-          <a href="marketing.html" class="dropdown-item"><div class="dropdown-icon">📢</div><div><div style="font-weight:700;color:#fff">Marketing va sotuv</div><div style="font-size:0.8rem;color:#94a3b8">Piksellar, UTM, jo'natmalar va tripvayrlar</div></div></a>
-          <a href="docs.html" class="dropdown-item"><div class="dropdown-icon">💻</div><div><div style="font-weight:700;color:#fff">API hujjatlar</div><div style="font-size:0.8rem;color:#94a3b8">Hujjatlar va integratsiyalar</div></div></a>
+          <a href="/features" class="dropdown-item"><div class="dropdown-icon">📑</div><div><div style="font-weight:700;color:#fff">Barcha imkoniyatlar</div><div style="font-size:0.78rem;color:var(--text-dim)">Bitta platformada 11 ta vosita</div></div></a>
+          <a href="/course-builder" class="dropdown-item"><div class="dropdown-icon">🎛️</div><div><div style="font-weight:700;color:#fff">Kurs konstruktori</div><div style="font-size:0.78rem;color:var(--text-dim)">Video DRM, matn, testlar muharriri</div></div></a>
+          <a href="/homework" class="dropdown-item"><div class="dropdown-icon">📝</div><div><div style="font-weight:700;color:#fff">Uy vazifalari</div><div style="font-size:0.78rem;color:var(--text-dim)">Testlar, topshiriqlar va avto-tekshirish</div></div></a>
+          <a href="/payments" class="dropdown-item"><div class="dropdown-icon">💳</div><div><div style="font-weight:700;color:#fff">To'lovlar & CRM</div><div style="font-size:0.78rem;color:var(--text-dim)">Kommo CRM v4 va Telegram Admin</div></div></a>
+          <a href="/customization" class="dropdown-item"><div class="dropdown-icon">🎨</div><div><div style="font-weight:700;color:#fff">Maktab kastomizatsiyasi</div><div style="font-size:0.78rem;color:var(--text-dim)">O'z brendingiz, ranglar va domen</div></div></a>
+          <a href="/analytics" class="dropdown-item"><div class="dropdown-icon">📈</div><div><div style="font-weight:700;color:#fff">Analitika & Users</div><div style="font-size:0.78rem;color:var(--text-dim)">Daromad, o'quvchilar va o'qituvchilar</div></div></a>
+          <a href="/messenger" class="dropdown-item"><div class="dropdown-icon">💬</div><div><div style="font-weight:700;color:#fff">Messendjer</div><div style="font-size:0.78rem;color:var(--text-dim)">Real-time WebSocket suhbat</div></div></a>
+          <a href="/training" class="dropdown-item"><div class="dropdown-icon">🎓</div><div><div style="font-weight:700;color:#fff">O'quvchi Paneli</div><div style="font-size:0.78rem;color:var(--text-dim)">My Training va darslar</div></div></a>
         </div>
       </li>
-      <li><a href="courses.html" class="nav-link">Kurslar Catalog</a></li>
-      <li><a href="pricing.html" class="nav-link">Tariflar & Bo'lib to'lash</a></li>
-      <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+      <li><a href="/courses" class="nav-link">Kurslar Catalog</a></li>
+      <li><a href="/pricing" class="nav-link">Tariflar</a></li>
+      <li><a href="/manage/dashboard" class="nav-link">Dashboard</a></li>
     </ul>
-    <div style="display:flex;gap:10px">
-      <a href="login.html" class="btn btn-secondary btn-sm">Kirish</a>
-      <a href="register.html" class="btn btn-primary btn-sm">Maktab ochish</a>
+
+    <div style="display:flex;gap:12px">
+      <a href="/login" class="btn btn-secondary">Kirish</a>
+      <a href="/register" class="btn btn-primary">Maktab ochish</a>
     </div>
   </nav>
+
+  <!-- HERO SECTION -->
   <section class="hero">
-    <span class="badge badge-primary" style="margin-bottom:16px">🚀 Bitta platformada 11 ta vosita</span>
+    <span class="badge">🚀 Bitta platformada 11 ta professional vosita</span>
     <h1 class="hero-title">O'z Onlayn Maktabingizni <br><span class="text-gradient">Exode.biz bilan Barpo Eting</span></h1>
-    <p class="hero-desc">Kinescope video xavfsizligi, Kommo CRM avto-lidi, Payme/Click/Uzum to'lovlari, Uy vazifalari va Telegram yopiq guruh avto-kirish imkoniyati.</p>
+    <p class="hero-desc">Kinescope video DRM xavfsizligi, Kommo CRM v4 avto-lidi, Telegram Admin to'lovlari, Uy vazifalari va Realtime Messenger imkoniyati.</p>
     <div style="display:flex;gap:16px;justify-content:center">
-      <a href="register.html" class="btn btn-primary">Maktab Yaratish (14 kun bepul)</a>
-      <a href="features.html" class="btn btn-secondary">Barcha Imkoniyatlarni Ko'rish</a>
+      <a href="/manage/dashboard" class="btn btn-primary">Maktab Yaratish (14 kun bepul)</a>
+      <a href="/courses" class="btn btn-secondary">Barcha Imkoniyatlarni Ko'rish</a>
     </div>
   </section>
-  <footer style="border-top:1px solid var(--border-glass);padding:3rem 0;margin-top:5rem;text-align:center;color:var(--text-dim)">
-    <div class="container">
-      <p>© 2026 Exode.biz — Onlayn Maktab va Kurslar Platformasi. Barcha huquqlar himoyalangan.</p>
-    </div>
+
+  <footer>
+    <p>© 2026 Exode.biz — Onlayn Maktab va Kurslar Platformasi. Barcha huquqlar himoyalangan.</p>
   </footer>
 </body>
 </html>

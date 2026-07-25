@@ -113,6 +113,11 @@ async def serve_login():
 async def serve_register():
     return FileResponse(os.path.join(FRONTEND_DIR, "register.html"))
 
-# SERVE STATIC ASSETS IF ANY
-if os.path.exists(FRONTEND_DIR):
-    app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
+# SERVE STATIC ASSETS DIRECTLY AT ROOT IF FILE EXISTS
+@app.get("/{file_path:path}")
+async def serve_static_file(file_path: str):
+    target = os.path.join(FRONTEND_DIR, file_path)
+    if os.path.isfile(target):
+        return FileResponse(target)
+    # Fallback to index.html
+    return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
