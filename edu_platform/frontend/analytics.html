@@ -1,69 +1,205 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="uz" class="notranslate" style="color-scheme: dark;">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Analitika va Sotuv Voronkasi — Exode.biz</title>
+  <title>Users & Students — dev.exode.biz/manage/school/users/1</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./src/index.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    .dropdown-container { position: relative; display: inline-block; }
-    .dropdown-menu { display: none; position: absolute; top: 100%; left: -100px; width: 680px; padding: 1.5rem; background: #0c1322; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; grid-template-columns: 1fr 1fr; gap: 1rem; z-index: 1000; box-shadow: 0 25px 60px rgba(0,0,0,0.8); }
-    .dropdown-container:hover .dropdown-menu { display: grid; }
-    .dropdown-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: 12px; text-decoration: none; color: inherit; transition: background 0.2s; }
-    .dropdown-item:hover { background: rgba(255,255,255,0.06); }
-    .dropdown-icon { width: 42px; height: 42px; border-radius: 10px; background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+    :root {
+      --bg-dark: #0d0f12;
+      --sidebar-bg: #13151b;
+      --card-bg: #181a21;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-cyan: #06b6d4;
+      --accent-orange: #f97316;
+      --text-main: #f8fafc;
+      --text-muted: #8e99a8;
+      --btn-bg: rgba(255, 255, 255, 0.05);
+      --green-active: #10b981;
+      --purple-teacher: #a855f7;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+    /* LEFT SIDEBAR WITH CLEAN URLS */
+    .sidebar { width: 84px; background: var(--sidebar-bg); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 0.6rem; overflow-y: auto; z-index: 100; flex-shrink: 0; }
+    .sidebar-brand { width: 44px; height: 44px; background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(249, 115, 22, 0.2)); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; cursor: pointer; }
+
+    .nav-item { width: 62px; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 0; border-radius: 12px; color: var(--text-muted); text-decoration: none; font-size: 0.68rem; font-weight: 600; transition: all 0.2s; cursor: pointer; }
+    .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.04); }
+    .nav-item.active { color: var(--accent-cyan); background: rgba(6, 182, 212, 0.12); border: 1px solid rgba(6, 182, 212, 0.3); }
+    .svg-icon { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .sidebar-avatar { margin-top: auto; width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; border: 2px solid #22c55e; position: relative; }
+
+    /* MAIN WRAPPER */
+    .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: var(--bg-dark); }
+    .top-header { display: flex; justify-content: space-between; align-items: center; padding: 1.1rem 2rem; border-bottom: 1px solid var(--card-border); }
+    .header-left { display: flex; align-items: center; gap: 12px; font-size: 1.25rem; font-weight: 700; }
+    
+    .btn-add-user { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; border: none; padding: 8px 18px; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3); }
+
+    /* PEOPLE CONTAINER */
+    .people-container { padding: 1.8rem 2rem; display: flex; flex-direction: column; gap: 1.5rem; }
+
+    /* FILTERS CARD MATCHING PEOPLE.HTML */
+    .filters-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.25rem; display: flex; justify-content: space-between; align-items: center; }
+    .status-pills { display: flex; gap: 8px; background: rgba(255,255,255,0.04); padding: 4px; border-radius: 10px; }
+    .pill-btn { padding: 6px 16px; border-radius: 7px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; }
+    .pill-btn.active { background: var(--accent-orange); color: #fff; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3); }
+
+    .search-input { background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: 10px; padding: 8px 14px; color: #fff; font-size: 0.88rem; outline: none; width: 280px; }
+
+    /* USERS TABLE */
+    .table-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; overflow: hidden; }
+    .users-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .users-table th { background: rgba(255,255,255,0.03); padding: 14px 18px; color: var(--text-muted); font-size: 0.82rem; font-weight: 700; border-bottom: 1px solid var(--card-border); }
+    .users-table td { padding: 16px 18px; border-bottom: 1px solid var(--card-border); font-size: 0.9rem; }
+    .users-table tr:last-child td { border-bottom: none; }
+
+    .user-avatar-cell { display: flex; align-items: center; gap: 12px; }
+    .avatar-circle { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #06b6d4, #3b82f6); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; }
+
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
+    .badge-student { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); border: 1px solid rgba(6, 182, 212, 0.3); }
+    .badge-admin { background: rgba(249, 115, 22, 0.15); color: var(--accent-orange); border: 1px solid rgba(249, 115, 22, 0.3); }
+    .badge-active { background: rgba(16, 185, 129, 0.15); color: var(--green-active); border: 1px solid rgba(16, 185, 129, 0.3); }
+
+    .btn-edit { background: var(--btn-bg); border: 1px solid var(--card-border); color: var(--text-muted); padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+    .btn-edit:hover { color: #fff; border-color: var(--accent-cyan); }
   </style>
 </head>
 <body>
-  <div class="bg-glow"></div>
-  <nav class="navbar">
-    <a href="index.html" class="nav-brand">
-      <div class="brand-icon">⚡</div>
-      <span>exode<span class="text-gradient">.biz</span></span>
+
+  <!-- LEFT SIDEBAR WITH CLEAN URLS -->
+  <aside class="sidebar">
+    <a href="/" class="sidebar-brand">
+      <svg class="svg-icon" style="stroke:var(--accent-cyan)" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
     </a>
-    <ul class="nav-links">
-      <li class="dropdown-container">
-        <span class="nav-link" style="cursor:pointer">Imkoniyatlar ▼</span>
-        <div class="dropdown-menu">
-          <a href="features.html" class="dropdown-item"><div class="dropdown-icon">📑</div><div><div style="font-weight:700;color:#fff">Barcha imkoniyatlar</div><div style="font-size:0.8rem;color:#94a3b8">Bitta platformada 11 ta vosita</div></div></a>
-          <a href="course-builder.html" class="dropdown-item"><div class="dropdown-icon">🎛️</div><div><div style="font-weight:700;color:#fff">Kurs konstruktori</div><div style="font-size:0.8rem;color:#94a3b8">Video, matn, testlar — vizual muharrir</div></div></a>
-          <a href="homework.html" class="dropdown-item"><div class="dropdown-icon">📝</div><div><div style="font-weight:700;color:#fff">Uy vazifalari</div><div style="font-size:0.8rem;color:#94a3b8">Testlar, topshiriqlar va avto-tekshirish</div></div></a>
-          <a href="payments.html" class="dropdown-item"><div class="dropdown-icon">💳</div><div><div style="font-weight:700;color:#fff">To'lovlarni qabul qilish</div><div style="font-size:0.8rem;color:#94a3b8">Payme, Click, Uzum va rossiya kartalari</div></div></a>
-          <a href="installments.html" class="dropdown-item"><div class="dropdown-icon">🔄</div><div><div style="font-weight:700;color:#fff">Bo'lib-bo'lib to'lash</div><div style="font-size:0.8rem;color:#94a3b8">Avto-yechib olish va bosqichma-bosqich...</div></div></a>
-          <a href="customization.html" class="dropdown-item"><div class="dropdown-icon">🎨</div><div><div style="font-weight:700;color:#fff">Maktab kastomizatsiyasi</div><div style="font-size:0.8rem;color:#94a3b8">O'z brendingiz, ranglar va domen</div></div></a>
-          <a href="analytics.html" class="dropdown-item"><div class="dropdown-icon">📈</div><div><div style="font-weight:700;color:#fff">Analitika</div><div style="font-size:0.8rem;color:#94a3b8">Daromad, faollik va o'quvchi xulqi</div></div></a>
-          <a href="messenger.html" class="dropdown-item"><div class="dropdown-icon">💬</div><div><div style="font-weight:700;color:#fff">Messendjer</div><div style="font-size:0.8rem;color:#94a3b8">Platforma ichida o'quvchilar bilan suhbat</div></div></a>
-          <a href="marketing.html" class="dropdown-item"><div class="dropdown-icon">📢</div><div><div style="font-weight:700;color:#fff">Marketing va sotuv</div><div style="font-size:0.8rem;color:#94a3b8">Piksellar, UTM, jo'natmalar va tripvayrlar</div></div></a>
-          <a href="docs.html" class="dropdown-item"><div class="dropdown-icon">💻</div><div><div style="font-weight:700;color:#fff">API hujjatlar</div><div style="font-size:0.8rem;color:#94a3b8">Hujjatlar va integratsiyalar</div></div></a>
+
+    <a href="/manage/dashboard" class="nav-item">
+      <svg class="svg-icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Bosh sahifa</span>
+    </a>
+
+    <a href="/courses" class="nav-item">
+      <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+      <span>Katalog</span>
+    </a>
+
+    <a href="/payments" class="nav-item">
+      <svg class="svg-icon" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+      <span>To'lovlar</span>
+    </a>
+
+    <a href="/homework" class="nav-item">
+      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1"/></svg>
+      <span>Amaliyot</span>
+    </a>
+
+    <a href="/analytics" class="nav-item active">
+      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Foydalanuvchilar</span>
+    </a>
+
+    <a href="/customization" class="nav-item">
+      <svg class="svg-icon" viewBox="0 0 24 24"><path d="m4 6 8-4 8 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6z"/><path d="M12 22V12"/></svg>
+      <span>Maktabim</span>
+    </a>
+
+    <a href="/messenger" class="nav-item">
+      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>Chats</span>
+    </a>
+
+    <a href="/courses" class="nav-item">
+      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+      <span>O'quvchi</span>
+    </a>
+
+    <div class="sidebar-avatar">H</div>
+  </aside>
+
+  <!-- MAIN WRAPPER -->
+  <main class="main-wrapper">
+    <header class="top-header">
+      <div class="header-left">
+        <svg class="svg-icon" style="stroke:var(--accent-cyan)" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>1. Users & Students (Foydalanuvchilar va O'quvchilar)</span>
+      </div>
+
+      <button class="btn-add-user" onclick="alert('Yangi foydalanuvchi taklif qilindi va Gmail orqali havola yuborildi!')">
+        + Foydalanuvchi Qo'shish
+      </button>
+    </header>
+
+    <div class="people-container">
+      <!-- FILTERS CARD MATCHING PEOPLE.HTML -->
+      <div class="filters-card">
+        <div class="status-pills">
+          <div class="pill-btn active">Barchasi (All)</div>
+          <div class="pill-btn">O'quvchilar (Students)</div>
+          <div class="pill-btn">O'qituvchilar (Teachers)</div>
+          <div class="pill-btn">Adminlar</div>
         </div>
-      </li>
-      <li><a href="courses.html" class="nav-link">Kurslar Catalog</a></li>
-      <li><a href="pricing.html" class="nav-link">Tariflar & Bo'lib to'lash</a></li>
-      <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
-    </ul>
-    <div style="display:flex;gap:10px">
-      <a href="login.html" class="btn btn-secondary btn-sm">Kirish</a>
-      <a href="register.html" class="btn btn-primary btn-sm">Maktab ochish</a>
+
+        <input type="text" class="search-input" placeholder="🔍 Ism, Email yoki Telefon bo'yicha..." />
+      </div>
+
+      <!-- USERS TABLE MATCHING PEOPLE.HTML -->
+      <div class="table-card">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>FOYDALANUVCHI (NAME)</th>
+              <th>EMAIL & ALOQA</th>
+              <th>ROLI (ROLE)</th>
+              <th>A'ZOLIK SANI</th>
+              <th>HOLAT (STATUS)</th>
+              <th>AMAL (ACTION)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="user-avatar-cell">
+                  <div class="avatar-circle">H</div>
+                  <div>
+                    <div style="font-weight:700">Hojiakbar Hayrullayev</div>
+                    <div style="font-size:0.78rem;color:var(--text-muted)">ID: #160021</div>
+                  </div>
+                </div>
+              </td>
+              <td>usa20070302@gmail.com</td>
+              <td><span class="badge badge-admin">👑 Admin / Creator</span></td>
+              <td style="color:var(--text-muted)">25 Jul 2026</td>
+              <td><span class="badge badge-active">● Active</span></td>
+              <td><button class="btn-edit">✏️ Tahrirlash</button></td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="user-avatar-cell">
+                  <div class="avatar-circle" style="background:linear-gradient(135deg, #f97316, #ea580c)">S</div>
+                  <div>
+                    <div style="font-weight:700">Sardor Alimov</div>
+                    <div style="font-size:0.78rem;color:var(--text-muted)">ID: #160022</div>
+                  </div>
+                </div>
+              </td>
+              <td>sardor@gmail.com</td>
+              <td><span class="badge badge-student">🎓 Student</span></td>
+              <td style="color:var(--text-muted)">25 Jul 2026</td>
+              <td><span class="badge badge-active">● Active</span></td>
+              <td><button class="btn-edit">✏️ Tahrirlash</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </nav>
-
-  
-<div class="container">
-  <div class="glass-panel" style="padding:3rem;margin-bottom:3rem">
-    <span class="badge badge-warning">Real-time Dashbord</span>
-    <h1 style="font-size:2.8rem;margin:12px 0">Ta'lim va Sotuv Analitikasi</h1>
-    <p style="font-size:1.2rem;color:var(--text-muted);max-width:800px">O'quvchilar faolligi, daromad statistikasi, yetib borish foizi, NPS ko'rsatkichi hamda sotuv voronkasi — barcha ma'lumotlar bitta joyda.</p>
-  </div>
-</div>
-
-
-  <footer style="border-top:1px solid var(--border-glass);padding:3rem 0;margin-top:5rem;text-align:center;color:var(--text-dim)">
-    <div class="container">
-      <p>© 2026 Exode.biz — Onlayn Maktab va Kurslar Platformasi. Barcha huquqlar himoyalangan.</p>
-    </div>
-  </footer>
+  </main>
 </body>
 </html>
