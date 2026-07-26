@@ -140,6 +140,10 @@ async def serve_settings_payments():
 async def serve_settings_media():
     return FileResponse(os.path.join(FRONTEND_DIR, "settings-media.html"))
 
+@app.get("/manage/school/settings/dev")
+async def serve_settings_dev():
+    return FileResponse(os.path.join(FRONTEND_DIR, "settings-dev.html"))
+
 @app.get("/manage/school/settings/{setting_slug}")
 async def serve_generic_settings(setting_slug: str):
     return FileResponse(os.path.join(FRONTEND_DIR, "settings-basic.html"))

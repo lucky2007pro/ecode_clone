@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="uz" class="notranslate" style="color-scheme: dark;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School Settings — For Developers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #121212;
+      --sidebar-bg: #141414;
+      --subnav-bg: #1a1a1a;
+      --card-bg: #1e2028;
+      --popup-bg: #1e2028;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-orange: #f97316;
+      --green-active: #22c55e;
+      --text-main: #f8fafc;
+      --text-muted: #8e99a8;
+      --input-bg: #18191e;
+      --red-error: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; position: relative; }
+
+    /* PRIMARY SIDEBAR */
+    .primary-sidebar { width: 78px; background: var(--sidebar-bg); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 0.6rem; overflow-y: auto; flex-shrink: 0; position: relative; z-index: 50; }
+    .brand-box { width: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; margin-bottom: 0.5rem; text-decoration: none; color: #fff; font-weight: 800; font-size: 0.9rem; }
+    .status-dot-text { font-size: 0.55rem; color: var(--green-active); font-weight: 700; display: flex; align-items: center; gap: 2px; }
+
+    .nav-item { width: 64px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0; border-radius: 12px; color: var(--text-muted); text-decoration: none; font-size: 0.68rem; font-weight: 600; transition: all 0.2s; cursor: pointer; }
+    .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.04); }
+    .nav-item.active { color: var(--accent-orange); }
+    .active-icon-box { width: 34px; height: 34px; border-radius: 10px; background: rgba(249, 115, 22, 0.12); border: 1px solid rgba(249, 115, 22, 0.3); display: flex; align-items: center; justify-content: center; color: var(--accent-orange); }
+
+    .svg-icon { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .user-avatar-small { margin-top: auto; width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; font-weight: 800; font-size: 0.88rem; display: flex; align-items: center; justify-content: center; }
+
+    /* SECONDARY SUBNAV */
+    .settings-subnav { width: 240px; background: var(--subnav-bg); border-right: 1px solid var(--card-border); padding: 1.25rem 1rem; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; flex-shrink: 0; }
+    .settings-header { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; font-weight: 800; color: #fff; padding-bottom: 0.5rem; border-bottom: 1px solid var(--card-border); }
+
+    .subnav-group { display: flex; flex-direction: column; gap: 4px; }
+    .subnav-item { padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
+    .subnav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
+    .subnav-item.active { color: #fff; font-weight: 700; background: rgba(255,255,255,0.1); border-left: 3px solid var(--accent-orange); }
+    
+    .sub-child-item { padding-left: 2rem; padding-top: 8px; padding-bottom: 8px; font-size: 0.84rem; color: var(--text-muted); text-decoration: none; display: block; border-radius: 6px; transition: all 0.2s; }
+    .sub-child-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
+
+    /* MAIN CONTENT AREA */
+    .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: var(--bg-dark); }
+    .top-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid var(--card-border); flex-shrink: 0; }
+    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--text-muted); font-weight: 600; }
+    .btn-preview { background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); color: #fff; padding: 6px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+
+    .form-container { padding: 2rem 2.5rem; max-width: 900px; display: flex; flex-direction: column; gap: 2rem; }
+    .section-title { font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem; }
+
+    /* BUTTONS AND BADGES MATCHING USER SCREENSHOTS 1-TO-1 */
+    .btn-create-webhook { background: #22c55e; color: #fff; border: none; padding: 9px 18px; border-radius: 12px; font-weight: 700; font-size: 0.88rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
+
+    .empty-webhooks-box { padding: 5rem 2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; }
+    .target-signal-icon { width: 80px; height: 80px; color: var(--accent-orange); margin-bottom: 0.5rem; }
+
+    /* WEBHOOK CREATION FORM STYLES */
+    .form-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
+    .form-label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+    .form-input { background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 13px 16px; color: #fff; font-size: 0.95rem; outline: none; }
+    .form-input.error { border-color: var(--red-error); background: rgba(239, 68, 68, 0.04); }
+    
+    .error-text { font-size: 0.78rem; color: var(--red-error); font-weight: 600; margin-top: 2px; }
+    .char-counter { font-size: 0.78rem; color: var(--text-muted); text-align: right; margin-top: 2px; }
+
+    .event-card { background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 14px; padding: 1.1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: background 0.2s; }
+    .event-card:hover { background: rgba(255,255,255,0.04); }
+    
+    .event-left { display: flex; align-items: flex-start; gap: 14px; }
+    .event-checkbox { width: 20px; height: 20px; border-radius: 4px; border: 2px solid var(--text-muted); accent-color: var(--accent-orange); cursor: pointer; margin-top: 2px; }
+    
+    .paperplane-icon { color: var(--accent-orange); width: 22px; height: 22px; transform: rotate(45deg); flex-shrink: 0; }
+
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; }
+    .modal-card { width: 560px; background: #1a1c23; border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; display: flex; flex-direction: column; gap: 1.25rem; box-shadow: 0 25px 60px rgba(0,0,0,0.9); }
+  </style>
+</head>
+<body>
+
+  <!-- PRIMARY SIDEBAR -->
+  <aside class="primary-sidebar">
+    <a href="/" class="brand-box"><svg class="svg-icon" style="stroke:var(--accent-orange)" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg><span>dev</span><span class="status-dot-text">● Everything is saved</span></a>
+    <a href="/manage/dashboard" class="nav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
+    <a href="/manage/courses/1" class="nav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg><span>Courses</span></a>
+    <a href="/payments" class="nav-item"><svg class="svg-icon" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg><span>Sales</span></a>
+    <a href="/homework" class="nav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg><span>Practice</span></a>
+    <a href="/analytics" class="nav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span>People</span></a>
+    <a href="/manage/school/settings/basic" class="nav-item active"><div class="active-icon-box"><svg class="svg-icon" viewBox="0 0 24 24"><path d="m4 6 8-4 8 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6z"/></svg></div><span>My school</span></a>
+    <a href="/chat" class="nav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Chats</span></a>
+    <a href="/training" class="nav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/></svg><span>Student panel</span></a>
+    <div class="user-avatar-small">H</div>
+  </aside>
+
+  <!-- SECONDARY SUBNAV -->
+  <aside class="settings-subnav">
+    <div class="settings-header">
+      <svg class="svg-icon" style="stroke:var(--accent-orange)" viewBox="0 0 24 24"><line x1="4" x2="20" y1="21" y2="21"/><line x1="4" x2="20" y1="14" y2="14"/><line x1="4" x2="20" y1="7" y2="7"/></svg>
+      <span>Settings</span>
+    </div>
+
+    <div class="subnav-group">
+      <a href="/manage/school/settings/basic" class="sub-child-item">Information and Domain</a>
+      <a href="/manage/school/settings/design" class="sub-child-item">Design and Brand</a>
+      <a href="/manage/school/settings/catalog" class="sub-child-item">Catalog and footer</a>
+      <a href="/manage/school/settings/menu" class="sub-child-item">Left menu of the site</a>
+    </div>
+
+    <a href="/manage/school/settings/legal" class="subnav-item"><svg class="svg-icon" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/></svg><span>Legal data</span></a>
+    <a href="/manage/school/settings/payments" class="subnav-item"><svg class="svg-icon" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/></svg><span>Payment Acceptance</span></a>
+    <a href="/manage/school/settings/team" class="subnav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span>Team</span></a>
+    <a href="/manage/school/settings/privacy" class="subnav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/></svg><span>Login and registration</span></a>
+    <a href="/manage/school/settings/media" class="subnav-item"><svg class="svg-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg><span>Content and media</span></a>
+    <a href="/manage/school/settings/dev" class="subnav-item active"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77"/></svg><span>For Developers</span></a>
+    <a href="/manage/school/settings/subscription" class="subnav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"/></svg><span>Subscription and Rate</span></a>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-wrapper">
+    <header class="top-header">
+      <div class="breadcrumb">
+        <svg class="svg-icon" style="width:16px;height:16px" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <span>School</span>
+        <span>›</span>
+        <span>For developers</span>
+        <span>›</span>
+        <span style="color:#fff" id="crumbDevActive">School's Webhooks</span>
+        <span style="color:var(--accent-orange);cursor:pointer" onclick="window.location.reload()">↺</span>
+      </div>
+
+      <button class="btn-preview">Preview</button>
+    </header>
+
+    <div class="form-container">
+      
+      <!-- VIEW 1: WEBHOOKS OVERVIEW (SCREENSHOT 1) -->
+      <div id="devViewList" style="display:flex;flex-direction:column;gap:1.5rem">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h1 class="section-title" style="display:flex;align-items:center;gap:10px;margin-bottom:0">
+            <span>School's Webhooks</span>
+            <span style="width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.1);font-size:0.8rem;font-weight:800;display:flex;align-items:center;justify-content:center" id="webhookCountPill">0</span>
+            <span style="font-size:0.9rem;color:var(--text-muted)">ⓘ</span>
+          </h1>
+
+          <button class="btn-create-webhook" onclick="openCreateWebhookModal()">
+            <span>+ Create a webhook</span>
+          </button>
+        </div>
+
+        <div class="empty-webhooks-box" id="emptyWebhooksView">
+          <!-- TARGET CONCENTRIC SIGNAL ICON MATCHING SCREENSHOT 1 -->
+          <svg class="target-signal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="9" />
+            <circle cx="12" cy="12" r="5" />
+            <circle cx="12" cy="12" r="1" fill="currentColor" />
+            <path d="M17 17l4 4M21 17h-4v4" stroke-width="2.5" />
+          </svg>
+          <h2 style="font-size:1.35rem;font-weight:800;color:#fff">Webhooks not created</h2>
+          <p style="font-size:0.9rem;color:var(--text-muted)">Add the first webhook for your integration</p>
+        </div>
+
+        <div id="webhooksList" style="display:none;flex-direction:column;gap:1rem"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- MODAL POPUP FOR CREATING WEBHOOK MATCHING SCREENSHOT 2 1-TO-1 -->
+  <div class="modal-overlay" id="createWebhookModal">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 style="font-size:1.25rem;font-weight:800;color:#fff">Create Webhook</h3>
+        <span style="cursor:pointer;color:var(--text-muted);font-weight:800" onclick="closeCreateWebhookModal()">✕</span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Link *</label>
+        <input type="text" id="webhookUrlInput" class="form-input error" placeholder="https://my-service.com/api/..." oninput="validateWebhookUrl()" />
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="error-text" id="urlErrorText">Enter a valid URL address</span>
+          <span class="char-counter" id="urlCharCounter">0 / 255</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Service note</label>
+        <input type="text" id="webhookNoteInput" class="form-input" placeholder="For instance, &quot;Integration with AmoCRM and Google Sheets&quot;" oninput="updateNoteCounter()" />
+        <span class="char-counter" id="noteCharCounter">0 / 255</span>
+      </div>
+
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem">
+          <span style="font-size:0.78rem;font-weight:800;color:var(--text-muted);letter-spacing:0.05em">SELECTED EVENTS</span>
+          <span style="width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,0.1);font-size:0.75rem;font-weight:800;display:flex;align-items:center;justify-content:center" id="selectedEventsCount">0</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="event-card" onclick="toggleEventCheck('evt1')">
+            <div class="event-left">
+              <input type="checkbox" id="evt1" class="event-checkbox" onchange="updateSelectedCount()" />
+              <div>
+                <div style="font-weight:700;font-size:0.95rem;color:#fff">Course completed</div>
+                <div style="font-size:0.78rem;color:var(--text-muted)">All available modules and lessons of the course have been completed by the user</div>
+              </div>
+            </div>
+            <svg class="paperplane-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </div>
+
+          <div class="event-card" onclick="toggleEventCheck('evt2')">
+            <div class="event-left">
+              <input type="checkbox" id="evt2" class="event-checkbox" onchange="updateSelectedCount()" />
+              <div>
+                <div style="font-weight:700;font-size:0.95rem;color:#fff">Practice successfully completed (reviewed)</div>
+                <div style="font-size:0.78rem;color:var(--text-muted)">Moving practice to "Completed" status</div>
+              </div>
+            </div>
+            <svg class="paperplane-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </div>
+
+          <div class="event-card" onclick="toggleEventCheck('evt3')">
+            <div class="event-left">
+              <input type="checkbox" id="evt3" class="event-checkbox" onchange="updateSelectedCount()" />
+              <div>
+                <div style="font-weight:700;font-size:0.95rem;color:#fff">Course progress updated</div>
+                <div style="font-size:0.78rem;color:var(--text-muted)">The user's progress has changed</div>
+              </div>
+            </div>
+            <svg class="paperplane-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </div>
+
+          <div class="event-card" onclick="toggleEventCheck('evt4')">
+            <div class="event-left">
+              <input type="checkbox" id="evt4" class="event-checkbox" onchange="updateSelectedCount()" />
+              <div>
+                <div style="font-weight:700;font-size:0.95rem;color:#fff">The user has registered</div>
+                <div style="font-size:0.78rem;color:var(--text-muted)">Successful independent registration of a new user</div>
+              </div>
+            </div>
+            <svg class="paperplane-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-top:0.5rem;position:relative">
+        <!-- VALIDATION ERROR POPUP MATCHING SCREENSHOT 2 -->
+        <div id="validationTooltip" style="background:#fff;color:#121212;padding:6px 16px;border-radius:20px;font-size:0.82rem;font-weight:700;display:flex;align-items:center;gap:6px;box-shadow:0 10px 25px rgba(0,0,0,0.5)">
+          <span style="color:#ef4444">ⓧ</span>
+          <span>Enter a valid URL address</span>
+        </div>
+
+        <button id="btnCreateWebhook" onclick="confirmCreateWebhook()" style="background:#4b5563;color:#9ca3af;border:none;padding:12px 24px;border-radius:12px;font-weight:700;cursor:not-allowed">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let webhookCount = 0;
+
+    function openCreateWebhookModal() {
+      document.getElementById('createWebhookModal').style.display = 'flex';
+    }
+
+    function closeCreateWebhookModal() {
+      document.getElementById('createWebhookModal').style.display = 'none';
+    }
+
+    function validateWebhookUrl() {
+      const input = document.getElementById('webhookUrlInput');
+      const val = input.value;
+      document.getElementById('urlCharCounter').innerText = val.length + ' / 255';
+
+      const isValid = val.startsWith('http://') || val.startsWith('https://');
+      const errorText = document.getElementById('urlErrorText');
+      const tooltip = document.getElementById('validationTooltip');
+      const btn = document.getElementById('btnCreateWebhook');
+
+      if (isValid) {
+        input.classList.remove('error');
+        errorText.style.display = 'none';
+        tooltip.style.display = 'none';
+        btn.style.background = '#22c55e';
+        btn.style.color = '#fff';
+        btn.style.cursor = 'pointer';
+      } else {
+        input.classList.add('error');
+        errorText.style.display = 'block';
+        tooltip.style.display = 'flex';
+        btn.style.background = '#4b5563';
+        btn.style.color = '#9ca3af';
+        btn.style.cursor = 'not-allowed';
+      }
+    }
+
+    function updateNoteCounter() {
+      const val = document.getElementById('webhookNoteInput').value;
+      document.getElementById('noteCharCounter').innerText = val.length + ' / 255';
+    }
+
+    function toggleEventCheck(id) {
+      const cb = document.getElementById(id);
+      cb.checked = !cb.checked;
+      updateSelectedCount();
+    }
+
+    function updateSelectedCount() {
+      let cnt = 0;
+      ['evt1', 'evt2', 'evt3', 'evt4'].forEach(id => {
+        if (document.getElementById(id).checked) cnt++;
+      });
+      document.getElementById('selectedEventsCount').innerText = cnt;
+    }
+
+    function confirmCreateWebhook() {
+      const url = document.getElementById('webhookUrlInput').value;
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        alert("Enter a valid URL address!");
+        return;
+      }
+
+      webhookCount++;
+      document.getElementById('webhookCountPill').innerText = webhookCount;
+      document.getElementById('emptyWebhooksView').style.display = 'none';
+
+      const list = document.getElementById('webhooksList');
+      list.style.display = 'flex';
+
+      const item = document.createElement('div');
+      item.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid var(--card-border);padding:1rem 1.25rem;border-radius:14px;display:flex;align-items:center;justify-content:space-between';
+      item.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:1.4rem">🎯</span>
+          <div>
+            <div style="font-weight:700;color:#fff">${url}</div>
+            <div style="font-size:0.78rem;color:var(--text-muted)">${document.getElementById('webhookNoteInput').value || 'Webhook Integration'} • Active</div>
+          </div>
+        </div>
+        <span style="color:#22c55e;font-weight:800;font-size:0.85rem">● Active</span>
+      `;
+      list.appendChild(item);
+
+      closeCreateWebhookModal();
+      alert("Webhook muvaffaqiyatli yaratildi!");
+    }
+  </script>
+</body>
+</html>
