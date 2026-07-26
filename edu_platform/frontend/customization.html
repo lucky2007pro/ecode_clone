@@ -12,7 +12,7 @@
       --bg-dark: #121212;
       --sidebar-bg: #141414;
       --subnav-bg: #1a1a1a;
-      --card-bg: #22242b;
+      --card-bg: #1e2028;
       --popup-bg: #1e2028;
       --card-border: rgba(255, 255, 255, 0.08);
       --accent-orange: #f97316;
@@ -75,16 +75,19 @@
     .sub-child-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
     .sub-child-item.active { color: #fff; font-weight: 700; text-decoration: underline; }
 
+    .btn-back-team { margin-top: auto; background: rgba(255,255,255,0.85); color: #121212; border: none; padding: 10px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+
     /* MAIN CONTENT AREA */
     .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: var(--bg-dark); }
     
     /* TOP BREADCRUMB HEADER */
     .top-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid var(--card-border); flex-shrink: 0; }
     .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--text-muted); font-weight: 600; }
+    .search-input-header { background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: 20px; padding: 6px 14px 6px 34px; color: #fff; font-size: 0.82rem; outline: none; width: 180px; }
     .btn-preview { background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); color: #fff; padding: 6px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
 
     /* TAB CONTENT PANELS */
-    .tab-panel { display: none; padding: 2rem 2.5rem; max-width: 860px; flex-direction: column; gap: 2rem; }
+    .tab-panel { display: none; padding: 2rem 2.5rem; max-width: 900px; flex-direction: column; gap: 1.75rem; }
     .tab-panel.active { display: flex; }
 
     .section-title { font-size: 1.35rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem; }
@@ -96,19 +99,34 @@
 
     .char-counter { font-size: 0.75rem; color: var(--text-muted); align-self: flex-end; margin-top: 4px; }
 
-    /* BANNER GREEN CARD */
-    .status-banner { background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-    .banner-left { display: flex; align-items: center; gap: 12px; }
-    .green-check-icon { width: 28px; height: 28px; border-radius: 50%; background: var(--green-active); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.9rem; flex-shrink: 0; }
-    
-    .btn-tg { background: #ffffff; color: #121212; border: none; padding: 9px 18px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(255,255,255,0.1); }
+    /* TEAM MANAGEMENT SPECIFIC STYLES MATCHING SCREENSHOTS 1-TO-1 */
+    .btn-add-team { background: #22c55e; color: #fff; border: none; padding: 9px 18px; border-radius: 12px; font-weight: 700; font-size: 0.88rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
 
-    /* DOMAIN CARDS GRID */
-    .domain-cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    .team-member-card { background: rgba(255,255,255,0.025); border: 1px solid var(--card-border); border-radius: 18px; padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: background 0.2s; }
+    .team-member-card:hover { background: rgba(255,255,255,0.05); }
     
-    .domain-card { background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 14px; padding: 1.25rem; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 6px; cursor: pointer; }
-    .domain-card.selected { border: 2px solid var(--accent-orange); background: rgba(249, 115, 22, 0.04); }
-    .globe-watermark { position: absolute; right: -10px; bottom: -10px; width: 72px; height: 72px; stroke: rgba(255,255,255,0.05); fill: none; stroke-width: 1.5; pointer-events: none; }
+    .member-info { display: flex; align-items: center; gap: 14px; }
+    .member-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; font-weight: 800; font-size: 1rem; display: flex; align-items: center; justify-content: center; position: relative; }
+    .green-dot-online { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; border: 2px solid var(--bg-dark); position: absolute; bottom: 0; right: 0; }
+
+    .member-badges { display: flex; align-items: center; gap: 10px; }
+    .badge-crown { font-size: 1.1rem; }
+    .badge-active-pill { background: #22c55e; color: #fff; padding: 3px 12px; border-radius: 12px; font-weight: 800; font-size: 0.75rem; display: flex; align-items: center; gap: 4px; }
+
+    /* GRANULAR PERMISSIONS LIST MATCHING SCREENSHOT 2 & 3 */
+    .perm-group-header { font-size: 0.78rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 1rem; margin-bottom: 0.5rem; }
+    
+    .perm-card { background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 14px; padding: 1rem 1.25rem; display: flex; align-items: flex-start; gap: 14px; }
+    .perm-checkbox { width: 18px; height: 18px; accent-color: var(--accent-orange); margin-top: 2px; cursor: pointer; }
+    .perm-title-row { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.95rem; color: #fff; }
+    .mandatory-badge { background: rgba(255,255,255,0.08); color: var(--text-muted); padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; }
+    .perm-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+
+    .dropdown-search-box { position: relative; }
+    .user-select-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: #1a1c23; border: 1px solid var(--accent-orange); border-radius: 14px; margin-top: 4px; overflow: hidden; z-index: 100; box-shadow: 0 15px 40px rgba(0,0,0,0.8); }
+    .select-item { padding: 10px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.2s; }
+    .select-item:hover { background: rgba(255,255,255,0.06); }
+    .avatar-mini { width: 24px; height: 24px; border-radius: 50%; background: #ea580c; color: #fff; font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; justify-content: center; }
 
     .btn-save-settings { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 700; cursor: pointer; width: fit-content; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3); }
   </style>
@@ -259,7 +277,7 @@
     </a>
   </div>
 
-  <!-- SECONDARY SETTINGS SUB-MENU BAR WITH FULL CLICK SWITCHING -->
+  <!-- SECONDARY SETTINGS SUB-MENU BAR -->
   <aside class="settings-subnav">
     <div class="settings-header">
       <svg class="svg-icon" style="stroke:var(--accent-orange)" viewBox="0 0 24 24"><line x1="4" x2="20" y1="21" y2="21"/><line x1="4" x2="20" y1="14" y2="14"/><line x1="4" x2="20" y1="7" y2="7"/><circle cx="8" cy="21" r="2"/><circle cx="16" cy="14" r="2"/><circle cx="12" cy="7" r="2"/></svg>
@@ -267,7 +285,7 @@
     </div>
 
     <div class="subnav-group">
-      <div class="sub-child-item active" onclick="switchSettingTab('info', this)">Information and Domain</div>
+      <div class="sub-child-item" onclick="switchSettingTab('info', this)">Information and Domain</div>
       <div class="sub-child-item" onclick="switchSettingTab('design', this)">Design and Brand</div>
       <div class="sub-child-item" onclick="switchSettingTab('catalog', this)">Catalog and footer</div>
       <div class="sub-child-item" onclick="switchSettingTab('menu', this)">Left menu of the site</div>
@@ -283,7 +301,7 @@
       <span>Payment Acceptance</span>
     </div>
 
-    <div class="subnav-item" onclick="switchSettingTab('team', this)">
+    <div class="subnav-item active" id="subnav-team" onclick="switchSettingTab('team', this)">
       <svg class="svg-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       <span>Team</span>
     </div>
@@ -307,38 +325,49 @@
       <svg class="svg-icon" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"/></svg>
       <span>Subscription and Rate</span>
     </div>
+
+    <!-- BACK TO TEAM BUTTON MATCHING SCREENSHOT 3 -->
+    <button class="btn-back-team" id="btnBackToTeam" onclick="showTeamView('list')" style="display:none">
+      <span>↰ Back to team</span>
+    </button>
   </aside>
 
   <!-- MAIN CONTENT AREA -->
   <main class="main-wrapper">
     <header class="top-header">
-      <div class="breadcrumb">
+      <div class="breadcrumb" id="breadcrumbContainer">
         <svg class="svg-icon" style="width:16px;height:16px" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-        <span>Settings</span>
+        <span>School</span>
         <span>›</span>
-        <span style="color:#fff" id="breadcrumbActive">Information and Domain</span>
+        <span style="color:#fff" id="breadcrumbActive">Team</span>
+        <span style="color:var(--accent-orange);cursor:pointer" onclick="window.location.reload()">↺</span>
       </div>
 
-      <button class="btn-preview">
-        <svg class="svg-icon" style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        <span>Preview</span>
-      </button>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="position:relative" id="topHeaderSearch">
+          <input type="text" class="search-input-header" placeholder="🔍 Поиск" />
+        </div>
+        <button class="btn-preview">
+          <svg class="svg-icon" style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Preview</span>
+        </button>
+      </div>
     </header>
 
     <!-- TAB 1: INFORMATION AND DOMAIN -->
-    <div class="tab-panel active" id="panel-info">
+    <div class="tab-panel" id="panel-info">
       <div>
         <h2 class="section-title">School Name and Description</h2>
         
         <div class="form-group" style="margin-top:1rem">
           <label class="form-label">School Name *</label>
-          <input type="text" id="schoolNameInput" class="form-input" value="dev" />
+          <input type="text" class="form-input" value="dev" />
           <span class="char-counter">3 / 50</span>
         </div>
 
         <div class="form-group" style="margin-top:1rem">
           <label class="form-label">School slogan</label>
-          <textarea class="form-input" id="schoolSloganInput" rows="3" placeholder="Enter the school's slogan"></textarea>
+          <textarea class="form-input" rows="3" placeholder="Enter the school's slogan"></textarea>
           <span class="char-counter">0 / 100</span>
         </div>
       </div>
@@ -364,7 +393,6 @@
           <div class="domain-card selected">
             <div style="font-weight:700;font-size:0.95rem;color:#fff">Base domain</div>
             <div style="font-size:0.82rem;color:var(--text-muted)">School will be available at dev.exode.biz</div>
-            <svg class="globe-watermark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
           </div>
 
           <div class="domain-card">
@@ -375,179 +403,253 @@
 
         <div class="form-group" style="margin-top:1.5rem">
           <label class="form-label">School's base domain</label>
-          <div style="position:relative">
-            <input type="text" class="form-input" value="dev" style="width:100%" />
-          </div>
+          <input type="text" class="form-input" value="dev" style="width:100%" />
         </div>
       </div>
 
       <button class="btn-save-settings" onclick="saveSettings('Information and Domain')">💾 Save Information</button>
     </div>
 
-    <!-- TAB 2: DESIGN AND BRAND -->
-    <div class="tab-panel" id="panel-design">
-      <h2 class="section-title">Design and Brand Settings</h2>
+    <!-- TAB 7: TEAM (EXACT REPLICA OF USER SCREENSHOTS 1, 2, 3) -->
+    <div class="tab-panel active" id="panel-team">
       
-      <div class="form-group">
-        <label class="form-label">School Logo (PNG, SVG, JPG)</label>
-        <div style="border:2px dashed var(--card-border);padding:2rem;border-radius:14px;text-align:center;cursor:pointer">
-          📁 Click to upload school logo
+      <!-- SUB-VIEW 1: TEAM MANAGEMENT LIST (SCREENSHOT 1) -->
+      <div id="teamViewList" style="display:flex;flex-direction:column;gap:1.75rem">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h1 class="section-title" style="font-size:1.6rem;display:flex;align-items:center;gap:10px">
+            <span>Team management</span>
+            <span style="width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.1);font-size:0.8rem;font-weight:800;display:flex;align-items:center;justify-content:center">1</span>
+            <span style="font-size:0.9rem;color:var(--text-muted)">ⓘ</span>
+          </h1>
+
+          <button class="btn-add-team" onclick="showTeamView('add')">
+            <span>+ Add to team</span>
+          </button>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label class="form-label">Primary Brand Color</label>
-        <div style="display:flex;gap:12px;margin-top:4px">
-          <div style="width:36px;height:36px;border-radius:50%;background:#f97316;cursor:pointer;border:2px solid #fff"></div>
-          <div style="width:36px;height:36px;border-radius:50%;background:#06b6d4;cursor:pointer"></div>
-          <div style="width:36px;height:36px;border-radius:50%;background:#6366f1;cursor:pointer"></div>
-          <div style="width:36px;height:36px;border-radius:50%;background:#10b981;cursor:pointer"></div>
-        </div>
-      </div>
-
-      <button class="btn-save-settings" onclick="saveSettings('Design and Brand')">💾 Save Brand Colors</button>
-    </div>
-
-    <!-- TAB 3: CATALOG AND FOOTER -->
-    <div class="tab-panel" id="panel-catalog">
-      <h2 class="section-title">Catalog and Footer Settings</h2>
-      
-      <div class="form-group">
-        <label class="form-label">Footer Copyright Text</label>
-        <input type="text" class="form-input" value="© 2026 dev.exode.biz. All rights reserved." />
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Telegram Support Link</label>
-        <input type="text" class="form-input" value="https://t.me/exode_biz_support" />
-      </div>
-
-      <button class="btn-save-settings" onclick="saveSettings('Catalog and footer')">💾 Save Footer</button>
-    </div>
-
-    <!-- TAB 4: LEFT MENU OF THE SITE -->
-    <div class="tab-panel" id="panel-menu">
-      <h2 class="section-title">Left Menu of the Site</h2>
-      <p style="color:var(--text-muted);font-size:0.85rem">Configure which items are visible in the left navigation sidebar.</p>
-
-      <div style="display:flex;flex-direction:column;gap:12px;margin-top:1rem">
-        <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" checked /> Home Dashboard</label>
-        <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" checked /> Courses & Catalog</label>
-        <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" checked /> Sales & Invoices</label>
-        <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" checked /> Homework & Practice</label>
-        <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" checked /> Realtime Messenger</label>
-      </div>
-
-      <button class="btn-save-settings" onclick="saveSettings('Left menu')">💾 Save Sidebar Config</button>
-    </div>
-
-    <!-- TAB 5: LEGAL DATA -->
-    <div class="tab-panel" id="panel-legal">
-      <h2 class="section-title">Legal Data</h2>
-
-      <div class="form-group">
-        <label class="form-label">Legal Entity Name (Yuridik Shaxs Nomi)</label>
-        <input type="text" class="form-input" value="OOO Exode Education Platform" />
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">INN / TAX Identification Number</label>
-        <input type="text" class="form-input" value="309182746" />
-      </div>
-
-      <button class="btn-save-settings" onclick="saveSettings('Legal data')">💾 Save Legal Data</button>
-    </div>
-
-    <!-- TAB 6: PAYMENT ACCEPTANCE -->
-    <div class="tab-panel" id="panel-payments">
-      <h2 class="section-title">Payment Acceptance Gateways</h2>
-
-      <div style="display:flex;flex-direction:column;gap:14px;margin-top:1rem">
-        <div style="display:flex;justify-content:space-between;align-items:center;background:var(--card-bg);padding:1rem;border-radius:12px;border:1px solid var(--card-border)">
-          <span>💳 Payme Integration</span>
-          <span style="color:var(--green-active);font-weight:700">● Active</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;background:var(--card-bg);padding:1rem;border-radius:12px;border:1px solid var(--card-border)">
-          <span>💳 Click Integration</span>
-          <span style="color:var(--green-active);font-weight:700">● Active</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;background:var(--card-bg);padding:1rem;border-radius:12px;border:1px solid var(--card-border)">
-          <span>✈️ Telegram Admin Checkout (@exode_biz_support)</span>
-          <span style="color:var(--green-active);font-weight:700">● Active</span>
-        </div>
-      </div>
-
-      <button class="btn-save-settings" onclick="saveSettings('Payment Acceptance')">💾 Save Payments</button>
-    </div>
-
-    <!-- TAB 7: TEAM -->
-    <div class="tab-panel" id="panel-team">
-      <h2 class="section-title">Team & Staff Roles</h2>
-
-      <div style="display:flex;flex-direction:column;gap:10px;margin-top:1rem">
-        <div style="display:flex;align-items:center;justify-content:space-between;background:var(--card-bg);padding:12px 16px;border-radius:12px;border:1px solid var(--card-border)">
-          <div>
-            <div style="font-weight:700">Hojiakbar Hayrullayev</div>
-            <div style="font-size:0.75rem;color:var(--text-muted)">usa20070302@gmail.com</div>
+        <!-- TEAM MEMBER CARD MATCHING SCREENSHOT 1 -->
+        <div class="team-member-card" onclick="showTeamView('settings')">
+          <div class="member-info">
+            <div class="member-avatar">
+              H
+              <div class="green-dot-online"></div>
+            </div>
+            <div>
+              <div style="font-weight:800;font-size:1rem;color:#fff">Hojiakbar Hayrullayev</div>
+              <div style="font-size:0.78rem;color:var(--text-muted)">Granted 21 rights ⓘ • Modified yesterday 15:36</div>
+            </div>
           </div>
-          <span style="color:var(--accent-orange);font-weight:700">👑 Owner / Admin</span>
+
+          <div class="member-badges">
+            <span class="badge-crown">👑</span>
+            <span class="badge-active-pill">⚡ Active</span>
+          </div>
         </div>
       </div>
 
-      <button class="btn-save-settings" onclick="saveSettings('Team')">💾 Save Team Config</button>
-    </div>
+      <!-- SUB-VIEW 2: ADDING A TEAM MEMBER (SCREENSHOT 2) -->
+      <div id="teamViewAdd" style="display:none;flex-direction:column;gap:1.5rem">
+        <h1 class="section-title" style="font-size:1.6rem">Adding a team member</h1>
 
-    <!-- TAB 8: LOGIN AND REGISTRATION -->
-    <div class="tab-panel" id="panel-login">
-      <h2 class="section-title">Login and Registration Onboarding</h2>
+        <!-- USER SEARCH DROPDOWN -->
+        <div class="form-group dropdown-search-box">
+          <label class="form-label">User search</label>
+          <input type="text" class="form-input" placeholder="Enter username" id="userSearchInput" onfocus="toggleUserDropdown(true)" />
+          
+          <div class="user-select-dropdown" id="userDropdownList" style="display:none">
+            <div class="select-item" onclick="selectSearchUser('+998200043039')">
+              <div class="avatar-mini" style="background:#ef4444">+</div>
+              <span style="font-weight:700;font-size:0.9rem">+998200043039</span>
+            </div>
+            <div class="select-item" onclick="selectSearchUser('Hojiakbar Hayrullayev')">
+              <div class="avatar-mini" style="background:#ea580c">H</div>
+              <span style="font-weight:700;font-size:0.9rem">Hojiakbar Hayrullayev</span>
+            </div>
+          </div>
+        </div>
 
-      <div class="form-group">
-        <label class="form-label">Onboarding Persona Question</label>
-        <input type="text" class="form-input" value="Choose the option that suits you" />
+        <!-- PERMISSION CHECKBOXES -->
+        <div>
+          <div class="perm-group-header">SCHOOL MANAGEMENT</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="perm-card">
+              <input type="checkbox" class="perm-checkbox" checked />
+              <div>
+                <div class="perm-title-row">School Settings Management</div>
+                <div class="perm-desc">The user will be able to modify the general school settings.</div>
+              </div>
+            </div>
+
+            <div class="perm-card">
+              <input type="checkbox" class="perm-checkbox" checked />
+              <div>
+                <div class="perm-title-row">School User Management</div>
+                <div class="perm-desc">The user will be able to see users and manage them</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="perm-group-header">ORGANIZATION MANAGEMENT</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="perm-card">
+              <input type="checkbox" class="perm-checkbox" checked />
+              <div>
+                <div class="perm-title-row">School organization management</div>
+                <div class="perm-desc">The user will be able to view and update information about the school and details.</div>
+              </div>
+            </div>
+
+            <div class="perm-card">
+              <input type="checkbox" class="perm-checkbox" checked />
+              <div>
+                <div class="perm-title-row">School Sales</div>
+                <div class="perm-desc">The user will be able to view payment history, as well as review financial reports and receive notifications about payments.</div>
+              </div>
+            </div>
+
+            <div class="perm-card">
+              <input type="checkbox" class="perm-checkbox" checked />
+              <div>
+                <div class="perm-title-row">School Refunds</div>
+                <div class="perm-desc">The user will be able to view a list of refunds, communicate with users on return issues, and confirm refunds.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end">
+          <button class="btn-save-settings" style="background:#3b3e4a;box-shadow:none" onclick="confirmAddTeamMember()">Add to team</button>
+        </div>
       </div>
 
-      <button class="btn-save-settings" onclick="saveSettings('Login & Registration')">💾 Save Onboarding Config</button>
-    </div>
+      <!-- SUB-VIEW 3: TEAM MEMBER SETTINGS (SCREENSHOT 3) -->
+      <div id="teamViewSettings" style="display:none;flex-direction:column;gap:1.5rem">
+        <h1 class="section-title" style="font-size:1.6rem;display:flex;align-items:center;gap:8px">
+          <span>Team member settings</span>
+          <span style="font-size:0.9rem;color:var(--text-muted)">ⓘ</span>
+        </h1>
 
-    <!-- TAB 9: CONTENT AND MEDIA -->
-    <div class="tab-panel" id="panel-media">
-      <h2 class="section-title">Content and Media Settings</h2>
+        <!-- MEMBER CARD -->
+        <div class="team-member-card" style="cursor:default">
+          <div class="member-info">
+            <div class="member-avatar">
+              H
+              <div class="green-dot-online"></div>
+            </div>
+            <div>
+              <div style="font-weight:800;font-size:1rem;color:#fff">Hojiakbar Hayrullayev</div>
+              <div style="font-size:0.78rem;color:var(--text-muted)">Granted 21 rights ⓘ • Modified yesterday 15:36</div>
+            </div>
+          </div>
 
-      <div class="form-group">
-        <label class="form-label">Kinescope DRM Video API Key</label>
-        <input type="text" class="form-input" value="a4200163-b642-4f2c-9dc9-78226ce6f761" />
+          <div class="member-badges">
+            <span class="badge-crown">👑</span>
+            <span class="badge-active-pill">⚡ Active</span>
+          </div>
+        </div>
+
+        <!-- GRANULAR PERMISSIONS WITH MANDATORY BADGES -->
+        <div>
+          <div class="perm-group-header">SCHOOL MANAGEMENT</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="perm-card">
+              <input type="checkbox" class="perm-checkbox" checked disabled />
+              <div>
+                <div class="perm-title-row">
+                  <span>School Settings Management</span>
+                  <span class="mandatory-badge">Mandatory for the owner</span>
+                </div>
+                <div class="perm-desc">The user will be able to modify the general school settings.</div>
+              </div>
+            </div>
+
+            <div class="perm-card">
+              <input type="checkbox" class="perm-checkbox" checked disabled />
+              <div>
+                <div class="perm-title-row">
+                  <span>School User Management</span>
+                  <span class="mandatory-badge">Mandatory for the owner</span>
+                </div>
+                <div class="perm-desc">The user will be able to see users and manage them</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="perm-group-header">ORGANIZATION MANAGEMENT</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="perm-card">
+              <input type="checkbox" class="perm-checkbox" checked disabled />
+              <div>
+                <div class="perm-title-row">
+                  <span>School organization management</span>
+                  <span class="mandatory-badge">Mandatory for the owner</span>
+                </div>
+                <div class="perm-desc">The user will be able to view and update information about the school and details.</div>
+              </div>
+            </div>
+
+            <div class="perm-card">
+              <input type="checkbox" class="perm-checkbox" checked />
+              <div>
+                <div class="perm-title-row">School Sales</div>
+                <div class="perm-desc">The user will be able to view payment history, as well as review financial reports and receive notifications about payments.</div>
+              </div>
+            </div>
+
+            <div class="perm-card">
+              <input type="checkbox" class="perm-checkbox" checked />
+              <div>
+                <div class="perm-title-row">School Refunds</div>
+                <div class="perm-desc">The user will be able to view a list of refunds, communicate with users on return issues, and confirm refunds.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-save-settings" onclick="saveSettings('Team Member Rights')">💾 Save Member Rights</button>
       </div>
 
-      <button class="btn-save-settings" onclick="saveSettings('Content and Media')">💾 Save Kinescope API Key</button>
-    </div>
-
-    <!-- TAB 10: FOR DEVELOPERS -->
-    <div class="tab-panel" id="panel-dev">
-      <h2 class="section-title">For Developers (Webhooks & API Keys)</h2>
-
-      <div class="form-group">
-        <label class="form-label">Kommo CRM Client ID</label>
-        <input type="text" class="form-input" value="e8ce8579-8797-4d79-b8a1-aea5cf56d770" />
-      </div>
-
-      <button class="btn-save-settings" onclick="saveSettings('For Developers')">💾 Save Developer Keys</button>
-    </div>
-
-    <!-- TAB 11: SUBSCRIPTION AND RATE -->
-    <div class="tab-panel" id="panel-sub">
-      <h2 class="section-title">Subscription and Rate (Tariflar)</h2>
-
-      <div style="background:var(--card-bg);border:1px solid var(--accent-orange);border-radius:16px;padding:1.5rem;display:flex;flex-direction:column;gap:8px">
-        <div style="font-size:0.8rem;color:var(--accent-orange);font-weight:700">● CURRENT ACTIVE PLAN</div>
-        <div style="font-size:1.4rem;font-weight:800">Pro School Plan (Unlimited Courses & Students)</div>
-        <div style="font-size:0.85rem;color:var(--text-muted)">Active until 1 August 2026</div>
-      </div>
-
-      <button class="btn-save-settings" onclick="saveSettings('Subscription')">💾 Upgrade Subscription</button>
     </div>
   </main>
 
   <script>
+    function showTeamView(viewName) {
+      document.getElementById('teamViewList').style.display = 'none';
+      document.getElementById('teamViewAdd').style.display = 'none';
+      document.getElementById('teamViewSettings').style.display = 'none';
+
+      const btnBack = document.getElementById('btnBackToTeam');
+
+      if (viewName === 'list') {
+        document.getElementById('teamViewList').style.display = 'flex';
+        btnBack.style.display = 'none';
+        document.getElementById('breadcrumbActive').innerText = 'Team';
+      } else if (viewName === 'add') {
+        document.getElementById('teamViewAdd').style.display = 'flex';
+        btnBack.style.display = 'flex';
+        document.getElementById('breadcrumbActive').innerText = 'Adding team member';
+      } else if (viewName === 'settings') {
+        document.getElementById('teamViewSettings').style.display = 'flex';
+        btnBack.style.display = 'flex';
+        document.getElementById('breadcrumbActive').innerText = 'Team member';
+      }
+    }
+
+    function toggleUserDropdown(show) {
+      document.getElementById('userDropdownList').style.display = show ? 'block' : 'none';
+    }
+
+    function selectSearchUser(userName) {
+      document.getElementById('userSearchInput').value = userName;
+      toggleUserDropdown(false);
+    }
+
+    function confirmAddTeamMember() {
+      const name = document.getElementById('userSearchInput').value || 'New Team Member';
+      alert(name + " jamoaga muvaffaqiyatli qo'shildi!");
+      showTeamView('list');
+    }
+
     function switchSettingTab(tabName, el) {
       document.querySelectorAll('.subnav-item, .sub-child-item').forEach(item => item.classList.remove('active'));
       if (el) el.classList.add('active');
@@ -562,6 +664,10 @@
         const textSpan = el.querySelector('span');
         const labelText = textSpan ? textSpan.innerText : el.innerText;
         document.getElementById('breadcrumbActive').innerText = labelText;
+      }
+
+      if (tabName === 'team') {
+        showTeamView('list');
       }
     }
 
