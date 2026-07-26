@@ -89,6 +89,31 @@ async def root():
 async def serve_student_training():
     return FileResponse(os.path.join(FRONTEND_DIR, "student.html"))
 
+# STUDENT PANEL CLEAN URL ROUTES
+@app.get("/training/courses")
+async def serve_student_courses():
+    return FileResponse(os.path.join(FRONTEND_DIR, "student-courses.html"))
+
+@app.get("/training/lesson/{lesson_id}")
+async def serve_student_lesson(lesson_id: str = "1"):
+    return FileResponse(os.path.join(FRONTEND_DIR, "student-lesson.html"))
+
+@app.get("/training/homework")
+async def serve_student_homework():
+    return FileResponse(os.path.join(FRONTEND_DIR, "student-homework.html"))
+
+@app.get("/training/certificates")
+async def serve_student_certificates():
+    return FileResponse(os.path.join(FRONTEND_DIR, "student-certificates.html"))
+
+@app.get("/training/profile")
+async def serve_student_profile():
+    return FileResponse(os.path.join(FRONTEND_DIR, "student-profile.html"))
+
+@app.get("/training/notifications")
+async def serve_student_notifications():
+    return FileResponse(os.path.join(FRONTEND_DIR, "student-notifications.html"))
+
 @app.get("/manage/dashboard")
 @app.get("/dashboard")
 async def serve_dashboard():

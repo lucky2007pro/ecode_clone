@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="uz" class="notranslate" style="color-scheme: dark;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dars Ko'rish — O'quvchi Paneli</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #121212;
+      --sidebar-bg: #141414;
+      --card-bg: #1a1a1a;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-orange: #f97316;
+      --green: #22c55e;
+      --text-main: #f8fafc;
+      --text-muted: #8e99a8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+    /* LESSON SIDEBAR (COURSE MODULES) */
+    .lesson-sidebar { width: 320px; background: var(--sidebar-bg); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0; }
+    .sidebar-header { padding: 1.25rem 1rem; border-bottom: 1px solid var(--card-border); display: flex; align-items: center; gap: 10px; }
+    .btn-back { background: rgba(255,255,255,0.06); border: none; color: #fff; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+    .course-sidebar-title { font-size: 0.95rem; font-weight: 800; color: #fff; line-height: 1.3; }
+    .svg-icon { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .progress-sidebar { padding: 1rem; border-bottom: 1px solid var(--card-border); }
+    .progress-bar-sm { height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+    .progress-fill-sm { height: 100%; background: var(--green); border-radius: 3px; }
+    .progress-text { font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; display: flex; justify-content: space-between; }
+
+    .module-group { border-bottom: 1px solid var(--card-border); }
+    .module-header { padding: 1rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: background 0.2s; }
+    .module-header:hover { background: rgba(255,255,255,0.03); }
+    .module-name { font-size: 0.88rem; font-weight: 700; color: #fff; }
+    .module-count { font-size: 0.72rem; color: var(--text-muted); }
+
+    .lesson-list { display: flex; flex-direction: column; }
+    .lesson-item { padding: 10px 1rem 10px 2.5rem; display: flex; align-items: center; gap: 10px; font-size: 0.84rem; color: var(--text-muted); cursor: pointer; transition: all 0.2s; position: relative; }
+    .lesson-item:hover { background: rgba(255,255,255,0.04); color: #fff; }
+    .lesson-item.active { background: rgba(249, 115, 22, 0.08); color: var(--accent-orange); font-weight: 700; border-left: 3px solid var(--accent-orange); }
+    .lesson-item.completed { color: var(--green); }
+
+    .lesson-check { width: 16px; height: 16px; border-radius: 50%; border: 2px solid currentColor; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .lesson-check.done { background: var(--green); border-color: var(--green); }
+    .lesson-duration { margin-left: auto; font-size: 0.72rem; color: var(--text-muted); }
+
+    /* MAIN CONTENT */
+    .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+
+    /* VIDEO PLAYER AREA */
+    .video-area { background: #000; aspect-ratio: 16/9; max-height: 500px; display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; }
+    .video-placeholder { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .big-play-btn { width: 72px; height: 72px; background: rgba(249, 115, 22, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s; box-shadow: 0 8px 30px rgba(249, 115, 22, 0.4); }
+    .big-play-btn:hover { transform: scale(1.1); }
+
+    /* LESSON INFO BELOW VIDEO */
+    .lesson-content { padding: 2rem 2.5rem; display: flex; flex-direction: column; gap: 1.5rem; max-width: 900px; }
+    .lesson-title-main { font-size: 1.5rem; font-weight: 800; color: #fff; }
+    .lesson-meta-bar { display: flex; align-items: center; gap: 16px; font-size: 0.85rem; color: var(--text-muted); }
+
+    .lesson-nav-buttons { display: flex; gap: 12px; }
+    .btn-lesson-nav { padding: 10px 20px; border-radius: 12px; font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+    .btn-prev { background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); color: #fff; }
+    .btn-next { background: var(--accent-orange); border: none; color: #fff; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3); }
+    .btn-complete { background: var(--green); border: none; color: #fff; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
+
+    .lesson-description { font-size: 0.92rem; color: var(--text-muted); line-height: 1.7; }
+    .lesson-description h3 { color: #fff; font-size: 1.1rem; margin-bottom: 0.5rem; }
+
+    .materials-card { background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.25rem; display: flex; flex-direction: column; gap: 10px; }
+    .material-item { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 10px; background: rgba(255,255,255,0.03); cursor: pointer; transition: background 0.2s; }
+    .material-item:hover { background: rgba(255,255,255,0.08); }
+    .file-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(59, 130, 246, 0.15); color: #3b82f6; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+
+  <!-- COURSE MODULES SIDEBAR -->
+  <aside class="lesson-sidebar">
+    <div class="sidebar-header">
+      <a href="/training/courses" class="btn-back">
+        <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </a>
+      <div class="course-sidebar-title">Python asoslari: Noldan dasturlash</div>
+    </div>
+
+    <div class="progress-sidebar">
+      <div class="progress-bar-sm"><div class="progress-fill-sm" style="width:65%"></div></div>
+      <div class="progress-text"><span>65% yakunlangan</span><span>13 / 20 dars</span></div>
+    </div>
+
+    <!-- MODULE 1 -->
+    <div class="module-group">
+      <div class="module-header" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'flex' : 'none'">
+        <div>
+          <div class="module-name">1. Kirish va O'rnatish</div>
+          <div class="module-count">4 ta dars • 45 min</div>
+        </div>
+        <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="lesson-list">
+        <div class="lesson-item completed" onclick="selectLesson(this)">
+          <div class="lesson-check done"><svg style="width:10px;height:10px;stroke:#fff;fill:none;stroke-width:3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span>Python nima?</span>
+          <span class="lesson-duration">8 min</span>
+        </div>
+        <div class="lesson-item completed" onclick="selectLesson(this)">
+          <div class="lesson-check done"><svg style="width:10px;height:10px;stroke:#fff;fill:none;stroke-width:3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span>Python o'rnatish</span>
+          <span class="lesson-duration">12 min</span>
+        </div>
+        <div class="lesson-item completed" onclick="selectLesson(this)">
+          <div class="lesson-check done"><svg style="width:10px;height:10px;stroke:#fff;fill:none;stroke-width:3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span>Birinchi dastur</span>
+          <span class="lesson-duration">15 min</span>
+        </div>
+        <div class="lesson-item completed" onclick="selectLesson(this)">
+          <div class="lesson-check done"><svg style="width:10px;height:10px;stroke:#fff;fill:none;stroke-width:3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span>VS Code sozlash</span>
+          <span class="lesson-duration">10 min</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 2 -->
+    <div class="module-group">
+      <div class="module-header" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'flex' : 'none'">
+        <div>
+          <div class="module-name">2. O'zgaruvchilar va Ma'lumot Turlari</div>
+          <div class="module-count">5 ta dars • 1 soat</div>
+        </div>
+        <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="lesson-list">
+        <div class="lesson-item completed" onclick="selectLesson(this)">
+          <div class="lesson-check done"><svg style="width:10px;height:10px;stroke:#fff;fill:none;stroke-width:3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span>O'zgaruvchilar</span>
+          <span class="lesson-duration">14 min</span>
+        </div>
+        <div class="lesson-item completed" onclick="selectLesson(this)">
+          <div class="lesson-check done"><svg style="width:10px;height:10px;stroke:#fff;fill:none;stroke-width:3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span>Sonlar: int va float</span>
+          <span class="lesson-duration">12 min</span>
+        </div>
+        <div class="lesson-item active" onclick="selectLesson(this)">
+          <div class="lesson-check"></div>
+          <span>Satrlar: str</span>
+          <span class="lesson-duration">16 min</span>
+        </div>
+        <div class="lesson-item" onclick="selectLesson(this)">
+          <div class="lesson-check"></div>
+          <span>Boolean va None</span>
+          <span class="lesson-duration">10 min</span>
+        </div>
+        <div class="lesson-item" onclick="selectLesson(this)">
+          <div class="lesson-check"></div>
+          <span>Amaliy mashq</span>
+          <span class="lesson-duration">8 min</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 3 -->
+    <div class="module-group">
+      <div class="module-header" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'flex' : 'none'">
+        <div>
+          <div class="module-name">3. Shart operatorlari</div>
+          <div class="module-count">4 ta dars • 50 min</div>
+        </div>
+        <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="lesson-list" style="display:none">
+        <div class="lesson-item"><div class="lesson-check"></div><span>if operatori</span><span class="lesson-duration">12 min</span></div>
+        <div class="lesson-item"><div class="lesson-check"></div><span>if-else</span><span class="lesson-duration">14 min</span></div>
+        <div class="lesson-item"><div class="lesson-check"></div><span>elif</span><span class="lesson-duration">12 min</span></div>
+        <div class="lesson-item"><div class="lesson-check"></div><span>Amaliy mashq</span><span class="lesson-duration">12 min</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-wrapper">
+    <!-- VIDEO PLAYER -->
+    <div class="video-area">
+      <div class="video-placeholder">
+        <div class="big-play-btn" onclick="this.parentElement.innerHTML='<div style=color:#fff;font-size:1.2rem>🎬 Video Player (Kinescope)</div>'">
+          <svg style="width:28px;height:28px;stroke:#fff;fill:none;stroke-width:2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+        <div style="color:var(--text-muted);font-size:0.9rem">Videoni boshlash uchun play tugmasini bosing</div>
+      </div>
+    </div>
+
+    <!-- LESSON INFO -->
+    <div class="lesson-content">
+      <div>
+        <div class="lesson-title-main">Satrlar: str — Python'da matn bilan ishlash</div>
+        <div class="lesson-meta-bar" style="margin-top:8px">
+          <span>📚 Modul 2: O'zgaruvchilar va Ma'lumot Turlari</span>
+          <span>•</span>
+          <span>⏱ 16 daqiqa</span>
+          <span>•</span>
+          <span>📋 Dars 7 / 20</span>
+        </div>
+      </div>
+
+      <div class="lesson-nav-buttons">
+        <button class="btn-lesson-nav btn-prev" onclick="alert('Oldingi darsga qaytish')">
+          <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          Oldingi dars
+        </button>
+        <button class="btn-lesson-nav btn-complete" onclick="alert('Dars yakunlandi!')">
+          <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Darsni yakunlash
+        </button>
+        <button class="btn-lesson-nav btn-next" onclick="alert('Keyingi darsga o'tish')">
+          Keyingi dars
+          <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+
+      <div class="lesson-description">
+        <h3>Dars haqida</h3>
+        <p>Bu darsda siz Python dasturlash tilida satrlar (strings) bilan ishlashni o'rganasiz. Satrlar — bu matnli ma'lumotlarni saqlash uchun ishlatiladigan ma'lumot turidir.</p>
+        <br>
+        <p>Darsda quyidagilarni o'rganasiz:</p>
+        <ul style="margin-left:1.5rem;margin-top:0.5rem;display:flex;flex-direction:column;gap:4px">
+          <li>Satr e'lon qilish usullari (bir qatorli va ko'p qatorli)</li>
+          <li>Satr indekslash va kesish (slicing)</li>
+          <li>Satr metodlari: upper(), lower(), strip(), split()</li>
+          <li>F-string formatlash</li>
+          <li>Satrlarni birlashtirish va takrorlash</li>
+        </ul>
+      </div>
+
+      <!-- MATERIALS -->
+      <div class="materials-card">
+        <div style="font-weight:800;font-size:0.95rem;color:#fff;margin-bottom:4px">📎 Dars materiallari</div>
+        <div class="material-item">
+          <div class="file-icon">
+            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:0.88rem;color:#fff">Dars prezentatsiyasi.pdf</div>
+            <div style="font-size:0.72rem;color:var(--text-muted)">2.4 MB</div>
+          </div>
+          <svg class="svg-icon" style="color:var(--text-muted)" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+        </div>
+        <div class="material-item">
+          <div class="file-icon" style="background:rgba(34, 197, 94, 0.15);color:#22c55e">
+            <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:0.88rem;color:#fff">strings_example.py</div>
+            <div style="font-size:0.72rem;color:var(--text-muted)">1.1 KB</div>
+          </div>
+          <svg class="svg-icon" style="color:var(--text-muted)" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function selectLesson(el) {
+      document.querySelectorAll('.lesson-item').forEach(l => l.classList.remove('active'));
+      el.classList.add('active');
+    }
+  </script>
+</body>
+</html>
