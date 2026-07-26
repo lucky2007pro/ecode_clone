@@ -1,69 +1,165 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="uz" class="notranslate" style="color-scheme: dark;">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Marketing va Sotuv — Exode.biz</title>
+  <title>Marketing & UTM Tracking — Exode.biz</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./src/index.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    .dropdown-container { position: relative; display: inline-block; }
-    .dropdown-menu { display: none; position: absolute; top: 100%; left: -100px; width: 680px; padding: 1.5rem; background: #0c1322; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; grid-template-columns: 1fr 1fr; gap: 1rem; z-index: 1000; box-shadow: 0 25px 60px rgba(0,0,0,0.8); }
-    .dropdown-container:hover .dropdown-menu { display: grid; }
-    .dropdown-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: 12px; text-decoration: none; color: inherit; transition: background 0.2s; }
-    .dropdown-item:hover { background: rgba(255,255,255,0.06); }
-    .dropdown-icon { width: 42px; height: 42px; border-radius: 10px; background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+    :root {
+      --bg-dark: #090d16;
+      --card-bg: #111827;
+      --card-border: rgba(255, 255, 255, 0.1);
+      --accent-orange: #f97316;
+      --accent-cyan: #06b6d4;
+      --text-main: #f8fafc;
+      --text-dim: #94a3b8;
+      --green-active: #10b981;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: var(--bg-dark); color: var(--text-main); line-height: 1.5; min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* NAVBAR */
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 3rem; border-bottom: 1px solid var(--card-border); background: rgba(9, 13, 22, 0.8); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
+    .nav-brand { display: flex; align-items: center; gap: 8px; font-size: 1.5rem; font-weight: 800; color: #fff; text-decoration: none; }
+    .text-gradient { background: linear-gradient(135deg, #06b6d4, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    .nav-links { display: flex; align-items: center; gap: 2rem; list-style: none; }
+    .nav-link { color: var(--text-dim); text-decoration: none; font-size: 0.95rem; font-weight: 600; transition: color 0.2s; }
+    .nav-link:hover { color: #fff; }
+
+    .btn { padding: 10px 22px; border-radius: 10px; font-weight: 700; text-decoration: none; font-size: 0.9rem; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-primary { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; box-shadow: 0 4px 20px rgba(249, 115, 22, 0.4); }
+
+    /* MAIN CONTAINER */
+    .container { max-width: 1100px; margin: 3rem auto; padding: 0 1.5rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    .hero-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2.5rem; display: flex; flex-direction: column; gap: 1rem; }
+    .badge { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--green-active); padding: 4px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; width: fit-content; }
+
+    /* GENERATOR GRID */
+    .marketing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 0.88rem; font-weight: 600; color: var(--text-dim); }
+    .form-input { background: rgba(0,0,0,0.4); border: 1px solid var(--card-border); border-radius: 10px; padding: 12px 14px; color: #fff; font-size: 0.95rem; outline: none; }
+
+    .table-card { background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: 14px; overflow: hidden; margin-top: 1rem; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { padding: 10px 14px; background: rgba(255,255,255,0.03); color: var(--text-dim); font-size: 0.78rem; text-transform: uppercase; font-weight: 700; border-bottom: 1px solid var(--card-border); }
+    td { padding: 12px 14px; border-bottom: 1px solid var(--card-border); font-size: 0.88rem; }
   </style>
 </head>
 <body>
-  <div class="bg-glow"></div>
+
+  <!-- NAVBAR -->
   <nav class="navbar">
-    <a href="index.html" class="nav-brand">
-      <div class="brand-icon">⚡</div>
+    <a href="/" class="nav-brand">
+      <div style="font-size:1.4rem">⚡</div>
       <span>exode<span class="text-gradient">.biz</span></span>
     </a>
+
     <ul class="nav-links">
-      <li class="dropdown-container">
-        <span class="nav-link" style="cursor:pointer">Imkoniyatlar ▼</span>
-        <div class="dropdown-menu">
-          <a href="features.html" class="dropdown-item"><div class="dropdown-icon">📑</div><div><div style="font-weight:700;color:#fff">Barcha imkoniyatlar</div><div style="font-size:0.8rem;color:#94a3b8">Bitta platformada 11 ta vosita</div></div></a>
-          <a href="course-builder.html" class="dropdown-item"><div class="dropdown-icon">🎛️</div><div><div style="font-weight:700;color:#fff">Kurs konstruktori</div><div style="font-size:0.8rem;color:#94a3b8">Video, matn, testlar — vizual muharrir</div></div></a>
-          <a href="homework.html" class="dropdown-item"><div class="dropdown-icon">📝</div><div><div style="font-weight:700;color:#fff">Uy vazifalari</div><div style="font-size:0.8rem;color:#94a3b8">Testlar, topshiriqlar va avto-tekshirish</div></div></a>
-          <a href="payments.html" class="dropdown-item"><div class="dropdown-icon">💳</div><div><div style="font-weight:700;color:#fff">To'lovlarni qabul qilish</div><div style="font-size:0.8rem;color:#94a3b8">Payme, Click, Uzum va rossiya kartalari</div></div></a>
-          <a href="installments.html" class="dropdown-item"><div class="dropdown-icon">🔄</div><div><div style="font-weight:700;color:#fff">Bo'lib-bo'lib to'lash</div><div style="font-size:0.8rem;color:#94a3b8">Avto-yechib olish va bosqichma-bosqich...</div></div></a>
-          <a href="customization.html" class="dropdown-item"><div class="dropdown-icon">🎨</div><div><div style="font-weight:700;color:#fff">Maktab kastomizatsiyasi</div><div style="font-size:0.8rem;color:#94a3b8">O'z brendingiz, ranglar va domen</div></div></a>
-          <a href="analytics.html" class="dropdown-item"><div class="dropdown-icon">📈</div><div><div style="font-weight:700;color:#fff">Analitika</div><div style="font-size:0.8rem;color:#94a3b8">Daromad, faollik va o'quvchi xulqi</div></div></a>
-          <a href="messenger.html" class="dropdown-item"><div class="dropdown-icon">💬</div><div><div style="font-weight:700;color:#fff">Messendjer</div><div style="font-size:0.8rem;color:#94a3b8">Platforma ichida o'quvchilar bilan suhbat</div></div></a>
-          <a href="marketing.html" class="dropdown-item"><div class="dropdown-icon">📢</div><div><div style="font-weight:700;color:#fff">Marketing va sotuv</div><div style="font-size:0.8rem;color:#94a3b8">Piksellar, UTM, jo'natmalar va tripvayrlar</div></div></a>
-          <a href="docs.html" class="dropdown-item"><div class="dropdown-icon">💻</div><div><div style="font-weight:700;color:#fff">API hujjatlar</div><div style="font-size:0.8rem;color:#94a3b8">Hujjatlar va integratsiyalar</div></div></a>
-        </div>
-      </li>
-      <li><a href="courses.html" class="nav-link">Kurslar Catalog</a></li>
-      <li><a href="pricing.html" class="nav-link">Tariflar & Bo'lib to'lash</a></li>
-      <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+      <li><a href="/courses" class="nav-link">Kurslar Catalog</a></li>
+      <li><a href="/pricing" class="nav-link">Tariflar</a></li>
+      <li><a href="/manage/dashboard" class="nav-link">Dashboard</a></li>
     </ul>
-    <div style="display:flex;gap:10px">
-      <a href="login.html" class="btn btn-secondary btn-sm">Kirish</a>
-      <a href="register.html" class="btn btn-primary btn-sm">Maktab ochish</a>
+
+    <div style="display:flex;gap:12px">
+      <a href="/login" class="btn btn-secondary">Kirish</a>
+      <a href="/register" class="btn btn-primary">Maktab ochish</a>
     </div>
   </nav>
 
-  
-<div class="container">
-  <div class="glass-panel" style="padding:3rem;margin-bottom:3rem">
-    <span class="badge badge-success">FB Pixel & GA4 & UTM</span>
-    <h1 style="font-size:2.8rem;margin:12px 0">Marketing va Sotuv Vositalari</h1>
-    <p style="font-size:1.2rem;color:var(--text-muted);max-width:800px">Facebook Pixel, Google Analytics 4, UTM metkalar kuzatuvi hamda Telegram yopiq kanallariga avtomatik taklif nomalari.</p>
-  </div>
-</div>
-
-
-  <footer style="border-top:1px solid var(--border-glass);padding:3rem 0;margin-top:5rem;text-align:center;color:var(--text-dim)">
-    <div class="container">
-      <p>© 2026 Exode.biz — Onlayn Maktab va Kurslar Platformasi. Barcha huquqlar himoyalangan.</p>
+  <div class="container">
+    <div class="hero-card">
+      <span class="badge">📢 FB Pixel & GA4 & UTM Tracking</span>
+      <h1 style="font-size:2.4rem;font-weight:800">Marketing & UTM Metkalar Generatoridan Boshqarish</h1>
+      <p style="color:var(--text-dim);max-width:750px">Reklama kampaniyalaringiz va lidingiz haqiqiy manbasini aniqlang, Facebook Pixel va Google Analytics 4 statistikalarini kuzating.</p>
     </div>
-  </footer>
+
+    <!-- MARKETING GENERATOR & TRACKING TABLE -->
+    <div class="marketing-grid">
+      <div style="display:flex;flex-direction:column;gap:1.25rem">
+        <h3 style="font-size:1.15rem;font-weight:700">🔗 UTM Havola Generator</h3>
+        
+        <div class="form-group">
+          <label class="form-label">Manba (UTM Source)</label>
+          <input type="text" id="utmSource" class="form-input" value="instagram" oninput="generateUtmLink()" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Kanal (UTM Medium)</label>
+          <input type="text" id="utmMedium" class="form-input" value="cpc_story" oninput="generateUtmLink()" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Kampaniya Nomi (UTM Campaign)</label>
+          <input type="text" id="utmCampaign" class="form-input" value="fastapi_launch" oninput="generateUtmLink()" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tayyor UTM Havolangiz</label>
+          <input type="text" id="generatedLink" class="form-input" style="color:var(--accent-cyan);font-weight:700" readonly />
+        </div>
+
+        <button class="btn btn-primary" onclick="copyUtmLink()">
+          📋 UTM Havolani Nusxalash
+        </button>
+      </div>
+
+      <div>
+        <h3 style="font-size:1.15rem;font-weight:700">📊 Faol UTM Kampaniyalar</h3>
+        
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Kampaniya</th>
+                <th>Tashriflar</th>
+                <th>Lidlar</th>
+                <th>Konversiya</th>
+              </tr>
+            </thead>
+            <tbody id="utmTbody">
+              <tr>
+                <td style="font-weight:700">instagram / cpc_story</td>
+                <td>1,420</td>
+                <td style="color:var(--accent-orange);font-weight:800">84 ta</td>
+                <td><span style="color:var(--green-active);font-weight:700">5.9%</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:700">telegram / channel_post</td>
+                <td>890</td>
+                <td style="color:var(--accent-orange);font-weight:800">62 ta</td>
+                <td><span style="color:var(--green-active);font-weight:700">6.9%</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function generateUtmLink() {
+      const source = document.getElementById('utmSource').value;
+      const medium = document.getElementById('utmMedium').value;
+      const campaign = document.getElementById('utmCampaign').value;
+      const link = window.location.origin + '/courses?utm_source=' + source + '&utm_medium=' + medium + '&utm_campaign=' + campaign;
+      document.getElementById('generatedLink').value = link;
+    }
+
+    function copyUtmLink() {
+      const copyText = document.getElementById('generatedLink');
+      copyText.select();
+      document.execCommand('copy');
+      alert('UTM havola buferga nusxalandi!');
+    }
+
+    window.onload = generateUtmLink;
+  </script>
 </body>
 </html>
