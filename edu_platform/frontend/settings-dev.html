@@ -43,12 +43,13 @@
     .settings-header { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; font-weight: 800; color: #fff; padding-bottom: 0.5rem; border-bottom: 1px solid var(--card-border); }
 
     .subnav-group { display: flex; flex-direction: column; gap: 4px; }
-    .subnav-item { padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
+    .subnav-item { padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 10px; transition: all 0.2s; cursor: pointer; }
     .subnav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
-    .subnav-item.active { color: #fff; font-weight: 700; background: rgba(255,255,255,0.1); border-left: 3px solid var(--accent-orange); }
+    .subnav-item.active { color: var(--accent-orange); font-weight: 700; background: rgba(255,255,255,0.08); border-left: 3px solid var(--accent-orange); }
     
-    .sub-child-item { padding-left: 2rem; padding-top: 8px; padding-bottom: 8px; font-size: 0.84rem; color: var(--text-muted); text-decoration: none; display: block; border-radius: 6px; transition: all 0.2s; }
+    .sub-child-item { padding-left: 2rem; padding-top: 8px; padding-bottom: 8px; font-size: 0.84rem; color: var(--text-muted); text-decoration: none; display: block; border-radius: 6px; transition: all 0.2s; cursor: pointer; }
     .sub-child-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
+    .sub-child-item.active { color: #fff; font-weight: 700; text-decoration: underline; }
 
     /* MAIN CONTENT AREA */
     .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: var(--bg-dark); }
@@ -59,13 +60,10 @@
     .form-container { padding: 2rem 2.5rem; max-width: 900px; display: flex; flex-direction: column; gap: 2rem; }
     .section-title { font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem; }
 
-    /* BUTTONS AND BADGES MATCHING USER SCREENSHOTS 1-TO-1 */
     .btn-create-webhook { background: #22c55e; color: #fff; border: none; padding: 9px 18px; border-radius: 12px; font-weight: 700; font-size: 0.88rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
-
     .empty-webhooks-box { padding: 5rem 2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; }
     .target-signal-icon { width: 80px; height: 80px; color: var(--accent-orange); margin-bottom: 0.5rem; }
 
-    /* WEBHOOK CREATION FORM STYLES */
     .form-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
     .form-label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
     .form-input { background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 13px 16px; color: #fff; font-size: 0.95rem; outline: none; }
@@ -84,6 +82,8 @@
 
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; }
     .modal-card { width: 560px; background: #1a1c23; border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; display: flex; flex-direction: column; gap: 1.25rem; box-shadow: 0 25px 60px rgba(0,0,0,0.9); }
+
+    .btn-save-settings { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 700; cursor: pointer; width: fit-content; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3); }
   </style>
 </head>
 <body>
@@ -102,7 +102,7 @@
     <div class="user-avatar-small">H</div>
   </aside>
 
-  <!-- SECONDARY SUBNAV -->
+  <!-- SECONDARY SUBNAV WITH FOR DEVELOPERS NESTED SUB-ITEMS MATCHING USER SCREENSHOT -->
   <aside class="settings-subnav">
     <div class="settings-header">
       <svg class="svg-icon" style="stroke:var(--accent-orange)" viewBox="0 0 24 24"><line x1="4" x2="20" y1="21" y2="21"/><line x1="4" x2="20" y1="14" y2="14"/><line x1="4" x2="20" y1="7" y2="7"/></svg>
@@ -121,8 +121,20 @@
     <a href="/manage/school/settings/team" class="subnav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span>Team</span></a>
     <a href="/manage/school/settings/privacy" class="subnav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/></svg><span>Login and registration</span></a>
     <a href="/manage/school/settings/media" class="subnav-item"><svg class="svg-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg><span>Content and media</span></a>
-    <a href="/manage/school/settings/dev" class="subnav-item active"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77"/></svg><span>For Developers</span></a>
-    <a href="/manage/school/settings/subscription" class="subnav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"/></svg><span>Subscription and Rate</span></a>
+    
+    <!-- FOR DEVELOPERS WITH NESTED MENU ITEMS MATCHING USER SCREENSHOT EXACTLY -->
+    <div class="subnav-item active" style="color:var(--accent-orange);font-weight:700">
+      <svg class="svg-icon" style="stroke:var(--accent-orange)" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77"/></svg>
+      <span>For Developers</span>
+    </div>
+    <div class="subnav-group" style="margin-left:0.5rem">
+      <div class="sub-child-item active" id="subitem-webhooks" onclick="switchDevTab('webhooks', this)">Webhooks</div>
+      <div class="sub-child-item" id="subitem-apikeys" onclick="switchDevTab('apikeys', this)">API keys</div>
+      <div class="sub-child-item" id="subitem-customcode" onclick="switchDevTab('customcode', this)">Custom code</div>
+      <a href="/docs" target="_blank" class="sub-child-item">API Documentation ↗</a>
+    </div>
+
+    <a href="/manage/school/settings/subscription" class="subnav-item" style="margin-top:0.5rem"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"/></svg><span>Subscription and Rate</span></a>
   </aside>
 
   <!-- MAIN CONTENT -->
@@ -143,8 +155,8 @@
 
     <div class="form-container">
       
-      <!-- VIEW 1: WEBHOOKS OVERVIEW (SCREENSHOT 1) -->
-      <div id="devViewList" style="display:flex;flex-direction:column;gap:1.5rem">
+      <!-- SUB-TAB 1: WEBHOOKS -->
+      <div id="devTabWebhooks" style="display:flex;flex-direction:column;gap:1.5rem">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <h1 class="section-title" style="display:flex;align-items:center;gap:10px;margin-bottom:0">
             <span>School's Webhooks</span>
@@ -158,7 +170,6 @@
         </div>
 
         <div class="empty-webhooks-box" id="emptyWebhooksView">
-          <!-- TARGET CONCENTRIC SIGNAL ICON MATCHING SCREENSHOT 1 -->
           <svg class="target-signal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <circle cx="12" cy="12" r="9" />
             <circle cx="12" cy="12" r="5" />
@@ -170,6 +181,43 @@
         </div>
 
         <div id="webhooksList" style="display:none;flex-direction:column;gap:1rem"></div>
+      </div>
+
+      <!-- SUB-TAB 2: API KEYS -->
+      <div id="devTabApikeys" style="display:none;flex-direction:column;gap:1.5rem">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h1 class="section-title" style="margin-bottom:0">School API Keys</h1>
+          <button class="btn-create-webhook" onclick="generateApiKey()">
+            <span>+ Generate API Key</span>
+          </button>
+        </div>
+        <p style="color:var(--text-muted);font-size:0.9rem">Use API keys to authenticate requests from your custom services and CRMs.</p>
+
+        <div style="background:rgba(255,255,255,0.025);border:1px solid var(--card-border);border-radius:16px;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-weight:800;color:#fff">Production Master API Key</div>
+            <div style="font-family:monospace;font-size:0.88rem;color:var(--accent-orange);margin-top:4px" id="apiKeyDisplay">exode_live_sec_89f7a28109c34a12e</div>
+          </div>
+          <button onclick="navigator.clipboard.writeText(document.getElementById('apiKeyDisplay').innerText); alert('API Key nusxalandi!')" style="background:rgba(255,255,255,0.08);color:#fff;border:none;padding:8px 16px;border-radius:10px;font-weight:600;cursor:pointer">Copy Key</button>
+        </div>
+      </div>
+
+      <!-- SUB-TAB 3: CUSTOM CODE -->
+      <div id="devTabCustomcode" style="display:none;flex-direction:column;gap:1.5rem">
+        <h1 class="section-title">Custom Code & Analytics Integration</h1>
+        <p style="color:var(--text-muted);font-size:0.9rem">Insert custom Meta Pixel, Google Analytics, Yandex Metrika, or custom CSS/JS snippets into your school pages.</p>
+
+        <div class="form-group">
+          <label class="form-label">Header Code (&lt;head&gt;...&lt;/head&gt;)</label>
+          <textarea class="form-input" rows="5" style="font-family:monospace;font-size:0.85rem" placeholder="&lt;!-- Facebook Pixel, Google Tag Manager scripts --&gt;"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Footer Code (&lt;body&gt;...&lt;/body&gt;)</label>
+          <textarea class="form-input" rows="5" style="font-family:monospace;font-size:0.85rem" placeholder="&lt;!-- Live Chat Widgets, Custom JS --&gt;"></textarea>
+        </div>
+
+        <button class="btn-save-settings" onclick="alert('Custom code muvaffaqiyatli saqlandi!')">💾 Save Custom Code</button>
       </div>
 
     </div>
@@ -252,7 +300,6 @@
       </div>
 
       <div style="display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-top:0.5rem;position:relative">
-        <!-- VALIDATION ERROR POPUP MATCHING SCREENSHOT 2 -->
         <div id="validationTooltip" style="background:#fff;color:#121212;padding:6px 16px;border-radius:20px;font-size:0.82rem;font-weight:700;display:flex;align-items:center;gap:6px;box-shadow:0 10px 25px rgba(0,0,0,0.5)">
           <span style="color:#ef4444">ⓧ</span>
           <span>Enter a valid URL address</span>
@@ -265,6 +312,32 @@
 
   <script>
     let webhookCount = 0;
+
+    function switchDevTab(tabName, el) {
+      document.querySelectorAll('.sub-child-item').forEach(i => i.classList.remove('active'));
+      if (el) el.classList.add('active');
+
+      document.getElementById('devTabWebhooks').style.display = 'none';
+      document.getElementById('devTabApikeys').style.display = 'none';
+      document.getElementById('devTabCustomcode').style.display = 'none';
+
+      if (tabName === 'webhooks') {
+        document.getElementById('devTabWebhooks').style.display = 'flex';
+        document.getElementById('crumbDevActive').innerText = "School's Webhooks";
+      } else if (tabName === 'apikeys') {
+        document.getElementById('devTabApikeys').style.display = 'flex';
+        document.getElementById('crumbDevActive').innerText = 'API keys';
+      } else if (tabName === 'customcode') {
+        document.getElementById('devTabCustomcode').style.display = 'flex';
+        document.getElementById('crumbDevActive').innerText = 'Custom code';
+      }
+    }
+
+    function generateApiKey() {
+      const newKey = 'exode_live_sec_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 10);
+      document.getElementById('apiKeyDisplay').innerText = newKey;
+      alert("Yangi API Key muvaffaqiyatli yaratildi!");
+    }
 
     function openCreateWebhookModal() {
       document.getElementById('createWebhookModal').style.display = 'flex';
