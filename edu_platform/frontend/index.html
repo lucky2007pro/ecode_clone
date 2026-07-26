@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="uz" class="notranslate" style="color-scheme: dark;">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,18 +21,34 @@
     body { background: var(--bg-dark); color: var(--text-main); line-height: 1.5; min-height: 100vh; display: flex; flex-direction: column; }
 
     /* NAVBAR */
-    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 3rem; border-bottom: 1px solid var(--card-border); background: rgba(9, 13, 22, 0.8); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 3rem; border-bottom: 1px solid var(--card-border); background: rgba(9, 13, 22, 0.85); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
     .nav-brand { display: flex; align-items: center; gap: 8px; font-size: 1.5rem; font-weight: 800; color: #fff; text-decoration: none; }
     .text-gradient { background: linear-gradient(135deg, #06b6d4, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
     .nav-links { display: flex; align-items: center; gap: 2rem; list-style: none; }
-    .nav-link { color: var(--text-dim); text-decoration: none; font-size: 0.95rem; font-weight: 600; transition: color 0.2s; }
+    .nav-link { color: var(--text-dim); text-decoration: none; font-size: 0.95rem; font-weight: 600; transition: color 0.2s; cursor: pointer; padding: 6px 10px; border-radius: 8px; }
     .nav-link:hover { color: #fff; }
 
-    .dropdown-container { position: relative; }
-    .dropdown-menu { display: none; position: absolute; top: 100%; left: -100px; width: 640px; padding: 1.5rem; background: #0f172a; border: 1px solid var(--card-border); border-radius: 16px; grid-template-columns: 1fr 1fr; gap: 1rem; z-index: 1000; box-shadow: 0 25px 60px rgba(0,0,0,0.8); margin-top: 10px; }
-    .dropdown-container:hover .dropdown-menu { display: grid; }
-    .dropdown-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: 12px; text-decoration: none; color: inherit; transition: background 0.2s; }
+    /* DROPDOWN WITH INVISIBLE HOVER BRIDGE AND CLICK TOGGLE FIX */
+    .dropdown-container { position: relative; display: flex; align-items: center; }
+    
+    .dropdown-menu { display: none; position: absolute; top: calc(100% + 4px); left: -80px; width: 640px; padding: 1.25rem; background: #0f172a; border: 1px solid var(--card-border); border-radius: 16px; grid-template-columns: 1fr 1fr; gap: 0.8rem; z-index: 1000; box-shadow: 0 25px 60px rgba(0,0,0,0.85); }
+    
+    /* INVISIBLE HOVER BRIDGE TO PREVENT DROPDOWN DISAPPEARING ON MOUSE MOVE DOWN */
+    .dropdown-menu::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 0;
+      right: 0;
+      height: 20px;
+      background: transparent;
+    }
+
+    .dropdown-container:hover .dropdown-menu,
+    .dropdown-menu.show { display: grid; }
+
+    .dropdown-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px; border-radius: 12px; text-decoration: none; color: inherit; transition: background 0.2s; }
     .dropdown-item:hover { background: rgba(255,255,255,0.06); }
     .dropdown-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.3); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
 
@@ -53,7 +69,7 @@
 </head>
 <body>
 
-  <!-- NAVBAR WITH CLEAN URLS WITHOUT .HTML -->
+  <!-- NAVBAR WITH INVISIBLE HOVER BRIDGE & CLICK TOGGLE -->
   <nav class="navbar">
     <a href="/" class="nav-brand">
       <div style="font-size:1.4rem">⚡</div>
@@ -62,8 +78,8 @@
 
     <ul class="nav-links">
       <li class="dropdown-container">
-        <span class="nav-link" style="cursor:pointer">Imkoniyatlar ▼</span>
-        <div class="dropdown-menu">
+        <span class="nav-link" id="imkoniyatlarTrigger" onclick="toggleDropdownMenu(event)">Imkoniyatlar ▼</span>
+        <div class="dropdown-menu" id="imkoniyatlarMenu">
           <a href="/features" class="dropdown-item"><div class="dropdown-icon">📑</div><div><div style="font-weight:700;color:#fff">Barcha imkoniyatlar</div><div style="font-size:0.78rem;color:var(--text-dim)">Bitta platformada 11 ta vosita</div></div></a>
           <a href="/course-builder" class="dropdown-item"><div class="dropdown-icon">🎛️</div><div><div style="font-weight:700;color:#fff">Kurs konstruktori</div><div style="font-size:0.78rem;color:var(--text-dim)">Video DRM, matn, testlar muharriri</div></div></a>
           <a href="/homework" class="dropdown-item"><div class="dropdown-icon">📝</div><div><div style="font-weight:700;color:#fff">Uy vazifalari</div><div style="font-size:0.78rem;color:var(--text-dim)">Testlar, topshiriqlar va avto-tekshirish</div></div></a>
@@ -99,5 +115,21 @@
   <footer>
     <p>© 2026 Exode.biz — Onlayn Maktab va Kurslar Platformasi. Barcha huquqlar himoyalangan.</p>
   </footer>
+
+  <script>
+    function toggleDropdownMenu(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('imkoniyatlarMenu');
+      menu.classList.toggle('show');
+    }
+
+    document.addEventListener('click', function(e) {
+      const menu = document.getElementById('imkoniyatlarMenu');
+      const trigger = document.getElementById('imkoniyatlarTrigger');
+      if (menu && menu.classList.contains('show') && !menu.contains(e.target) && e.target !== trigger) {
+        menu.classList.remove('show');
+      }
+    });
+  </script>
 </body>
 </html>
