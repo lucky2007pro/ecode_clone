@@ -83,52 +83,33 @@
     /* TOP BREADCRUMB HEADER */
     .top-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid var(--card-border); flex-shrink: 0; }
     .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--text-muted); font-weight: 600; }
-    .search-input-header { background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: 20px; padding: 6px 14px 6px 34px; color: #fff; font-size: 0.82rem; outline: none; width: 180px; }
     .btn-preview { background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); color: #fff; padding: 6px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
 
     /* TAB CONTENT PANELS */
-    .tab-panel { display: none; padding: 2rem 2.5rem; max-width: 900px; flex-direction: column; gap: 1.75rem; }
+    .tab-panel { display: none; padding: 2rem 2.5rem; max-width: 900px; flex-direction: column; gap: 2.25rem; }
     .tab-panel.active { display: flex; }
 
     .section-title { font-size: 1.35rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem; }
 
     .form-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
     .form-label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
-    .form-input { background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 12px 14px; color: #fff; font-size: 0.95rem; outline: none; }
+    .form-input { background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 13px 16px; color: #fff; font-size: 0.95rem; outline: none; }
     .form-input:focus { border-color: var(--accent-orange); }
 
     .char-counter { font-size: 0.75rem; color: var(--text-muted); align-self: flex-end; margin-top: 4px; }
 
-    /* TEAM MANAGEMENT SPECIFIC STYLES MATCHING SCREENSHOTS 1-TO-1 */
-    .btn-add-team { background: #22c55e; color: #fff; border: none; padding: 9px 18px; border-radius: 12px; font-weight: 700; font-size: 0.88rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
+    /* LEGAL DATA SPECIFIC STYLES MATCHING USER SCREENSHOT 1-TO-1 */
+    .btn-add-doc { background: #22c55e; color: #fff; border: none; padding: 8px 18px; border-radius: 12px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
 
-    .team-member-card { background: rgba(255,255,255,0.025); border: 1px solid var(--card-border); border-radius: 18px; padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: background 0.2s; }
-    .team-member-card:hover { background: rgba(255,255,255,0.05); }
+    .empty-docs-container { padding: 4rem 2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; }
     
-    .member-info { display: flex; align-items: center; gap: 14px; }
-    .member-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; font-weight: 800; font-size: 1rem; display: flex; align-items: center; justify-content: center; position: relative; }
-    .green-dot-online { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; border: 2px solid var(--bg-dark); position: absolute; bottom: 0; right: 0; }
-
-    .member-badges { display: flex; align-items: center; gap: 10px; }
-    .badge-crown { font-size: 1.1rem; }
-    .badge-active-pill { background: #22c55e; color: #fff; padding: 3px 12px; border-radius: 12px; font-weight: 800; font-size: 0.75rem; display: flex; align-items: center; gap: 4px; }
-
-    /* GRANULAR PERMISSIONS LIST MATCHING SCREENSHOT 2 & 3 */
-    .perm-group-header { font-size: 0.78rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 1rem; margin-bottom: 0.5rem; }
-    
-    .perm-card { background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 14px; padding: 1rem 1.25rem; display: flex; align-items: flex-start; gap: 14px; }
-    .perm-checkbox { width: 18px; height: 18px; accent-color: var(--accent-orange); margin-top: 2px; cursor: pointer; }
-    .perm-title-row { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.95rem; color: #fff; }
-    .mandatory-badge { background: rgba(255,255,255,0.08); color: var(--text-muted); padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; }
-    .perm-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
-
-    .dropdown-search-box { position: relative; }
-    .user-select-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: #1a1c23; border: 1px solid var(--accent-orange); border-radius: 14px; margin-top: 4px; overflow: hidden; z-index: 100; box-shadow: 0 15px 40px rgba(0,0,0,0.8); }
-    .select-item { padding: 10px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.2s; }
-    .select-item:hover { background: rgba(255,255,255,0.06); }
-    .avatar-mini { width: 24px; height: 24px; border-radius: 50%; background: #ea580c; color: #fff; font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .orange-doc-icon { width: 56px; height: 56px; color: var(--accent-orange); margin-bottom: 0.5rem; }
 
     .btn-save-settings { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 700; cursor: pointer; width: fit-content; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3); }
+
+    /* MODAL POPUP FOR ADDING LEGAL DOCUMENT */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; }
+    .modal-card { width: 480px; background: #1a1c23; border: 1px solid var(--card-border); border-radius: 20px; padding: 2rem; display: flex; flex-direction: column; gap: 1.25rem; box-shadow: 0 25px 60px rgba(0,0,0,0.9); }
   </style>
 </head>
 <body>
@@ -162,7 +143,7 @@
     </a>
 
     <a href="/analytics" class="nav-item">
-      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       <span>People</span>
     </a>
 
@@ -215,53 +196,12 @@
       </div>
     </a>
 
-    <a href="#" class="popup-item">
-      <div class="popup-item-left">
-        <svg class="popup-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <div>
-          <div class="item-title">Notifications</div>
-          <div class="item-sub">Your notifications</div>
-        </div>
-      </div>
-    </a>
-
     <a href="/payments" class="popup-item">
       <div class="popup-item-left">
-        <svg class="popup-icon" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/><line x1="12" x2="16" y1="14" y2="14"/></svg>
+        <svg class="popup-icon" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
         <div>
           <div class="item-title">Payments and Bills</div>
           <div class="item-sub">Payment Management</div>
-        </div>
-      </div>
-    </a>
-
-    <a href="#" class="popup-item">
-      <div class="popup-item-left">
-        <svg class="popup-icon" viewBox="0 0 24 24"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-        <div>
-          <div class="item-title">Partnership</div>
-          <div class="item-sub">Get the link</div>
-        </div>
-      </div>
-    </a>
-
-    <a href="#" class="popup-item">
-      <div class="popup-item-left">
-        <svg class="popup-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-        <div>
-          <div class="item-title">Language</div>
-          <div class="item-sub">Change language</div>
-        </div>
-      </div>
-      <span style="font-size:1.1rem">🇺🇸</span>
-    </a>
-
-    <a href="#" class="popup-item">
-      <div class="popup-item-left">
-        <svg class="popup-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" x2="12" y1="1" y2="3"/><line x1="12" x2="12" y1="21" y2="23"/><line x1="4.22" x2="5.64" y1="4.22" y2="5.64"/><line x1="18.36" x2="19.78" y1="18.36" y2="19.78"/><line x1="1" x2="3" y1="12" y2="12"/><line x1="21" x2="23" y1="12" y2="12"/></svg>
-        <div>
-          <div class="item-title">Appearance</div>
-          <div class="item-sub">Switch theme</div>
         </div>
       </div>
     </a>
@@ -291,7 +231,7 @@
       <div class="sub-child-item" onclick="switchSettingTab('menu', this)">Left menu of the site</div>
     </div>
 
-    <div class="subnav-item" onclick="switchSettingTab('legal', this)">
+    <div class="subnav-item active" id="subnav-legal" onclick="switchSettingTab('legal', this)">
       <svg class="svg-icon" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
       <span>Legal data</span>
     </div>
@@ -301,7 +241,7 @@
       <span>Payment Acceptance</span>
     </div>
 
-    <div class="subnav-item active" id="subnav-team" onclick="switchSettingTab('team', this)">
+    <div class="subnav-item" onclick="switchSettingTab('team', this)">
       <svg class="svg-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       <span>Team</span>
     </div>
@@ -326,7 +266,6 @@
       <span>Subscription and Rate</span>
     </div>
 
-    <!-- BACK TO TEAM BUTTON MATCHING SCREENSHOT 3 -->
     <button class="btn-back-team" id="btnBackToTeam" onclick="showTeamView('list')" style="display:none">
       <span>↰ Back to team</span>
     </button>
@@ -339,20 +278,63 @@
         <svg class="svg-icon" style="width:16px;height:16px" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
         <span>School</span>
         <span>›</span>
-        <span style="color:#fff" id="breadcrumbActive">Team</span>
-        <span style="color:var(--accent-orange);cursor:pointer" onclick="window.location.reload()">↺</span>
+        <span style="color:#fff" id="breadcrumbActive">Legal Data</span>
       </div>
 
-      <div style="display:flex;align-items:center;gap:12px">
-        <div style="position:relative" id="topHeaderSearch">
-          <input type="text" class="search-input-header" placeholder="🔍 Поиск" />
-        </div>
-        <button class="btn-preview">
-          <svg class="svg-icon" style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          <span>Preview</span>
-        </button>
-      </div>
+      <button class="btn-preview">
+        <svg class="svg-icon" style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span>Preview</span>
+      </button>
     </header>
+
+    <!-- TAB 5: LEGAL DATA (EXACT 1-TO-1 MATCH OF USER SCREENSHOT) -->
+    <div class="tab-panel active" id="panel-legal">
+      <!-- SECTION 1: COMPANY DETAILS -->
+      <div>
+        <h1 class="section-title" style="font-size:1.6rem;margin-bottom:1.25rem">Company Details</h1>
+
+        <div style="display:flex;flex-direction:column;gap:1.25rem">
+          <div class="form-group">
+            <label class="form-label">Organization Name *</label>
+            <input type="text" id="orgNameInput" class="form-input" value="dev" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Organization's TIN *</label>
+            <input type="text" id="orgTinInput" class="form-input" placeholder="Enter TIN" required />
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: LEGAL DOCUMENTS -->
+      <div style="margin-top:1rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+          <h2 class="section-title" style="font-size:1.4rem;display:flex;align-items:center;gap:8px;margin-bottom:0">
+            <span>Legal Documents</span>
+            <span style="width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.1);font-size:0.8rem;font-weight:800;display:flex;align-items:center;justify-content:center" id="docCountPill">0</span>
+            <span style="font-size:0.9rem;color:var(--text-muted)">ⓘ</span>
+          </h2>
+
+          <button class="btn-add-doc" onclick="openAddDocModal()">
+            <span>Add document</span>
+          </button>
+        </div>
+
+        <!-- EMPTY STATE MATCHING USER SCREENSHOT 1-TO-1 -->
+        <div class="empty-docs-container" id="emptyDocsView">
+          <svg class="orange-doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>
+          <h3 style="font-size:1.2rem;font-weight:800;color:#fff">Documents have not been uploaded yet</h3>
+          <p style="font-size:0.88rem;color:var(--text-muted)">Uploaded documents will be displayed here</p>
+        </div>
+
+        <!-- UPLOADED DOCS LIST -->
+        <div id="uploadedDocsList" style="display:none;flex-direction:column;gap:12px">
+          <!-- DYNAMICALLY POPULATED ON ADD -->
+        </div>
+      </div>
+
+      <button class="btn-save-settings" onclick="saveSettings('Legal Data')">💾 Save Company Details</button>
+    </div>
 
     <!-- TAB 1: INFORMATION AND DOMAIN -->
     <div class="tab-panel" id="panel-info">
@@ -372,48 +354,11 @@
         </div>
       </div>
 
-      <div class="status-banner">
-        <div class="banner-left">
-          <div class="green-check-icon">✓</div>
-          <div>
-            <div style="font-weight:700;font-size:0.95rem;color:#fff">Everything is fine — the school is active</div>
-            <div style="font-size:0.8rem;color:var(--text-muted)">Secret recipes for successful schools on our TG channel</div>
-          </div>
-        </div>
-        <a href="https://t.me/exode_biz_support" target="_blank" class="btn-tg">
-          <svg class="svg-icon" style="width:16px;height:16px;stroke:#121212" viewBox="0 0 24 24"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          <span>Open in TG</span>
-        </a>
-      </div>
-
-      <div>
-        <h2 class="section-title">School domain</h2>
-        
-        <div class="domain-cards-grid" style="margin-top:1rem">
-          <div class="domain-card selected">
-            <div style="font-weight:700;font-size:0.95rem;color:#fff">Base domain</div>
-            <div style="font-size:0.82rem;color:var(--text-muted)">School will be available at dev.exode.biz</div>
-          </div>
-
-          <div class="domain-card">
-            <div style="font-weight:700;font-size:0.95rem;color:#fff">Your domain</div>
-            <div style="font-size:0.82rem;color:var(--text-muted)">Click to contact support for connection</div>
-          </div>
-        </div>
-
-        <div class="form-group" style="margin-top:1.5rem">
-          <label class="form-label">School's base domain</label>
-          <input type="text" class="form-input" value="dev" style="width:100%" />
-        </div>
-      </div>
-
       <button class="btn-save-settings" onclick="saveSettings('Information and Domain')">💾 Save Information</button>
     </div>
 
-    <!-- TAB 7: TEAM (EXACT REPLICA OF USER SCREENSHOTS 1, 2, 3) -->
-    <div class="tab-panel active" id="panel-team">
-      
-      <!-- SUB-VIEW 1: TEAM MANAGEMENT LIST (SCREENSHOT 1) -->
+    <!-- TAB 7: TEAM -->
+    <div class="tab-panel" id="panel-team">
       <div id="teamViewList" style="display:flex;flex-direction:column;gap:1.75rem">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <h1 class="section-title" style="font-size:1.6rem;display:flex;align-items:center;gap:10px">
@@ -427,7 +372,6 @@
           </button>
         </div>
 
-        <!-- TEAM MEMBER CARD MATCHING SCREENSHOT 1 -->
         <div class="team-member-card" onclick="showTeamView('settings')">
           <div class="member-info">
             <div class="member-avatar">
@@ -446,208 +390,67 @@
           </div>
         </div>
       </div>
-
-      <!-- SUB-VIEW 2: ADDING A TEAM MEMBER (SCREENSHOT 2) -->
-      <div id="teamViewAdd" style="display:none;flex-direction:column;gap:1.5rem">
-        <h1 class="section-title" style="font-size:1.6rem">Adding a team member</h1>
-
-        <!-- USER SEARCH DROPDOWN -->
-        <div class="form-group dropdown-search-box">
-          <label class="form-label">User search</label>
-          <input type="text" class="form-input" placeholder="Enter username" id="userSearchInput" onfocus="toggleUserDropdown(true)" />
-          
-          <div class="user-select-dropdown" id="userDropdownList" style="display:none">
-            <div class="select-item" onclick="selectSearchUser('+998200043039')">
-              <div class="avatar-mini" style="background:#ef4444">+</div>
-              <span style="font-weight:700;font-size:0.9rem">+998200043039</span>
-            </div>
-            <div class="select-item" onclick="selectSearchUser('Hojiakbar Hayrullayev')">
-              <div class="avatar-mini" style="background:#ea580c">H</div>
-              <span style="font-weight:700;font-size:0.9rem">Hojiakbar Hayrullayev</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- PERMISSION CHECKBOXES -->
-        <div>
-          <div class="perm-group-header">SCHOOL MANAGEMENT</div>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <div class="perm-card">
-              <input type="checkbox" class="perm-checkbox" checked />
-              <div>
-                <div class="perm-title-row">School Settings Management</div>
-                <div class="perm-desc">The user will be able to modify the general school settings.</div>
-              </div>
-            </div>
-
-            <div class="perm-card">
-              <input type="checkbox" class="perm-checkbox" checked />
-              <div>
-                <div class="perm-title-row">School User Management</div>
-                <div class="perm-desc">The user will be able to see users and manage them</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="perm-group-header">ORGANIZATION MANAGEMENT</div>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <div class="perm-card">
-              <input type="checkbox" class="perm-checkbox" checked />
-              <div>
-                <div class="perm-title-row">School organization management</div>
-                <div class="perm-desc">The user will be able to view and update information about the school and details.</div>
-              </div>
-            </div>
-
-            <div class="perm-card">
-              <input type="checkbox" class="perm-checkbox" checked />
-              <div>
-                <div class="perm-title-row">School Sales</div>
-                <div class="perm-desc">The user will be able to view payment history, as well as review financial reports and receive notifications about payments.</div>
-              </div>
-            </div>
-
-            <div class="perm-card">
-              <input type="checkbox" class="perm-checkbox" checked />
-              <div>
-                <div class="perm-title-row">School Refunds</div>
-                <div class="perm-desc">The user will be able to view a list of refunds, communicate with users on return issues, and confirm refunds.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div style="display:flex;justify-content:flex-end">
-          <button class="btn-save-settings" style="background:#3b3e4a;box-shadow:none" onclick="confirmAddTeamMember()">Add to team</button>
-        </div>
-      </div>
-
-      <!-- SUB-VIEW 3: TEAM MEMBER SETTINGS (SCREENSHOT 3) -->
-      <div id="teamViewSettings" style="display:none;flex-direction:column;gap:1.5rem">
-        <h1 class="section-title" style="font-size:1.6rem;display:flex;align-items:center;gap:8px">
-          <span>Team member settings</span>
-          <span style="font-size:0.9rem;color:var(--text-muted)">ⓘ</span>
-        </h1>
-
-        <!-- MEMBER CARD -->
-        <div class="team-member-card" style="cursor:default">
-          <div class="member-info">
-            <div class="member-avatar">
-              H
-              <div class="green-dot-online"></div>
-            </div>
-            <div>
-              <div style="font-weight:800;font-size:1rem;color:#fff">Hojiakbar Hayrullayev</div>
-              <div style="font-size:0.78rem;color:var(--text-muted)">Granted 21 rights ⓘ • Modified yesterday 15:36</div>
-            </div>
-          </div>
-
-          <div class="member-badges">
-            <span class="badge-crown">👑</span>
-            <span class="badge-active-pill">⚡ Active</span>
-          </div>
-        </div>
-
-        <!-- GRANULAR PERMISSIONS WITH MANDATORY BADGES -->
-        <div>
-          <div class="perm-group-header">SCHOOL MANAGEMENT</div>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <div class="perm-card">
-              <input type="checkbox" class="perm-checkbox" checked disabled />
-              <div>
-                <div class="perm-title-row">
-                  <span>School Settings Management</span>
-                  <span class="mandatory-badge">Mandatory for the owner</span>
-                </div>
-                <div class="perm-desc">The user will be able to modify the general school settings.</div>
-              </div>
-            </div>
-
-            <div class="perm-card">
-              <input type="checkbox" class="perm-checkbox" checked disabled />
-              <div>
-                <div class="perm-title-row">
-                  <span>School User Management</span>
-                  <span class="mandatory-badge">Mandatory for the owner</span>
-                </div>
-                <div class="perm-desc">The user will be able to see users and manage them</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="perm-group-header">ORGANIZATION MANAGEMENT</div>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <div class="perm-card">
-              <input type="checkbox" class="perm-checkbox" checked disabled />
-              <div>
-                <div class="perm-title-row">
-                  <span>School organization management</span>
-                  <span class="mandatory-badge">Mandatory for the owner</span>
-                </div>
-                <div class="perm-desc">The user will be able to view and update information about the school and details.</div>
-              </div>
-            </div>
-
-            <div class="perm-card">
-              <input type="checkbox" class="perm-checkbox" checked />
-              <div>
-                <div class="perm-title-row">School Sales</div>
-                <div class="perm-desc">The user will be able to view payment history, as well as review financial reports and receive notifications about payments.</div>
-              </div>
-            </div>
-
-            <div class="perm-card">
-              <input type="checkbox" class="perm-checkbox" checked />
-              <div>
-                <div class="perm-title-row">School Refunds</div>
-                <div class="perm-desc">The user will be able to view a list of refunds, communicate with users on return issues, and confirm refunds.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <button class="btn-save-settings" onclick="saveSettings('Team Member Rights')">💾 Save Member Rights</button>
-      </div>
-
     </div>
   </main>
 
+  <!-- ADD DOCUMENT MODAL POPUP -->
+  <div class="modal-overlay" id="addDocModal">
+    <div class="modal-card">
+      <h3 style="font-size:1.2rem;font-weight:800;color:#fff">Add Legal Document</h3>
+      
+      <div class="form-group">
+        <label class="form-label">Document Name *</label>
+        <input type="text" id="docNameInput" class="form-input" placeholder="e.g. Public Offer Agreement, License" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Upload File (.pdf, .doc)</label>
+        <input type="file" id="docFileInput" class="form-input" />
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:0.5rem">
+        <button onclick="closeAddDocModal()" style="background:rgba(255,255,255,0.08);color:#fff;border:none;padding:10px 18px;border-radius:10px;font-weight:600;cursor:pointer">Cancel</button>
+        <button onclick="confirmAddDocument()" class="btn-save-settings">Upload Document</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    function showTeamView(viewName) {
-      document.getElementById('teamViewList').style.display = 'none';
-      document.getElementById('teamViewAdd').style.display = 'none';
-      document.getElementById('teamViewSettings').style.display = 'none';
+    let uploadedDocsCount = 0;
 
-      const btnBack = document.getElementById('btnBackToTeam');
-
-      if (viewName === 'list') {
-        document.getElementById('teamViewList').style.display = 'flex';
-        btnBack.style.display = 'none';
-        document.getElementById('breadcrumbActive').innerText = 'Team';
-      } else if (viewName === 'add') {
-        document.getElementById('teamViewAdd').style.display = 'flex';
-        btnBack.style.display = 'flex';
-        document.getElementById('breadcrumbActive').innerText = 'Adding team member';
-      } else if (viewName === 'settings') {
-        document.getElementById('teamViewSettings').style.display = 'flex';
-        btnBack.style.display = 'flex';
-        document.getElementById('breadcrumbActive').innerText = 'Team member';
-      }
+    function openAddDocModal() {
+      document.getElementById('addDocModal').style.display = 'flex';
     }
 
-    function toggleUserDropdown(show) {
-      document.getElementById('userDropdownList').style.display = show ? 'block' : 'none';
+    function closeAddDocModal() {
+      document.getElementById('addDocModal').style.display = 'none';
     }
 
-    function selectSearchUser(userName) {
-      document.getElementById('userSearchInput').value = userName;
-      toggleUserDropdown(false);
-    }
+    function confirmAddDocument() {
+      const name = document.getElementById('docNameInput').value || 'Legal Document';
+      uploadedDocsCount++;
+      
+      document.getElementById('emptyDocsView').style.display = 'none';
+      const list = document.getElementById('uploadedDocsList');
+      list.style.display = 'flex';
 
-    function confirmAddTeamMember() {
-      const name = document.getElementById('userSearchInput').value || 'New Team Member';
-      alert(name + " jamoaga muvaffaqiyatli qo'shildi!");
-      showTeamView('list');
+      const item = document.createElement('div');
+      item.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid var(--card-border);padding:1rem;border-radius:14px;display:flex;align-items:center;justify-content:space-between';
+      item.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px">
+          <svg style="width:24px;height:24px;color:var(--accent-orange)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/></svg>
+          <div>
+            <div style="font-weight:700;color:#fff">${name}</div>
+            <div style="font-size:0.75rem;color:var(--text-muted)">Uploaded today • PDF Document</div>
+          </div>
+        </div>
+        <span style="color:#22c55e;font-weight:800;font-size:0.8rem">● Verified</span>
+      `;
+      list.appendChild(item);
+
+      document.getElementById('docCountPill').innerText = uploadedDocsCount;
+      closeAddDocModal();
+      alert(name + " muvaffaqiyatli yuklandi!");
     }
 
     function switchSettingTab(tabName, el) {
@@ -664,10 +467,6 @@
         const textSpan = el.querySelector('span');
         const labelText = textSpan ? textSpan.innerText : el.innerText;
         document.getElementById('breadcrumbActive').innerText = labelText;
-      }
-
-      if (tabName === 'team') {
-        showTeamView('list');
       }
     }
 
