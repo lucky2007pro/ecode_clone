@@ -132,6 +132,10 @@ async def serve_settings_legal():
 async def serve_settings_privacy():
     return FileResponse(os.path.join(FRONTEND_DIR, "settings-privacy.html"))
 
+@app.get("/manage/school/settings/payments")
+async def serve_settings_payments():
+    return FileResponse(os.path.join(FRONTEND_DIR, "settings-payments.html"))
+
 @app.get("/manage/school/settings/{setting_slug}")
 async def serve_generic_settings(setting_slug: str):
     return FileResponse(os.path.join(FRONTEND_DIR, "settings-basic.html"))
