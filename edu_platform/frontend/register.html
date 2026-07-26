@@ -3,86 +3,149 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maktab Ochish — Exode.biz</title>
+  <title>Choose the option that suits you — Exode.biz</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #090d16;
-      --card-bg: #111827;
-      --card-border: rgba(255, 255, 255, 0.1);
+      --bg-dark: #121212;
+      --card-bg: #18191e;
+      --option-bg: #262830;
+      --option-bg-hover: #323540;
+      --card-border: rgba(255, 255, 255, 0.08);
       --accent-orange: #f97316;
       --accent-cyan: #06b6d4;
       --text-main: #f8fafc;
-      --text-dim: #94a3b8;
+      --text-muted: #8e99a8;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     body { background: var(--bg-dark); color: var(--text-main); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem 0; }
 
-    .register-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2.5rem; width: 460px; display: flex; flex-direction: column; gap: 1.25rem; box-shadow: 0 25px 60px rgba(0,0,0,0.8); }
-    .brand-logo { font-size: 1.8rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; color: #fff; text-decoration: none; }
+    .onboarding-card { width: 540px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 2.5rem 3rem; display: flex; flex-direction: column; gap: 1.75rem; box-shadow: 0 30px 70px rgba(0,0,0,0.85); }
+    
+    .brand-logo { font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 8px; color: #fff; text-decoration: none; margin-bottom: 0.5rem; }
     .text-gradient { background: linear-gradient(135deg, #06b6d4, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
+    /* STEP 1 FORM STYLES */
     .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-label { font-size: 0.88rem; font-weight: 600; color: var(--text-dim); }
-    .form-input { background: rgba(0,0,0,0.4); border: 1px solid var(--card-border); border-radius: 10px; padding: 12px 14px; color: #fff; font-size: 0.95rem; outline: none; }
+    .form-label { font-size: 0.88rem; font-weight: 600; color: var(--text-muted); }
+    .form-input { background: #121316; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px 14px; color: #fff; font-size: 0.95rem; outline: none; }
     .form-input:focus { border-color: var(--accent-orange); }
 
-    .btn-submit { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 0.95rem; cursor: pointer; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4); }
+    .btn-next { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; border: none; padding: 14px; border-radius: 14px; font-weight: 700; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 20px rgba(249, 115, 22, 0.4); margin-top: 0.5rem; }
+
+    /* STEP 2 PERSONA SELECTION MATCHING USER SCREENSHOT */
+    .step-title { font-size: 1.75rem; font-weight: 800; color: #fff; letter-spacing: -0.5px; margin-bottom: 0.5rem; }
+
+    .options-list { display: flex; flex-direction: column; gap: 1rem; }
+    
+    .option-pill { background: var(--option-bg); border: 1px solid transparent; border-radius: 18px; padding: 1.1rem 1.5rem; color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: space-between; }
+    .option-pill:hover { background: var(--option-bg-hover); transform: translateY(-2px); }
+    .option-pill.selected { background: rgba(249, 115, 22, 0.12); border-color: var(--accent-orange); color: #fff; }
+
+    .radio-circle { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--text-muted); display: flex; align-items: center; justify-content: center; }
+    .option-pill.selected .radio-circle { border-color: var(--accent-orange); background: var(--accent-orange); }
+    .radio-inner { width: 8px; height: 8px; border-radius: 50%; background: #fff; display: none; }
+    .option-pill.selected .radio-inner { display: block; }
   </style>
 </head>
 <body>
 
-  <div class="register-card">
+  <div class="onboarding-card">
     <a href="/" class="brand-logo">
-      <span>⚡ exode<span class="text-gradient">.biz</span></span>
+      <div style="font-size:1.4rem">⚡</div>
+      <span>exode<span class="text-gradient">.biz</span></span>
     </a>
-    
-    <div style="text-align:center;margin-bottom:0.5rem">
-      <h2 style="font-size:1.35rem;font-weight:800">Yangi Onlayn Maktab Ochish</h2>
-      <p style="font-size:0.82rem;color:var(--text-dim)">Exode LMS va ERP boshqaruv panelini 1 daqiqada yoqing</p>
+
+    <!-- STEP 1: INITIAL REGISTRATION FORM -->
+    <div id="step1">
+      <h2 style="font-size:1.6rem;font-weight:800;margin-bottom:0.4rem">Onlayn Maktab Ochish</h2>
+      <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1.5rem">Ma'lumotlaringizni kiriting va 14 kunlik bepul sinov muddatiga ega bo'ling</p>
+
+      <form onsubmit="goToStep2(event)" style="display:flex;flex-direction:column;gap:1.25rem">
+        <div class="form-group">
+          <label class="form-label">Maktabingiz Nomi</label>
+          <input type="text" id="schoolNameInput" class="form-input" value="dev" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Ism va Familiyangiz</label>
+          <input type="text" id="fullNameInput" class="form-input" value="Hojiakbar Hayrullayev" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email Manzilingiz</label>
+          <input type="email" id="emailInput" class="form-input" value="usa20070302@gmail.com" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Parol</label>
+          <input type="password" id="passwordInput" class="form-input" value="password123" required />
+        </div>
+
+        <button type="submit" class="btn-next">Davom Etish →</button>
+      </form>
     </div>
 
-    <form onsubmit="handleRegister(event)" style="display:flex;flex-direction:column;gap:1.25rem">
-      <div class="form-group">
-        <label class="form-label">Maktabingiz Nomi</label>
-        <input type="text" id="schoolNameInput" class="form-input" value="dev" required />
+    <!-- STEP 2: PERSONA SELECTION MATCHING USER SCREENSHOT 1-TO-1 -->
+    <div id="step2" style="display:none">
+      <h1 class="step-title">Choose the option that suits you</h1>
+
+      <div class="options-list">
+        <div class="option-pill selected" onclick="selectPersona(this, 'I own an online school')">
+          <span>I own an online school</span>
+          <div class="radio-circle"><div class="radio-inner"></div></div>
+        </div>
+
+        <div class="option-pill" onclick="selectPersona(this, 'I\'m an individual expert / teacher')">
+          <span>I'm an individual expert / teacher</span>
+          <div class="radio-circle"><div class="radio-inner"></div></div>
+        </div>
+
+        <div class="option-pill" onclick="selectPersona(this, 'I\'m a producer')">
+          <span>I'm a producer</span>
+          <div class="radio-circle"><div class="radio-inner"></div></div>
+        </div>
+
+        <div class="option-pill" onclick="selectPersona(this, 'Corporate training')">
+          <span>Corporate training</span>
+          <div class="radio-circle"><div class="radio-inner"></div></div>
+        </div>
+
+        <div class="option-pill" onclick="selectPersona(this, 'Other')">
+          <span>Other</span>
+          <div class="radio-circle"><div class="radio-inner"></div></div>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Ismingiz va Familiyangiz</label>
-        <input type="text" id="fullNameInput" class="form-input" value="Hojiakbar Hayrullayev" required />
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Email Manzilingiz</label>
-        <input type="email" id="emailInput" class="form-input" value="usa20070302@gmail.com" required />
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Parolingiz</label>
-        <input type="password" id="passwordInput" class="form-input" value="password123" required />
-      </div>
-
-      <button type="submit" class="btn-submit">⚡ Onlayn Maktabni Yaratish</button>
-    </form>
-
-    <div style="text-align:center;font-size:0.85rem;color:var(--text-dim)">
-      Akkountingiz bormi? <a href="/login" style="color:var(--accent-cyan);font-weight:700;text-decoration:none">Tizimga kirish</a>
+      <button class="btn-next" onclick="completeRegistration()" style="margin-top:1.5rem">⚡ Maktabni Yoqish</button>
     </div>
   </div>
 
   <script>
-    async function handleRegister(e) {
+    let selectedPersona = 'I own an online school';
+
+    function goToStep2(e) {
       e.preventDefault();
+      document.getElementById('step1').style.display = 'none';
+      document.getElementById('step2').style.display = 'block';
+    }
+
+    function selectPersona(el, personaName) {
+      document.querySelectorAll('.option-pill').forEach(item => item.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedPersona = personaName;
+    }
+
+    async function completeRegistration() {
       const schoolName = document.getElementById('schoolNameInput').value;
       const fullName = document.getElementById('fullNameInput').value;
       const email = document.getElementById('emailInput').value;
       const password = document.getElementById('passwordInput').value;
 
       try {
-        const res = await fetch('/api/v1/users/register', {
+        await fetch('/api/v1/users/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -90,7 +153,8 @@
             email: email,
             password: password,
             school_name: schoolName,
-            role: 'owner'
+            role: 'owner',
+            persona: selectedPersona
           })
         });
 
