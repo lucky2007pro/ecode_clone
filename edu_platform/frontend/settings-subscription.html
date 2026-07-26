@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="uz" class="notranslate" style="color-scheme: dark;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School Settings — Subscription and Rate</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #121212;
+      --sidebar-bg: #141414;
+      --subnav-bg: #1a1a1a;
+      --card-bg: #1e2028;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-orange: #f97316;
+      --green-active: #22c55e;
+      --text-main: #f8fafc;
+      --text-muted: #8e99a8;
+      --input-bg: #18191e;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; position: relative; }
+
+    /* PRIMARY SIDEBAR */
+    .primary-sidebar { width: 78px; background: var(--sidebar-bg); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 0.6rem; overflow-y: auto; flex-shrink: 0; position: relative; z-index: 50; }
+    .brand-box { width: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; margin-bottom: 0.5rem; text-decoration: none; color: #fff; font-weight: 800; font-size: 0.9rem; }
+    .status-dot-text { font-size: 0.55rem; color: var(--green-active); font-weight: 700; display: flex; align-items: center; gap: 2px; }
+
+    .nav-item { width: 64px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0; border-radius: 12px; color: var(--text-muted); text-decoration: none; font-size: 0.68rem; font-weight: 600; transition: all 0.2s; cursor: pointer; }
+    .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.04); }
+    .nav-item.active { color: var(--accent-orange); }
+    .active-icon-box { width: 34px; height: 34px; border-radius: 10px; background: rgba(249, 115, 22, 0.12); border: 1px solid rgba(249, 115, 22, 0.3); display: flex; align-items: center; justify-content: center; color: var(--accent-orange); }
+
+    .svg-icon { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .user-avatar-small { margin-top: auto; width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; font-weight: 800; font-size: 0.88rem; display: flex; align-items: center; justify-content: center; }
+
+    /* SECONDARY SUBNAV */
+    .settings-subnav { width: 240px; background: var(--subnav-bg); border-right: 1px solid var(--card-border); padding: 1.25rem 1rem; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; flex-shrink: 0; }
+    .settings-header { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; font-weight: 800; color: #fff; padding-bottom: 0.5rem; border-bottom: 1px solid var(--card-border); }
+
+    .subnav-group { display: flex; flex-direction: column; gap: 4px; }
+    .subnav-item { padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
+    .subnav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
+    .subnav-item.active { color: #fff; font-weight: 700; background: rgba(255,255,255,0.1); border-left: 3px solid var(--accent-orange); }
+    
+    .sub-child-item { padding-left: 2rem; padding-top: 8px; padding-bottom: 8px; font-size: 0.84rem; color: var(--text-muted); text-decoration: none; display: block; border-radius: 6px; transition: all 0.2s; }
+
+    /* MAIN CONTENT AREA */
+    .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: var(--bg-dark); }
+    .top-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid var(--card-border); flex-shrink: 0; }
+    .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--text-muted); font-weight: 600; }
+    .btn-preview { background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); color: #fff; padding: 6px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; }
+
+    .pricing-container { padding: 3rem 2.5rem; max-width: 1200px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 3rem; }
+    .pricing-hero-title { font-size: 2.8rem; font-weight: 800; color: #fff; text-align: center; }
+
+    /* BILLING CYCLE SELECTOR PILL MATCHING SCREENSHOT 1 */
+    .billing-toggle-wrapper { position: relative; background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); border-radius: 30px; padding: 4px; display: flex; align-items: center; gap: 4px; }
+    .best-value-pill { position: absolute; top: -14px; left: 14px; background: #22c55e; color: #fff; font-size: 0.65rem; font-weight: 800; padding: 2px 8px; border-radius: 10px; }
+    .popular-pill { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: var(--accent-orange); color: #fff; font-size: 0.68rem; font-weight: 800; padding: 3px 10px; border-radius: 10px; }
+
+    .billing-btn { background: transparent; color: var(--text-muted); border: none; padding: 8px 18px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+    .billing-btn.active { background: rgba(255,255,255,0.12); color: #fff; }
+    .discount-badge-mini { color: #22c55e; font-size: 0.72rem; font-weight: 800; }
+
+    /* PRICING CARDS GRID MATCHING SCREENSHOTS 1 & 2 1-TO-1 */
+    .pricing-cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; width: 100%; }
+    .pricing-card { background: rgba(255,255,255,0.025); border: 1px solid var(--card-border); border-radius: 24px; padding: 2rem 1.75rem; display: flex; flex-direction: column; gap: 1.25rem; position: relative; transition: transform 0.2s, border-color 0.2s; }
+    .pricing-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.2); }
+    .pricing-card.popular { border: 2px solid var(--accent-orange); background: rgba(249, 115, 22, 0.03); }
+
+    .plan-header { display: flex; justify-content: space-between; align-items: flex-start; }
+    .plan-name { font-size: 1.5rem; font-weight: 800; color: #fff; }
+    .discount-tag { background: #22c55e; color: #fff; font-size: 0.75rem; font-weight: 800; padding: 2px 8px; border-radius: 8px; }
+
+    .plan-price-box { display: flex; flex-direction: column; gap: 2px; }
+    .big-price { font-size: 2.1rem; font-weight: 800; color: #fff; display: flex; align-items: baseline; gap: 6px; }
+    .old-price { font-size: 0.9rem; color: var(--text-muted); text-decoration: line-through; }
+    .savings-text { font-size: 0.82rem; color: #22c55e; font-weight: 700; margin-top: 4px; }
+
+    .total-box { background: rgba(255,255,255,0.04); border-radius: 14px; padding: 1rem; display: flex; flex-direction: column; gap: 4px; }
+    .total-label { font-size: 0.75rem; color: var(--text-muted); }
+    .total-val { font-size: 1.1rem; font-weight: 800; color: #fff; }
+
+    .spec-list { display: flex; flex-direction: column; gap: 10px; font-size: 0.88rem; color: var(--text-muted); margin-top: 0.5rem; }
+    .spec-item { display: flex; justify-content: space-between; align-items: center; }
+    .spec-val { color: #fff; font-weight: 700; }
+
+    .btn-choose-plan { border: 1px solid var(--accent-orange); background: transparent; color: #fff; padding: 12px 24px; border-radius: 14px; font-weight: 700; font-size: 0.95rem; cursor: pointer; text-align: center; text-decoration: none; transition: all 0.2s; margin-top: auto; }
+    .btn-choose-plan:hover { background: var(--accent-orange); }
+    .btn-choose-plan.filled { background: var(--accent-orange); border: none; box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4); }
+
+    /* COMPARE PLANS TABLE MATCHING SCREENSHOTS 3 & 4 1-TO-1 */
+    .compare-section { width: 100%; display: flex; flex-direction: column; gap: 2rem; margin-top: 2rem; }
+    .compare-table { width: 100%; border-collapse: separate; border-spacing: 0; background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 20px; overflow: hidden; }
+    .compare-table th, .compare-table td { padding: 1rem 1.5rem; text-align: center; border-bottom: 1px solid var(--card-border); font-size: 0.9rem; }
+    .compare-table th:first-child, .compare-table td:first-child { text-align: left; font-weight: 700; color: #fff; width: 35%; }
+    .compare-table th { font-weight: 800; font-size: 1rem; color: var(--accent-orange); background: rgba(0,0,0,0.2); }
+    .compare-table tr:last-child td { border-bottom: none; }
+
+    .check-mark { color: var(--accent-orange); font-size: 1.1rem; font-weight: 900; }
+    .dash-mark { color: var(--text-muted); font-size: 1.1rem; }
+  </style>
+</head>
+<body>
+
+  <!-- PRIMARY SIDEBAR -->
+  <aside class="primary-sidebar">
+    <a href="/" class="brand-box"><svg class="svg-icon" style="stroke:var(--accent-orange)" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg><span>dev</span><span class="status-dot-text">● Everything is saved</span></a>
+    <a href="/manage/dashboard" class="nav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></a>
+    <a href="/manage/courses/1" class="nav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg><span>Courses</span></a>
+    <a href="/payments" class="nav-item"><svg class="svg-icon" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg><span>Sales</span></a>
+    <a href="/homework" class="nav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg><span>Practice</span></a>
+    <a href="/analytics" class="nav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span>People</span></a>
+    <a href="/manage/school/settings/basic" class="nav-item active"><div class="active-icon-box"><svg class="svg-icon" viewBox="0 0 24 24"><path d="m4 6 8-4 8 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6z"/></svg></div><span>My school</span></a>
+    <a href="/chat" class="nav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Chats</span></a>
+    <a href="/training" class="nav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/></svg><span>Student panel</span></a>
+    <div class="user-avatar-small">H</div>
+  </aside>
+
+  <!-- SECONDARY SUBNAV -->
+  <aside class="settings-subnav">
+    <div class="settings-header">
+      <svg class="svg-icon" style="stroke:var(--accent-orange)" viewBox="0 0 24 24"><line x1="4" x2="20" y1="21" y2="21"/><line x1="4" x2="20" y1="14" y2="14"/><line x1="4" x2="20" y1="7" y2="7"/></svg>
+      <span>Settings</span>
+    </div>
+
+    <div class="subnav-group">
+      <a href="/manage/school/settings/basic" class="sub-child-item">Information and Domain</a>
+      <a href="/manage/school/settings/design" class="sub-child-item">Design and Brand</a>
+      <a href="/manage/school/settings/catalog" class="sub-child-item">Catalog and footer</a>
+      <a href="/manage/school/settings/menu" class="sub-child-item">Left menu of the site</a>
+    </div>
+
+    <a href="/manage/school/settings/legal" class="subnav-item"><svg class="svg-icon" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/></svg><span>Legal data</span></a>
+    <a href="/manage/school/settings/payments" class="subnav-item"><svg class="svg-icon" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/></svg><span>Payment Acceptance</span></a>
+    <a href="/manage/school/settings/team" class="subnav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span>Team</span></a>
+    <a href="/manage/school/settings/privacy" class="subnav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/></svg><span>Login and registration</span></a>
+    <a href="/manage/school/settings/media" class="subnav-item"><svg class="svg-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg><span>Content and media</span></a>
+    <a href="/manage/school/settings/dev" class="subnav-item"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77"/></svg><span>For Developers</span></a>
+    <a href="/manage/school/settings/subscription" class="subnav-item active"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"/></svg><span>Subscription and Rate</span></a>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-wrapper">
+    <header class="top-header">
+      <div class="breadcrumb">
+        <svg class="svg-icon" style="width:16px;height:16px" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <span>School</span>
+        <span>›</span>
+        <span style="color:#fff">Subscription and Rate</span>
+      </div>
+      <button class="btn-preview">Preview</button>
+    </header>
+
+    <div class="pricing-container">
+      <h1 class="pricing-hero-title">Pricing Plans</h1>
+
+      <!-- BILLING CYCLE TOGGLE MATCHING SCREENSHOT 1 -->
+      <div class="billing-toggle-wrapper">
+        <span class="best-value-pill">Best value</span>
+        <button class="billing-btn active" onclick="selectBillingCycle(12, this)">
+          <span>12 mo</span>
+          <span class="discount-badge-mini">-20%</span>
+        </button>
+        <button class="billing-btn" onclick="selectBillingCycle(6, this)">
+          <span>6 mo</span>
+          <span class="discount-badge-mini">-15%</span>
+        </button>
+        <button class="billing-btn" onclick="selectBillingCycle(3, this)">
+          <span>3 mo</span>
+          <span class="discount-badge-mini">-10%</span>
+        </button>
+        <button class="billing-btn" onclick="selectBillingCycle(1, this)">
+          <span>1 mo</span>
+        </button>
+      </div>
+
+      <!-- PRICING CARDS GRID MATCHING SCREENSHOTS 1 & 2 1-TO-1 -->
+      <div class="pricing-cards-grid">
+        
+        <!-- CARD 1: EXPERT -->
+        <div class="pricing-card">
+          <div class="plan-header">
+            <div>
+              <div class="plan-name">Expert</div>
+              <div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px">For bloggers and experts</div>
+            </div>
+            <span class="discount-tag">-20%</span>
+          </div>
+
+          <div class="plan-price-box">
+            <div class="big-price">
+              <span>950 000</span>
+              <span style="font-size:0.85rem;color:var(--text-muted);font-weight:600">so'm/mo</span>
+            </div>
+            <div class="old-price">1 190 000 so'm</div>
+            <div class="savings-text">You save 2 880 000 so'm</div>
+          </div>
+
+          <div class="total-box">
+            <span class="total-label">Total for 12 mo:</span>
+            <span class="total-val">11 400 000 so'm</span>
+          </div>
+
+          <div class="spec-list">
+            <div class="spec-item"><span>Student base</span><span class="spec-val">∞</span></div>
+            <div class="spec-item"><span>Total courses</span><span class="spec-val">5</span></div>
+            <div class="spec-item"><span>Online students per month</span><span class="spec-val">200</span></div>
+            <div class="spec-item"><span>Storage</span><span class="spec-val">∞</span></div>
+            <div class="spec-item"><span>Staff members</span><span class="spec-val">3</span></div>
+            <div class="spec-item"><span>Accept payments</span><span class="spec-val">✓</span></div>
+            <div class="spec-item"><span>Personal manager</span><span class="spec-val">No</span></div>
+          </div>
+
+          <a href="https://t.me/exode_biz_support" target="_blank" class="btn-choose-plan">Choose plan</a>
+        </div>
+
+        <!-- CARD 2: ACADEMY (POPULAR) -->
+        <div class="pricing-card popular">
+          <span class="popular-pill">Popular</span>
+
+          <div class="plan-header">
+            <div>
+              <div class="plan-name">Academy</div>
+              <div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px">For medium schools</div>
+            </div>
+            <span class="discount-tag">-20%</span>
+          </div>
+
+          <div class="plan-price-box">
+            <div class="big-price">
+              <span>1 510 000</span>
+              <span style="font-size:0.85rem;color:var(--text-muted);font-weight:600">so'm/mo</span>
+            </div>
+            <div class="old-price">1 890 000 so'm</div>
+            <div class="savings-text">You save 4 560 000 so'm</div>
+          </div>
+
+          <div class="total-box">
+            <span class="total-label">Total for 12 mo:</span>
+            <span class="total-val">18 120 000 so'm</span>
+          </div>
+
+          <div class="spec-list">
+            <div class="spec-item"><span>Student base</span><span class="spec-val">∞</span></div>
+            <div class="spec-item"><span>Total courses</span><span class="spec-val">10</span></div>
+            <div class="spec-item"><span>Online students per month</span><span class="spec-val">500</span></div>
+            <div class="spec-item"><span>Storage</span><span class="spec-val">∞</span></div>
+            <div class="spec-item"><span>Staff members</span><span class="spec-val">10</span></div>
+            <div class="spec-item"><span>Accept payments</span><span class="spec-val">✓</span></div>
+            <div class="spec-item"><span>Personal manager</span><span class="spec-val">✓</span></div>
+          </div>
+
+          <a href="https://t.me/exode_biz_support" target="_blank" class="btn-choose-plan filled">Choose plan</a>
+        </div>
+
+        <!-- CARD 3: ACADEMY MAX -->
+        <div class="pricing-card">
+          <div class="plan-header">
+            <div>
+              <div class="plan-name" style="display:flex;align-items:center;gap:6px"><span>🚀</span><span>Academy MAX</span></div>
+              <div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px">For large schools</div>
+            </div>
+            <span class="discount-tag">-20%</span>
+          </div>
+
+          <div class="plan-price-box">
+            <div class="big-price">
+              <span>2 070 000</span>
+              <span style="font-size:0.85rem;color:var(--text-muted);font-weight:600">so'm/mo</span>
+            </div>
+            <div class="old-price">2 590 000 so'm</div>
+            <div class="savings-text">You save 6 240 000 so'm</div>
+          </div>
+
+          <div class="total-box">
+            <span class="total-label">Total for 12 mo:</span>
+            <span class="total-val">24 840 000 so'm</span>
+          </div>
+
+          <div class="spec-list">
+            <div class="spec-item"><span>Student base</span><span class="spec-val">∞</span></div>
+            <div class="spec-item"><span>Total courses</span><span class="spec-val">∞</span></div>
+            <div class="spec-item"><span>Online students per month</span><span class="spec-val">1000</span></div>
+            <div class="spec-item"><span>Storage</span><span class="spec-val">∞</span></div>
+            <div class="spec-item"><span>Staff members</span><span class="spec-val">∞</span></div>
+            <div class="spec-item"><span>Accept payments</span><span class="spec-val">✓</span></div>
+            <div class="spec-item"><span>Personal manager</span><span class="spec-val">✓</span></div>
+          </div>
+
+          <a href="https://t.me/exode_biz_support" target="_blank" class="btn-choose-plan">Choose plan</a>
+        </div>
+
+      </div>
+
+      <!-- COMPARE PLANS DETAILED MATRIX TABLE MATCHING SCREENSHOTS 3 & 4 1-TO-1 -->
+      <div class="compare-section">
+        <h2 style="font-size:2.2rem;font-weight:800;color:#fff;text-align:center">Compare Plans</h2>
+
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Features</th>
+              <th>Expert</th>
+              <th>Academy</th>
+              <th>Academy MAX</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Student database</td><td>∞</td><td>∞</td><td>∞</td></tr>
+            <tr><td>Storage</td><td>∞</td><td>∞</td><td>∞</td></tr>
+            <tr><td>Active courses</td><td>5</td><td>10</td><td>∞</td></tr>
+            <tr><td>Online students per month</td><td>200</td><td>500</td><td>1000</td></tr>
+            <tr><td>Chat with students</td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td></tr>
+            <tr><td>Free courses</td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td></tr>
+            <tr><td>Group segmentation</td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td></tr>
+            <tr><td>Homework and tests</td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td></tr>
+            <tr><td>Payment acceptance</td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td></tr>
+            <tr><td>Mobile app</td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td></tr>
+            <tr><td>Personal manager</td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td></tr>
+            <tr><td>Lesson access control</td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td></tr>
+            <tr><td>Course promo codes</td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td></tr>
+            <tr><td>Course pricing plans</td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td></tr>
+            <tr><td>Analytics</td><td><span class="dash-mark">—</span></td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td></tr>
+            <tr><td>Design customization</td><td><span class="dash-mark">—</span></td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td></tr>
+            <tr><td>Telegram bot integration</td><td><span class="dash-mark">—</span></td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td></tr>
+            <tr><td>Marketing tools integration</td><td><span class="dash-mark">—</span></td><td><span class="check-mark">✓</span></td><td><span class="check-mark">✓</span></td></tr>
+            <tr><td>Knowledge base</td><td><span class="dash-mark">—</span></td><td><span class="dash-mark">—</span></td><td><span class="check-mark">✓</span></td></tr>
+            <tr><td>Event notifications (Webhooks)</td><td><span class="dash-mark">—</span></td><td><span class="dash-mark">—</span></td><td><span class="check-mark">✓</span></td></tr>
+            <tr><td>Course bundles</td><td><span class="dash-mark">—</span></td><td><span class="dash-mark">—</span></td><td><span class="check-mark">✓</span></td></tr>
+            <tr><td>Custom domain</td><td><span class="dash-mark">—</span></td><td><span class="dash-mark">—</span></td><td><span class="check-mark">✓</span></td></tr>
+            <tr><td>White Label</td><td><span class="dash-mark">—</span></td><td><span class="dash-mark">—</span></td><td><span class="check-mark">✓</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    function selectBillingCycle(months, el) {
+      document.querySelectorAll('.billing-btn').forEach(btn => btn.classList.remove('active'));
+      if (el) el.classList.add('active');
+    }
+  </script>
+</body>
+</html>

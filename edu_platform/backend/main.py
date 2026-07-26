@@ -144,6 +144,10 @@ async def serve_settings_media():
 async def serve_settings_dev():
     return FileResponse(os.path.join(FRONTEND_DIR, "settings-dev.html"))
 
+@app.get("/manage/school/settings/subscription")
+async def serve_settings_subscription():
+    return FileResponse(os.path.join(FRONTEND_DIR, "settings-subscription.html"))
+
 @app.get("/manage/school/settings/{setting_slug}")
 async def serve_generic_settings(setting_slug: str):
     return FileResponse(os.path.join(FRONTEND_DIR, "settings-basic.html"))
