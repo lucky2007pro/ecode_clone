@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="uz" class="notranslate" style="color-scheme: dark;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Imkoniyatlar Detallari — Exode.biz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --card-bg: #111827;
+      --card-border: rgba(255, 255, 255, 0.1);
+      --accent-orange: #f97316;
+      --accent-cyan: #06b6d4;
+      --text-main: #f8fafc;
+      --text-dim: #94a3b8;
+      --green-active: #10b981;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: var(--bg-dark); color: var(--text-main); line-height: 1.5; min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* NAVBAR */
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 3rem; border-bottom: 1px solid var(--card-border); background: rgba(9, 13, 22, 0.85); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
+    .nav-brand { display: flex; align-items: center; gap: 8px; font-size: 1.5rem; font-weight: 800; color: #fff; text-decoration: none; }
+    .text-gradient { background: linear-gradient(135deg, #06b6d4, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    .nav-links { display: flex; align-items: center; gap: 2rem; list-style: none; }
+    .nav-link { color: var(--text-dim); text-decoration: none; font-size: 0.95rem; font-weight: 600; transition: color 0.2s; cursor: pointer; padding: 6px 10px; border-radius: 8px; }
+    .nav-link:hover { color: #fff; }
+
+    .dropdown-container { position: relative; display: flex; align-items: center; }
+    .dropdown-menu { display: none; position: absolute; top: calc(100% + 4px); left: -80px; width: 640px; padding: 1.25rem; background: #0f172a; border: 1px solid var(--card-border); border-radius: 16px; grid-template-columns: 1fr 1fr; gap: 0.8rem; z-index: 1000; box-shadow: 0 25px 60px rgba(0,0,0,0.85); }
+    .dropdown-menu::before { content: ''; position: absolute; top: -20px; left: 0; right: 0; height: 20px; background: transparent; }
+    .dropdown-container:hover .dropdown-menu, .dropdown-menu.show { display: grid; }
+    .dropdown-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px; border-radius: 12px; text-decoration: none; color: inherit; transition: background 0.2s; }
+    .dropdown-item:hover { background: rgba(255,255,255,0.06); }
+    .dropdown-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.3); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+
+    .btn { padding: 10px 22px; border-radius: 10px; font-weight: 700; text-decoration: none; font-size: 0.9rem; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-primary { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; box-shadow: 0 4px 20px rgba(249, 115, 22, 0.4); }
+    .btn-secondary { background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid var(--card-border); }
+
+    /* CONTENT LAYOUT */
+    .container { max-width: 1100px; margin: 3rem auto; padding: 0 1.5rem; display: flex; flex-direction: column; gap: 2.5rem; }
+
+    .feature-hero { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 3rem; display: flex; flex-direction: column; gap: 1.5rem; text-align: center; align-items: center; }
+    .badge { background: rgba(6, 182, 212, 0.12); border: 1px solid rgba(6, 182, 212, 0.3); color: var(--accent-cyan); padding: 6px 18px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; width: fit-content; }
+    
+    .feature-title { font-size: 2.8rem; font-weight: 800; line-height: 1.2; letter-spacing: -1px; }
+    .feature-desc { font-size: 1.15rem; color: var(--text-dim); max-width: 780px; line-height: 1.6; }
+
+    .preview-image-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.6); display: flex; flex-direction: column; }
+    .preview-img { width: 100%; height: auto; display: block; }
+
+    .highlights-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .highlight-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; gap: 10px; }
+    .highlight-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(249, 115, 22, 0.15); border: 1px solid rgba(249, 115, 22, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: var(--accent-orange); }
+
+    footer { border-top: 1px solid var(--card-border); padding: 2.5rem 0; margin-top: auto; text-align: center; color: var(--text-dim); font-size: 0.88rem; }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="/" class="nav-brand">
+      <div style="font-size:1.4rem">⚡</div>
+      <span>exode<span class="text-gradient">.biz</span></span>
+    </a>
+
+    <ul class="nav-links">
+      <li class="dropdown-container">
+        <span class="nav-link" id="imkoniyatlarTrigger" onclick="toggleDropdownMenu(event)">Imkoniyatlar ▼</span>
+        <div class="dropdown-menu" id="imkoniyatlarMenu">
+          <a href="/features" class="dropdown-item"><div class="dropdown-icon">📑</div><div><div style="font-weight:700;color:#fff">Barcha imkoniyatlar</div><div style="font-size:0.78rem;color:var(--text-dim)">Bitta platformada 11 ta vosita</div></div></a>
+          <a href="/features/course-builder" class="dropdown-item"><div class="dropdown-icon">🎛️</div><div><div style="font-weight:700;color:#fff">Kurs konstruktori</div><div style="font-size:0.78rem;color:var(--text-dim)">Video DRM, matn, testlar muharriri</div></div></a>
+          <a href="/features/homework" class="dropdown-item"><div class="dropdown-icon">📝</div><div><div style="font-weight:700;color:#fff">Uy vazifalari</div><div style="font-size:0.78rem;color:var(--text-dim)">Testlar, topshiriqlar va avto-tekshirish</div></div></a>
+          <a href="/features/payments" class="dropdown-item"><div class="dropdown-icon">💳</div><div><div style="font-weight:700;color:#fff">To'lovlar & CRM</div><div style="font-size:0.78rem;color:var(--text-dim)">Kommo CRM v4 va Telegram Admin</div></div></a>
+          <a href="/features/customization" class="dropdown-item"><div class="dropdown-icon">🎨</div><div><div style="font-weight:700;color:#fff">Maktab kastomizatsiyasi</div><div style="font-size:0.78rem;color:var(--text-dim)">O'z brendingiz, ranglar va domen</div></div></a>
+          <a href="/features/analytics" class="dropdown-item"><div class="dropdown-icon">📈</div><div><div style="font-weight:700;color:#fff">Analitika & Users</div><div style="font-size:0.78rem;color:var(--text-dim)">Daromad, o'quvchilar va o'qituvchilar</div></div></a>
+          <a href="/features/messenger" class="dropdown-item"><div class="dropdown-icon">💬</div><div><div style="font-weight:700;color:#fff">Messendjer</div><div style="font-size:0.78rem;color:var(--text-dim)">Real-time WebSocket suhbat</div></div></a>
+          <a href="/features/student" class="dropdown-item"><div class="dropdown-icon">🎓</div><div><div style="font-weight:700;color:#fff">O'quvchi Paneli</div><div style="font-size:0.78rem;color:var(--text-dim)">My Training va darslar</div></div></a>
+        </div>
+      </li>
+      <li><a href="/courses" class="nav-link">Kurslar Catalog</a></li>
+      <li><a href="/pricing" class="nav-link">Tariflar</a></li>
+      <li><a href="/manage/dashboard" class="nav-link">Dashboard</a></li>
+    </ul>
+
+    <div style="display:flex;gap:12px">
+      <a href="/login" class="btn btn-secondary">Kirish</a>
+      <a href="/register" class="btn btn-primary">Maktab ochish</a>
+    </div>
+  </nav>
+
+  <!-- DYNAMIC FEATURE HERO -->
+  <div class="container">
+    <div class="feature-hero">
+      <span class="badge" id="featBadge">⚡ Professional Tool</span>
+      <h1 class="feature-title" id="featTitle">Imkoniyat Nomi</h1>
+      <p class="feature-desc" id="featDesc">Ushbu imkoniyat bo'yicha batafsil ma'lumotlar va rasmlar taqdimoti.</p>
+      
+      <div style="display:flex;gap:16px;margin-top:0.5rem">
+        <a href="#" id="appRedirectBtn" class="btn btn-primary">⚡ Sinab Ko'rish (Boshqaruv Paneli)</a>
+        <a href="/pricing" class="btn btn-secondary">Tariflarni Ko'rish</a>
+      </div>
+    </div>
+
+    <!-- HIGH-QUALITY PREVIEW IMAGE -->
+    <div class="preview-image-card">
+      <div style="padding:1rem 1.5rem;background:rgba(255,255,255,0.02);border-bottom:1px solid var(--card-border);font-weight:700;font-size:0.9rem;display:flex;align-items:center;justify-content:space-between">
+        <span id="previewHeaderTitle">📸 Real Platform UI Dashboard Interface Preview</span>
+        <span style="color:var(--green-active)">● HD Digital Render</span>
+      </div>
+      <img id="featImg" class="preview-img" src="/src/course_builder_preview.png" alt="Feature Preview" />
+    </div>
+
+    <!-- 3 HIGHLIGHT CARDS -->
+    <div class="highlights-grid" id="highlightsGrid">
+      <!-- DYNAMICALLY POPULATED -->
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2026 Exode.biz — Onlayn Maktab va Kurslar Platformasi. Barcha huquqlar himoyalangan.</p>
+  </footer>
+
+  <script>
+    const FEATURE_DATA = {
+      'course-builder': {
+        title: 'Kurs Konstruktori va Kinescope DRM Video',
+        badge: '🎛️ Kurs Muharriri & Video DRM Protection',
+        desc: 'Modullarni vizual daraxt ko\'rinishida yarating, Kinescope API Key (a4200163-b642...) orqali DRM videolarni yuklang, matn va test topshiriqlarini biriktiring.',
+        img: '/src/course_builder_preview.png',
+        appUrl: '/manage/courses/1',
+        highlights: [
+          { icon: '📹', title: 'Kinescope DRM Video', desc: 'Videolaringiz ekrandan yozib olinmaydi va yuklab olinmaydi.' },
+          { icon: '🌲', title: 'Modul & Darslar Daraxti', desc: 'Cheksiz modullar va darslar ketma-ketligini osongina tahrirlang.' },
+          { icon: '📝', title: 'Testlar va Savollar', desc: 'Har bir dars oxiriga avtomatik baholanadigan testlar biriktiring.' }
+        ]
+      },
+      'homework': {
+        title: 'Uy Vazifalari va Avto-Tekshirish',
+        badge: '📝 Practice & Homework Submissions',
+        desc: 'O\'quvchilar topshiriq javoblarini va loyiha havolalarini yuboradi. Ustozlar 1-5 baholash sistemasi va izohlar bilan vazifani qabul qiladi.',
+        img: '/src/homework_preview.png',
+        appUrl: '/homework',
+        highlights: [
+          { icon: '⭐', title: '1 dan 5 gacha Baholash', desc: 'O\'quvchilar topshiriqlarini baholang va ustoz izohlarini qoldiring.' },
+          { icon: '📊', title: 'Topshiriqlar Jadvali', desc: 'Barcha o\'quvchilar javoblarini bitta qulay jadvalda ko\'ring.' },
+          { icon: '✉️', title: 'Avto-xabarnoma', desc: 'Baho qo\'yilganda o\'quvchiga avtomatik email va bildirishnoma boradi.' }
+        ]
+      },
+      'payments': {
+        title: 'To\'lovlarni Qabul Qilish va Kommo CRM v4',
+        badge: '💳 Sales, Invoices & CRM Integration',
+        desc: 'Payme, Click, Uzum va Telegram Admin checkout orqali to\'lovlarni qabul qiling. Har bir lid avtomatik Kommo CRM v4 quvuriga o\'tadi.',
+        img: '/src/payments_crm_preview.png',
+        appUrl: '/payments',
+        highlights: [
+          { icon: '💳', title: 'Payme / Click / Uzum', desc: 'O\'zbekiston va xalqaro to\'lov tizimlari bilan integratsiya.' },
+          { icon: '📈', title: 'Kommo CRM v4 Auto-Sync', desc: 'Client ID e8ce8579-8797... orqali lidlar CRM ga o\'tadi.' },
+          { icon: '✈️', title: 'Telegram Admin Grant', desc: '@exode_biz_support orqali qo\'lda yoki avto kursga ruxsat berish.' }
+        ]
+      },
+      'customization': {
+        title: 'Maktab Kastemizatsiyasi va Shaxsiy Domen',
+        badge: '🎨 School Branding & Custom Domain',
+        desc: 'O\'z maktabingiz logotipi, domeni (dev.exode.biz yoki o\'z domeningiz), brend ranglari va profil menyularini 100% o\'zingizga moslang.',
+        img: '/src/course_builder_preview.png',
+        appUrl: '/customization',
+        highlights: [
+          { icon: '🌐', title: 'Shaxsiy Domen', desc: 'Maktabingizni o\'z domeni va SSL sertifikati bilan ishlashtiring.' },
+          { icon: '🎨', title: 'Brending va Logotip', desc: 'Dizayn ranglari, shior va logotiplaringizni bir daqiqada yangilang.' },
+          { icon: '👤', title: 'Profil Pop-up Menyusi', desc: 'Foydalanuvchilar uchun qulay va zamonaviy shaxsiy kabinet menyusi.' }
+        ]
+      },
+      'analytics': {
+        title: 'Analitika va Foydalanuvchilar Boshqaruvi',
+        badge: '📈 Revenue Analytics & Role Management',
+        desc: 'Maktabingiz daromadi, faol o\'quvchilar soni hamda admin/o\'qituvchilar huquqlarini bitta joydan nazorat qiling.',
+        img: '/src/payments_crm_preview.png',
+        appUrl: '/analytics',
+        highlights: [
+          { icon: '📊', title: 'Daromad Grafigi', desc: 'Kunlik va oylik tushumlarni aniq grafiklarda kuzating.' },
+          { icon: '👥', title: 'Rollarni Biriktirish', desc: 'Admin, O\'qituvchi va O\'quvchi huquqlarini belgilang.' },
+          { icon: '⚡', title: 'Faollik Statistikasi', desc: 'O\'quvchilar darslarni qanchalik o\'zlashtirayotganini ko\'ring.' }
+        ]
+      },
+      'messenger': {
+        title: 'Real-time WebSocket Messendjer',
+        badge: '💬 Live Chat & Group Channels',
+        desc: 'FastAPI WebSocket texnologiyasi asosida ustoz va o\'quvchilar o\'rtasida onlayn tezkor xabarlashuv va savol-javoblar.',
+        img: '/src/messenger_preview.png',
+        appUrl: '/chat',
+        highlights: [
+          { icon: '⚡', title: 'WebSocket Realtime', desc: 'Xabarlar bir soniyada kechikmasdan yetib boradi.' },
+          { icon: '🟢', title: 'Online Status', desc: 'Suhbatdoshlaringiz tarmoqda ekanligini yashil nishon bilan ko\'ring.' },
+          { icon: '📝', title: 'Fayl va Rasm Almashish', desc: 'Uy vazifalari bo\'yicha rasm va fayllarni chatda yuboring.' }
+        ]
+      },
+      'student': {
+        title: 'O\'quvchi Shaxsiy Paneli (My Training)',
+        badge: '🎓 Student Training Dashboard',
+        desc: 'O\'quvchilar sotib olgan kurslarini ko\'radi, darslarni ko\'radi, sertifikatlarini oladi va progressini kuzatadi.',
+        img: '/src/course_builder_preview.png',
+        appUrl: '/training',
+        highlights: [
+          { icon: '↺', title: 'My Training', desc: 'Barcha sotib olingan va faol kurslar ro\'yxati.' },
+          { icon: '🏆', title: 'Sertifikatlar', desc: 'Kursni muvaffaqiyatli tugatganda avtomatik sertifikat berish.' },
+          { icon: '▶️', title: 'Progressni Davom Ettirish', desc: 'Oxirgi to\'xtagan darsingizdan darhol davom eting.' }
+        ]
+      }
+    };
+
+    function loadFeatureDetails() {
+      const pathParts = window.location.pathname.split('/');
+      const featKey = pathParts[pathParts.length - 1] || 'course-builder';
+      const data = FEATURE_DATA[featKey] || FEATURE_DATA['course-builder'];
+
+      document.getElementById('pageTitle').innerText = data.title + ' — Exode.biz';
+      document.getElementById('featBadge').innerText = data.badge;
+      document.getElementById('featTitle').innerText = data.title;
+      document.getElementById('featDesc').innerText = data.desc;
+      document.getElementById('featImg').src = data.img;
+      document.getElementById('appRedirectBtn').href = data.appUrl;
+      document.getElementById('previewHeaderTitle').innerText = '📸 ' + data.title + ' UI Dashboard Preview';
+
+      const grid = document.getElementById('highlightsGrid');
+      grid.innerHTML = '';
+      data.highlights.forEach(h => {
+        const card = document.createElement('div');
+        card.className = 'highlight-card';
+        card.innerHTML = `
+          <div class="highlight-icon">${h.icon}</div>
+          <h3 style="font-weight:700">${h.title}</h3>
+          <p style="font-size:0.85rem;color:var(--text-dim)">${h.desc}</p>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function toggleDropdownMenu(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('imkoniyatlarMenu');
+      menu.classList.toggle('show');
+    }
+
+    document.addEventListener('click', function(e) {
+      const menu = document.getElementById('imkoniyatlarMenu');
+      const trigger = document.getElementById('imkoniyatlarTrigger');
+      if (menu && menu.classList.contains('show') && !menu.contains(e.target) && e.target !== trigger) {
+        menu.classList.remove('show');
+      }
+    });
+
+    window.onload = loadFeatureDetails;
+  </script>
+</body>
+</html>

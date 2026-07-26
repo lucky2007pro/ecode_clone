@@ -34,7 +34,6 @@
     
     .dropdown-menu { display: none; position: absolute; top: calc(100% + 4px); left: -80px; width: 640px; padding: 1.25rem; background: #0f172a; border: 1px solid var(--card-border); border-radius: 16px; grid-template-columns: 1fr 1fr; gap: 0.8rem; z-index: 1000; box-shadow: 0 25px 60px rgba(0,0,0,0.85); }
     
-    /* INVISIBLE HOVER BRIDGE TO PREVENT DROPDOWN DISAPPEARING ON MOUSE MOVE DOWN */
     .dropdown-menu::before {
       content: '';
       position: absolute;
@@ -69,7 +68,7 @@
 </head>
 <body>
 
-  <!-- NAVBAR WITH INVISIBLE HOVER BRIDGE & CLICK TOGGLE -->
+  <!-- NAVBAR WITH FEATURE SHOWCASE ROUTE LINKS -->
   <nav class="navbar">
     <a href="/" class="nav-brand">
       <div style="font-size:1.4rem">⚡</div>
@@ -81,13 +80,13 @@
         <span class="nav-link" id="imkoniyatlarTrigger" onclick="toggleDropdownMenu(event)">Imkoniyatlar ▼</span>
         <div class="dropdown-menu" id="imkoniyatlarMenu">
           <a href="/features" class="dropdown-item"><div class="dropdown-icon">📑</div><div><div style="font-weight:700;color:#fff">Barcha imkoniyatlar</div><div style="font-size:0.78rem;color:var(--text-dim)">Bitta platformada 11 ta vosita</div></div></a>
-          <a href="/course-builder" class="dropdown-item"><div class="dropdown-icon">🎛️</div><div><div style="font-weight:700;color:#fff">Kurs konstruktori</div><div style="font-size:0.78rem;color:var(--text-dim)">Video DRM, matn, testlar muharriri</div></div></a>
-          <a href="/homework" class="dropdown-item"><div class="dropdown-icon">📝</div><div><div style="font-weight:700;color:#fff">Uy vazifalari</div><div style="font-size:0.78rem;color:var(--text-dim)">Testlar, topshiriqlar va avto-tekshirish</div></div></a>
-          <a href="/payments" class="dropdown-item"><div class="dropdown-icon">💳</div><div><div style="font-weight:700;color:#fff">To'lovlar & CRM</div><div style="font-size:0.78rem;color:var(--text-dim)">Kommo CRM v4 va Telegram Admin</div></div></a>
-          <a href="/customization" class="dropdown-item"><div class="dropdown-icon">🎨</div><div><div style="font-weight:700;color:#fff">Maktab kastomizatsiyasi</div><div style="font-size:0.78rem;color:var(--text-dim)">O'z brendingiz, ranglar va domen</div></div></a>
-          <a href="/analytics" class="dropdown-item"><div class="dropdown-icon">📈</div><div><div style="font-weight:700;color:#fff">Analitika & Users</div><div style="font-size:0.78rem;color:var(--text-dim)">Daromad, o'quvchilar va o'qituvchilar</div></div></a>
-          <a href="/messenger" class="dropdown-item"><div class="dropdown-icon">💬</div><div><div style="font-weight:700;color:#fff">Messendjer</div><div style="font-size:0.78rem;color:var(--text-dim)">Real-time WebSocket suhbat</div></div></a>
-          <a href="/training" class="dropdown-item"><div class="dropdown-icon">🎓</div><div><div style="font-weight:700;color:#fff">O'quvchi Paneli</div><div style="font-size:0.78rem;color:var(--text-dim)">My Training va darslar</div></div></a>
+          <a href="/features/course-builder" class="dropdown-item"><div class="dropdown-icon">🎛️</div><div><div style="font-weight:700;color:#fff">Kurs konstruktori</div><div style="font-size:0.78rem;color:var(--text-dim)">Video DRM, matn, testlar muharriri</div></div></a>
+          <a href="/features/homework" class="dropdown-item"><div class="dropdown-icon">📝</div><div><div style="font-weight:700;color:#fff">Uy vazifalari</div><div style="font-size:0.78rem;color:var(--text-dim)">Testlar, topshiriqlar va avto-tekshirish</div></div></a>
+          <a href="/features/payments" class="dropdown-item"><div class="dropdown-icon">💳</div><div><div style="font-weight:700;color:#fff">To'lovlar & CRM</div><div style="font-size:0.78rem;color:var(--text-dim)">Kommo CRM v4 va Telegram Admin</div></div></a>
+          <a href="/features/customization" class="dropdown-item"><div class="dropdown-icon">🎨</div><div><div style="font-weight:700;color:#fff">Maktab kastomizatsiyasi</div><div style="font-size:0.78rem;color:var(--text-dim)">O'z brendingiz, ranglar va domen</div></div></a>
+          <a href="/features/analytics" class="dropdown-item"><div class="dropdown-icon">📈</div><div><div style="font-weight:700;color:#fff">Analitika & Users</div><div style="font-size:0.78rem;color:var(--text-dim)">Daromad, o'quvchilar va o'qituvchilar</div></div></a>
+          <a href="/features/messenger" class="dropdown-item"><div class="dropdown-icon">💬</div><div><div style="font-weight:700;color:#fff">Messendjer</div><div style="font-size:0.78rem;color:var(--text-dim)">Real-time WebSocket suhbat</div></div></a>
+          <a href="/features/student" class="dropdown-item"><div class="dropdown-icon">🎓</div><div><div style="font-weight:700;color:#fff">O'quvchi Paneli</div><div style="font-size:0.78rem;color:var(--text-dim)">My Training va darslar</div></div></a>
         </div>
       </li>
       <li><a href="/courses" class="nav-link">Kurslar Catalog</a></li>
@@ -108,7 +107,7 @@
     <p class="hero-desc">Kinescope video DRM xavfsizligi, Kommo CRM v4 avto-lidi, Telegram Admin to'lovlari, Uy vazifalari va Realtime Messenger imkoniyati.</p>
     <div style="display:flex;gap:16px;justify-content:center">
       <a href="/manage/dashboard" class="btn btn-primary">Maktab Yaratish (14 kun bepul)</a>
-      <a href="/courses" class="btn btn-secondary">Barcha Imkoniyatlarni Ko'rish</a>
+      <a href="/features" class="btn btn-secondary">Barcha Imkoniyatlarni Ko'rish</a>
     </div>
   </section>
 

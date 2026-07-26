@@ -136,6 +136,11 @@ async def serve_pricing():
 async def serve_features():
     return FileResponse(os.path.join(FRONTEND_DIR, "features.html"))
 
+# DYNAMIC FEATURE SHOWCASE LANDING ROUTES
+@app.get("/features/{feature_slug}")
+async def serve_feature_detail(feature_slug: str):
+    return FileResponse(os.path.join(FRONTEND_DIR, "feature-detail.html"))
+
 @app.get("/docs")
 async def serve_docs():
     return FileResponse(os.path.join(FRONTEND_DIR, "docs.html"))
