@@ -1,5 +1,6 @@
 import os
-from fastapi import FastAPI
+from typing import List, Dict
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -16,7 +17,7 @@ from notifications.router import router as notifications_router
 
 app = FastAPI(
     title="Exode Education & ERP Platform API",
-    description="Multi-tenant online school platform backend API with Clean URLs",
+    description="Multi-tenant online school platform backend API with Clean URLs and Realtime WebSockets",
     version="2.0.0"
 )
 
@@ -37,6 +38,39 @@ app.include_router(videos_router, prefix="/api/v1/videos", tags=["Kinescope Vide
 app.include_router(crm_router, prefix="/api/v1/crm", tags=["Kommo CRM Integration"])
 app.include_router(payments_router, prefix="/api/v1/payments", tags=["Telegram Admin Payments"])
 app.include_router(notifications_router, prefix="/api/v1/notifications", tags=["Gmail Free SMTP Notifications"])
+
+# REALTIME WEBSOCKET CONNECTION MANAGER
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        if websocket in self.active_connections:
+            self.active_connections.remove(websocket)
+
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
+            try:
+                await connection.send_text(message)
+            except Exception:
+                pass
+
+manager = ConnectionManager()
+
+@app.websocket("/ws/chat/{client_id}")
+async def websocket_chat_endpoint(websocket: WebSocket, client_id: str):
+    await manager.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            # Broadcast incoming message to all connected clients
+            await manager.broadcast(data)
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
 
 # FRONTEND CLEAN URL SERVING MATCHING EXODE.BIZ ROUTES
 FRONTEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend"))
@@ -119,5 +153,4 @@ async def serve_static_file(file_path: str):
     target = os.path.join(FRONTEND_DIR, file_path)
     if os.path.isfile(target):
         return FileResponse(target)
-    # Fallback to index.html
     return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
