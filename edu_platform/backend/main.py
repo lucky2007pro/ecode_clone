@@ -114,10 +114,27 @@ async def serve_homework(homework_id: str = "1"):
 async def serve_analytics(user_id: str = "1"):
     return FileResponse(os.path.join(FRONTEND_DIR, "analytics.html"))
 
+# DEDICATED CLEAN URL ROUTES FOR SETTINGS SECTIONS
 @app.get("/manage/school/settings/basic")
 @app.get("/customization")
-async def serve_customization():
-    return FileResponse(os.path.join(FRONTEND_DIR, "customization.html"))
+async def serve_settings_basic():
+    return FileResponse(os.path.join(FRONTEND_DIR, "settings-basic.html"))
+
+@app.get("/manage/school/settings/team")
+async def serve_settings_team():
+    return FileResponse(os.path.join(FRONTEND_DIR, "settings-team.html"))
+
+@app.get("/manage/school/settings/legal")
+async def serve_settings_legal():
+    return FileResponse(os.path.join(FRONTEND_DIR, "settings-legal.html"))
+
+@app.get("/manage/school/settings/privacy")
+async def serve_settings_privacy():
+    return FileResponse(os.path.join(FRONTEND_DIR, "settings-privacy.html"))
+
+@app.get("/manage/school/settings/{setting_slug}")
+async def serve_generic_settings(setting_slug: str):
+    return FileResponse(os.path.join(FRONTEND_DIR, "settings-basic.html"))
 
 @app.get("/chat")
 @app.get("/messenger")
@@ -136,7 +153,6 @@ async def serve_pricing():
 async def serve_features():
     return FileResponse(os.path.join(FRONTEND_DIR, "features.html"))
 
-# DYNAMIC FEATURE SHOWCASE LANDING ROUTES
 @app.get("/features/{feature_slug}")
 async def serve_feature_detail(feature_slug: str):
     return FileResponse(os.path.join(FRONTEND_DIR, "feature-detail.html"))
