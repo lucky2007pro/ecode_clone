@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kursni Boshqarish — dev.exode.biz/manage/courses/1</title>
+  <title>Course Detail & Lesson Builder — dev.exode.biz/manage/courses/1</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,57 +17,51 @@
       --accent-orange: #f97316;
       --text-main: #f8fafc;
       --text-muted: #8e99a8;
-      --btn-bg: rgba(255, 255, 255, 0.05);
+      --green-active: #10b981;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     body { background: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
 
-    /* LEFT SIDEBAR WITH CLEAN URLS AND PREMIUM SVG VECTOR ICONS */
-    .sidebar { width: 84px; background: var(--sidebar-bg); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 0.6rem; overflow-y: auto; z-index: 100; flex-shrink: 0; }
-    .sidebar-brand { width: 44px; height: 44px; background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(249, 115, 22, 0.2)); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; cursor: pointer; }
+    /* SIDEBAR */
+    .sidebar { width: 84px; background: var(--sidebar-bg); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 0.6rem; overflow-y: auto; flex-shrink: 0; }
+    .sidebar-brand { width: 44px; height: 44px; background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(249, 115, 22, 0.2)); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; }
 
-    .nav-item { width: 62px; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 0; border-radius: 12px; color: var(--text-muted); text-decoration: none; font-size: 0.68rem; font-weight: 600; transition: all 0.2s; cursor: pointer; }
+    .nav-item { width: 62px; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 0; border-radius: 12px; color: var(--text-muted); text-decoration: none; font-size: 0.68rem; font-weight: 600; transition: all 0.2s; }
     .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.04); }
     .nav-item.active { color: var(--accent-cyan); background: rgba(6, 182, 212, 0.12); border: 1px solid rgba(6, 182, 212, 0.3); }
     .svg-icon { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-    .sidebar-avatar { margin-top: auto; width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; border: 2px solid #22c55e; position: relative; }
-
     /* MAIN CONTENT */
-    .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: var(--bg-dark); }
-    .top-header { display: flex; justify-content: space-between; align-items: center; padding: 1.1rem 2rem; border-bottom: 1px solid var(--card-border); }
+    .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-dark); }
+    .top-header { display: flex; justify-content: space-between; align-items: center; padding: 1.1rem 2rem; border-bottom: 1px solid var(--card-border); flex-shrink: 0; }
     .header-left { display: flex; align-items: center; gap: 12px; font-size: 1.25rem; font-weight: 700; }
-    
+
     .course-tabs { display: flex; gap: 6px; background: rgba(255,255,255,0.04); padding: 4px; border-radius: 12px; }
-    .tab-btn { padding: 8px 18px; border-radius: 9px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
+    .tab-btn { padding: 8px 18px; border-radius: 9px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; }
     .tab-btn.active { background: var(--accent-orange); color: #fff; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3); }
 
-    /* COURSE BUILDER CONTENT GRID */
-    .builder-container { padding: 1.8rem 2rem; display: grid; grid-template-columns: 340px 1fr; gap: 1.5rem; }
-    
-    /* LEFT MODULES TREE */
-    .modules-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
-    .module-item { background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; }
-    .module-item.active { border-color: var(--accent-orange); background: rgba(249, 115, 22, 0.08); }
-    .module-header { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 0.95rem; }
-    
-    .lesson-subitem { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 8px; font-size: 0.83rem; color: var(--text-muted); background: rgba(0,0,0,0.2); margin-top: 4px; }
-    .lesson-subitem.active { color: #fff; background: rgba(6, 182, 212, 0.15); border-left: 3px solid var(--accent-cyan); }
+    /* BUILDER GRID */
+    .builder-grid { flex: 1; display: grid; grid-template-columns: 320px 1fr; overflow: hidden; }
 
-    /* RIGHT LESSON EDITOR PANEL */
-    .editor-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.8rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    .module-tree-panel { background: var(--card-bg); border-right: 1px solid var(--card-border); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; }
+    .tree-item { padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); font-size: 0.88rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+    .tree-item.active { border-color: var(--accent-cyan); background: rgba(6,182,212,0.1); color: #fff; }
+
+    .btn-add-module { background: rgba(255,255,255,0.05); border: 1px dashed var(--accent-cyan); color: var(--accent-cyan); padding: 10px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; text-align: center; }
+
+    /* LESSON EDITOR */
+    .editor-panel { padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem; overflow-y: auto; }
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
     .form-input { background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: 10px; padding: 12px 14px; color: #fff; font-size: 0.95rem; outline: none; }
-    .form-input:focus { border-color: var(--accent-cyan); }
 
-    .video-uploader-box { border: 2px dashed rgba(6, 182, 212, 0.4); background: rgba(6, 182, 212, 0.04); border-radius: 14px; padding: 2rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; cursor: pointer; }
-    .btn-primary { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3); }
+    .kinescope-box { border: 2px dashed rgba(6,182,212,0.4); background: rgba(6,182,212,0.04); border-radius: 14px; padding: 2rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; }
+    .btn-save { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 700; cursor: pointer; width: fit-content; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3); }
   </style>
 </head>
 <body>
 
-  <!-- LEFT SIDEBAR WITH CLEAN URLS AND VECTOR SVG ICONS -->
+  <!-- LEFT SIDEBAR -->
   <aside class="sidebar">
     <a href="/" class="sidebar-brand">
       <svg class="svg-icon" style="stroke:var(--accent-cyan)" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
@@ -102,26 +96,14 @@
       <svg class="svg-icon" viewBox="0 0 24 24"><path d="m4 6 8-4 8 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6z"/><path d="M12 22V12"/></svg>
       <span>Maktabim</span>
     </a>
-
-    <a href="/messenger" class="nav-item">
-      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <span>Chats</span>
-    </a>
-
-    <a href="/courses" class="nav-item">
-      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-      <span>O'quvchi</span>
-    </a>
-
-    <div class="sidebar-avatar">H</div>
   </aside>
 
   <!-- MAIN WRAPPER -->
   <main class="main-wrapper">
     <header class="top-header">
       <div class="header-left">
-        <a href="/courses" style="color:var(--text-muted);text-decoration:none;font-size:1rem">← Kurslar</a>
-        <span>Python & FastAPI Microservices</span>
+        <svg class="svg-icon" style="stroke:var(--accent-cyan)" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        <span>Python & FastAPI Microservices — Kurs Konstruktori</span>
       </div>
 
       <div class="course-tabs">
@@ -129,76 +111,74 @@
         <div class="tab-btn">Sozlamalar</div>
         <div class="tab-btn">O'quvchilar</div>
         <div class="tab-btn">Kirish Huquqi</div>
-        <div class="tab-btn">Analitika</div>
       </div>
     </header>
 
-    <!-- COURSE BUILDER CONTAINER MATCHING DEV_COURSE.HTML -->
-    <div class="builder-container">
-      <!-- LEFT MODULES TREE PANEL -->
-      <div class="modules-card">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-weight:700">Modullar & Darslar</span>
-          <button class="btn-primary" style="padding:6px 12px;font-size:0.8rem">+ Modul</button>
+    <div class="builder-grid">
+      <!-- MODULE TREE PANEL -->
+      <div class="module-tree-panel" id="moduleTree">
+        <div style="font-weight:700;font-size:0.9rem;color:var(--text-muted)">MODULLAR VA DARSLAR</div>
+
+        <div class="tree-item active">
+          <span>1.1 FastAPI + asyncpg DB</span>
+          <span style="font-size:0.75rem;color:var(--accent-cyan)">📹 DRM Video</span>
         </div>
 
-        <!-- MODULE 1 -->
-        <div class="module-item active">
-          <div class="module-header">
-            <span>1-Modul: Microservices Architecture</span>
-            <span>▼</span>
-          </div>
-          <div class="lesson-subitem active">
-            <span>1.1 FastAPI + asyncpg Setup</span>
-            <span style="color:var(--accent-cyan)">18:40</span>
-          </div>
-          <div class="lesson-subitem">
-            <span>1.2 RabbitMQ Event-Driven Broker</span>
-            <span>22:15</span>
-          </div>
-          <div class="lesson-subitem">
-            <span>1.3 PostgreSQL Multi-Tenancy</span>
-            <span>15:10</span>
-          </div>
+        <div class="tree-item">
+          <span>1.2 Kinescope DRM Video</span>
+          <span style="font-size:0.75rem;color:var(--accent-cyan)">📹 DRM Video</span>
         </div>
 
-        <!-- MODULE 2 -->
-        <div class="module-item">
-          <div class="module-header">
-            <span>2-Modul: Kinescope & Kommo Integratsiya</span>
-            <span>►</span>
-          </div>
-        </div>
+        <button class="btn-add-module" onclick="addNewModule()">+ Yangi Modul Qo'shish</button>
       </div>
 
-      <!-- RIGHT LESSON EDITOR PANEL -->
-      <div class="editor-card">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <h2>1.1 FastAPI + asyncpg Setup (Dars Muharriri)</h2>
-          <button class="btn-primary">💾 Saqlash</button>
+      <!-- LESSON EDITOR -->
+      <div class="editor-panel">
+        <div class="form-group">
+          <label class="form-label">Dars Sarlavhasi (Lesson Title)</label>
+          <input type="text" id="lessonTitleInput" class="form-input" value="1.1 FastAPI + asyncpg DB Connection Setup" />
         </div>
 
         <div class="form-group">
-          <label class="form-label">Dars Sarlavhasi</label>
-          <input type="text" class="form-input" value="1.1 FastAPI + asyncpg Setup va DB Ulanishi" />
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Kinescope Xavfsiz Video Fayl (api.kinescope.io)</label>
-          <div class="video-uploader-box">
-            <svg class="svg-icon" style="width:42px;height:42px;stroke:var(--accent-cyan)" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-            <div style="font-weight:700">Kinescope Video Yuklash yoki Video ID Kiriting</div>
-            <div style="font-size:0.8rem;color:var(--text-muted)">Videolar to'g'ridan-to'g'ri Kinescope API serverlariga yuklanadi va DRM bilan himoyalanadi</div>
-            <input type="text" class="form-input" style="width:100%;max-width:400px;text-align:center" value="kinescope-v101-fastapi-setup" />
+          <label class="form-label">Kinescope DRM Video Manzili (Upload Video)</label>
+          <div class="kinescope-box" onclick="uploadKinescopeVideo()">
+            <svg class="svg-icon" style="width:40px;height:40px;stroke:var(--accent-cyan)" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+            <div style="font-weight:700">Kinescope DRM Video Faylini Tanlang</div>
+            <div style="font-size:0.78rem;color:var(--text-muted)">API Key: a4200163-b642... (Avto-DRM himoya bilan kodlanadi)</div>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Darsga Biriktirilgan Uy Vazifasi va Testlar</label>
-          <textarea class="form-input" rows="4">1-topshiriq: SQLAlchemy 2.0 asinxron engine va AsyncSessionLocal fixture'ini sozlang.</textarea>
+          <label class="form-label">Dars Matni va Qo'shimcha Havolalar (Markdown / Text)</label>
+          <textarea class="form-input" rows="5">Ushbu darsda biz PostgreSQL 16 bilan FastAPI asyncpg ulagichini sozlaymiz va `init_db()` scriptini yozamiz.</textarea>
         </div>
+
+        <button class="btn-save" onclick="saveLesson()">💾 Darsni Saqlash</button>
       </div>
     </div>
   </main>
+
+  <script>
+    function addNewModule() {
+      const name = prompt("Yangi modul nomini kiriting:");
+      if (!name) return;
+      const tree = document.getElementById('moduleTree');
+      const btn = tree.querySelector('.btn-add-module');
+      const div = document.createElement('div');
+      div.className = 'tree-item';
+      div.innerHTML = `<span>${name}</span><span style="font-size:0.75rem;color:var(--accent-cyan)">📹 DRM Video</span>`;
+      tree.insertBefore(div, btn);
+      alert("Yangi modul (" + name + ") yaratildi!");
+    }
+
+    function uploadKinescopeVideo() {
+      alert("Kinescope DRM API (Key: a4200163-b642...) orqali video yuklandi va kodlandi!");
+    }
+
+    function saveLesson() {
+      const title = document.getElementById('lessonTitleInput').value;
+      alert("Dars (" + title + ") muvaffaqiyatli saqlandi!");
+    }
+  </script>
 </body>
 </html>

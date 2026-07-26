@@ -1,5 +1,5 @@
 import os
-from typing import List, Dict
+from typing import List
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -14,6 +14,7 @@ from videos.router import router as videos_router
 from crm.router import router as crm_router
 from payments.router import router as payments_router
 from notifications.router import router as notifications_router
+from homeworks.router import router as homeworks_router
 
 app = FastAPI(
     title="Exode Education & ERP Platform API",
@@ -38,6 +39,7 @@ app.include_router(videos_router, prefix="/api/v1/videos", tags=["Kinescope Vide
 app.include_router(crm_router, prefix="/api/v1/crm", tags=["Kommo CRM Integration"])
 app.include_router(payments_router, prefix="/api/v1/payments", tags=["Telegram Admin Payments"])
 app.include_router(notifications_router, prefix="/api/v1/notifications", tags=["Gmail Free SMTP Notifications"])
+app.include_router(homeworks_router, prefix="/api/v1/homeworks", tags=["Homework & Practice Submissions"])
 
 # REALTIME WEBSOCKET CONNECTION MANAGER
 class ConnectionManager:
@@ -67,7 +69,6 @@ async def websocket_chat_endpoint(websocket: WebSocket, client_id: str):
     try:
         while True:
             data = await websocket.receive_text()
-            # Broadcast incoming message to all connected clients
             await manager.broadcast(data)
     except WebSocketDisconnect:
         manager.disconnect(websocket)

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Users & Students — dev.exode.biz/manage/school/users/1</title>
+  <title>People & Users — dev.exode.biz/manage/school/users/1</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,64 +17,48 @@
       --accent-orange: #f97316;
       --text-main: #f8fafc;
       --text-muted: #8e99a8;
-      --btn-bg: rgba(255, 255, 255, 0.05);
       --green-active: #10b981;
-      --purple-teacher: #a855f7;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     body { background: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
 
-    /* LEFT SIDEBAR WITH CLEAN URLS */
-    .sidebar { width: 84px; background: var(--sidebar-bg); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 0.6rem; overflow-y: auto; z-index: 100; flex-shrink: 0; }
-    .sidebar-brand { width: 44px; height: 44px; background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(249, 115, 22, 0.2)); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; cursor: pointer; }
+    /* SIDEBAR */
+    .sidebar { width: 84px; background: var(--sidebar-bg); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 0.6rem; overflow-y: auto; flex-shrink: 0; }
+    .sidebar-brand { width: 44px; height: 44px; background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(249, 115, 22, 0.2)); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; }
 
-    .nav-item { width: 62px; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 0; border-radius: 12px; color: var(--text-muted); text-decoration: none; font-size: 0.68rem; font-weight: 600; transition: all 0.2s; cursor: pointer; }
+    .nav-item { width: 62px; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 0; border-radius: 12px; color: var(--text-muted); text-decoration: none; font-size: 0.68rem; font-weight: 600; transition: all 0.2s; }
     .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.04); }
     .nav-item.active { color: var(--accent-cyan); background: rgba(6, 182, 212, 0.12); border: 1px solid rgba(6, 182, 212, 0.3); }
     .svg-icon { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-    .sidebar-avatar { margin-top: auto; width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; border: 2px solid #22c55e; position: relative; }
-
-    /* MAIN WRAPPER */
+    /* MAIN CONTENT */
     .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: var(--bg-dark); }
     .top-header { display: flex; justify-content: space-between; align-items: center; padding: 1.1rem 2rem; border-bottom: 1px solid var(--card-border); }
     .header-left { display: flex; align-items: center; gap: 12px; font-size: 1.25rem; font-weight: 700; }
-    
-    .btn-add-user { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; border: none; padding: 8px 18px; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3); }
 
-    /* PEOPLE CONTAINER */
-    .people-container { padding: 1.8rem 2rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    .btn-add-user { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; border: none; padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3); }
 
-    /* FILTERS CARD MATCHING PEOPLE.HTML */
-    .filters-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.25rem; display: flex; justify-content: space-between; align-items: center; }
-    .status-pills { display: flex; gap: 8px; background: rgba(255,255,255,0.04); padding: 4px; border-radius: 10px; }
-    .pill-btn { padding: 6px 16px; border-radius: 7px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; }
-    .pill-btn.active { background: var(--accent-orange); color: #fff; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3); }
+    .users-container { padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem; }
 
-    .search-input { background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: 10px; padding: 8px 14px; color: #fff; font-size: 0.88rem; outline: none; width: 280px; }
-
-    /* USERS TABLE */
+    /* TABLE */
     .table-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; overflow: hidden; }
-    .users-table { width: 100%; border-collapse: collapse; text-align: left; }
-    .users-table th { background: rgba(255,255,255,0.03); padding: 14px 18px; color: var(--text-muted); font-size: 0.82rem; font-weight: 700; border-bottom: 1px solid var(--card-border); }
-    .users-table td { padding: 16px 18px; border-bottom: 1px solid var(--card-border); font-size: 0.9rem; }
-    .users-table tr:last-child td { border-bottom: none; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { padding: 1rem 1.25rem; background: rgba(255,255,255,0.02); color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700; border-bottom: 1px solid var(--card-border); }
+    td { padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--card-border); font-size: 0.9rem; }
 
-    .user-avatar-cell { display: flex; align-items: center; gap: 12px; }
-    .avatar-circle { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #06b6d4, #3b82f6); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; }
+    .role-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+    .role-admin { background: rgba(249, 115, 22, 0.15); color: var(--accent-orange); border: 1px solid rgba(249, 115, 22, 0.3); }
+    .role-student { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); border: 1px solid rgba(6, 182, 212, 0.3); }
 
-    .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
-    .badge-student { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); border: 1px solid rgba(6, 182, 212, 0.3); }
-    .badge-admin { background: rgba(249, 115, 22, 0.15); color: var(--accent-orange); border: 1px solid rgba(249, 115, 22, 0.3); }
-    .badge-active { background: rgba(16, 185, 129, 0.15); color: var(--green-active); border: 1px solid rgba(16, 185, 129, 0.3); }
-
-    .btn-edit { background: var(--btn-bg); border: 1px solid var(--card-border); color: var(--text-muted); padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
-    .btn-edit:hover { color: #fff; border-color: var(--accent-cyan); }
+    /* MODAL */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; }
+    .modal-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 2rem; width: 440px; display: flex; flex-direction: column; gap: 1rem; }
+    .modal-input { background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: 10px; padding: 10px 14px; color: #fff; font-size: 0.9rem; outline: none; }
   </style>
 </head>
 <body>
 
-  <!-- LEFT SIDEBAR WITH CLEAN URLS -->
+  <!-- LEFT SIDEBAR -->
   <aside class="sidebar">
     <a href="/" class="sidebar-brand">
       <svg class="svg-icon" style="stroke:var(--accent-cyan)" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
@@ -109,97 +93,120 @@
       <svg class="svg-icon" viewBox="0 0 24 24"><path d="m4 6 8-4 8 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6z"/><path d="M12 22V12"/></svg>
       <span>Maktabim</span>
     </a>
-
-    <a href="/messenger" class="nav-item">
-      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <span>Chats</span>
-    </a>
-
-    <a href="/courses" class="nav-item">
-      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-      <span>O'quvchi</span>
-    </a>
-
-    <div class="sidebar-avatar">H</div>
   </aside>
 
   <!-- MAIN WRAPPER -->
   <main class="main-wrapper">
     <header class="top-header">
       <div class="header-left">
-        <svg class="svg-icon" style="stroke:var(--accent-cyan)" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <span>1. Users & Students (Foydalanuvchilar va O'quvchilar)</span>
+        <svg class="svg-icon" style="stroke:var(--accent-cyan)" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        <span>1. People & Users (Foydalanuvchilar Boshqaruvi)</span>
       </div>
 
-      <button class="btn-add-user" onclick="alert('Yangi foydalanuvchi taklif qilindi va Gmail orqali havola yuborildi!')">
-        + Foydalanuvchi Qo'shish
+      <button class="btn-add-user" onclick="openAddUserModal()">
+        <span>+ Yangi Foydalanuvchi Qo'shish</span>
       </button>
     </header>
 
-    <div class="people-container">
-      <!-- FILTERS CARD MATCHING PEOPLE.HTML -->
-      <div class="filters-card">
-        <div class="status-pills">
-          <div class="pill-btn active">Barchasi (All)</div>
-          <div class="pill-btn">O'quvchilar (Students)</div>
-          <div class="pill-btn">O'qituvchilar (Teachers)</div>
-          <div class="pill-btn">Adminlar</div>
-        </div>
-
-        <input type="text" class="search-input" placeholder="🔍 Ism, Email yoki Telefon bo'yicha..." />
-      </div>
-
-      <!-- USERS TABLE MATCHING PEOPLE.HTML -->
+    <div class="users-container">
       <div class="table-card">
-        <table class="users-table">
+        <table>
           <thead>
             <tr>
-              <th>FOYDALANUVCHI (NAME)</th>
-              <th>EMAIL & ALOQA</th>
-              <th>ROLI (ROLE)</th>
-              <th>A'ZOLIK SANI</th>
-              <th>HOLAT (STATUS)</th>
-              <th>AMAL (ACTION)</th>
+              <th>Ism-Sharif</th>
+              <th>Email / ID</th>
+              <th>Rol (Role)</th>
+              <th>Status</th>
+              <th>Amal</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="usersTbody">
             <tr>
-              <td>
-                <div class="user-avatar-cell">
-                  <div class="avatar-circle">H</div>
-                  <div>
-                    <div style="font-weight:700">Hojiakbar Hayrullayev</div>
-                    <div style="font-size:0.78rem;color:var(--text-muted)">ID: #160021</div>
-                  </div>
-                </div>
-              </td>
-              <td>usa20070302@gmail.com</td>
-              <td><span class="badge badge-admin">👑 Admin / Creator</span></td>
-              <td style="color:var(--text-muted)">25 Jul 2026</td>
-              <td><span class="badge badge-active">● Active</span></td>
-              <td><button class="btn-edit">✏️ Tahrirlash</button></td>
+              <td style="font-weight:700">Hojiakbar Hayrullayev</td>
+              <td>usa20070302@gmail.com <br><span style="font-size:0.75rem;color:var(--text-muted)">id160021</span></td>
+              <td><span class="role-badge role-admin">👑 School Owner / Admin</span></td>
+              <td><span style="color:var(--green-active);font-weight:700">● Active</span></td>
+              <td><button style="background:none;border:1px solid var(--card-border);color:var(--text-muted);padding:4px 10px;border-radius:6px;cursor:pointer">Tahrirlash</button></td>
             </tr>
-
             <tr>
-              <td>
-                <div class="user-avatar-cell">
-                  <div class="avatar-circle" style="background:linear-gradient(135deg, #f97316, #ea580c)">S</div>
-                  <div>
-                    <div style="font-weight:700">Sardor Alimov</div>
-                    <div style="font-size:0.78rem;color:var(--text-muted)">ID: #160022</div>
-                  </div>
-                </div>
-              </td>
-              <td>sardor@gmail.com</td>
-              <td><span class="badge badge-student">🎓 Student</span></td>
-              <td style="color:var(--text-muted)">25 Jul 2026</td>
-              <td><span class="badge badge-active">● Active</span></td>
-              <td><button class="btn-edit">✏️ Tahrirlash</button></td>
+              <td style="font-weight:700">Sardor Alimov</td>
+              <td>sardor@dev.uz <br><span style="font-size:0.75rem;color:var(--text-muted)">id160022</span></td>
+              <td><span class="role-badge role-student">🎓 Student</span></td>
+              <td><span style="color:var(--green-active);font-weight:700">● Active</span></td>
+              <td><button style="background:none;border:1px solid var(--card-border);color:var(--text-muted);padding:4px 10px;border-radius:6px;cursor:pointer">Tahrirlash</button></td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
   </main>
+
+  <!-- ADD USER MODAL -->
+  <div class="modal-overlay" id="addUserModal">
+    <div class="modal-card">
+      <h3 style="font-size:1.1rem;font-weight:700">Yangi Foydalanuvchi Biriktirish</h3>
+      
+      <div>
+        <label style="font-size:0.8rem;color:var(--text-muted)">Ism-Sharifi</label>
+        <input type="text" id="addNameInput" class="modal-input" style="width:100%" placeholder="Masalan: Azizbek Karimov" />
+      </div>
+
+      <div>
+        <label style="font-size:0.8rem;color:var(--text-muted)">Email Manzili</label>
+        <input type="email" id="addEmailInput" class="modal-input" style="width:100%" placeholder="azizbek@gmail.com" />
+      </div>
+
+      <div>
+        <label style="font-size:0.8rem;color:var(--text-muted)">Roli</label>
+        <select id="addRoleInput" class="modal-input" style="width:100%">
+          <option value="Student">O'quvchi (Student)</option>
+          <option value="Teacher">O'qituvchi (Teacher)</option>
+          <option value="Admin">Admin</option>
+        </select>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button onclick="closeAddUserModal()" style="background:none;border:1px solid var(--card-border);color:var(--text-muted);padding:8px 16px;border-radius:8px;cursor:pointer">Bekor Qilish</button>
+        <button onclick="submitAddUser()" class="btn-add-user">💾 Qo'shish</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openAddUserModal() {
+      document.getElementById('addUserModal').style.display = 'flex';
+    }
+    function closeAddUserModal() {
+      document.getElementById('addUserModal').style.display = 'none';
+    }
+
+    function submitAddUser() {
+      const name = document.getElementById('addNameInput').value;
+      const email = document.getElementById('addEmailInput').value;
+      const role = document.getElementById('addRoleInput').value;
+
+      if (!name || !email) {
+        alert('Iltimos ism va emailni kiriting!');
+        return;
+      }
+
+      const tbody = document.getElementById('usersTbody');
+      const tr = document.createElement('tr');
+      const badgeClass = role === 'Admin' ? 'role-admin' : 'role-student';
+      const roleLabel = role === 'Admin' ? '👑 Admin' : '🎓 Student';
+
+      tr.innerHTML = `
+        <td style="font-weight:700">${name}</td>
+        <td>${email} <br><span style="font-size:0.75rem;color:var(--text-muted)">id${Math.floor(Math.random()*900000 + 100000)}</span></td>
+        <td><span class="role-badge ${badgeClass}">${roleLabel}</span></td>
+        <td><span style="color:var(--green-active);font-weight:700">● Active</span></td>
+        <td><button style="background:none;border:1px solid var(--card-border);color:var(--text-muted);padding:4px 10px;border-radius:6px;cursor:pointer">Tahrirlash</button></td>
+      `;
+      tbody.appendChild(tr);
+
+      closeAddUserModal();
+      alert(name + " tizimga " + role + " sifatida muvaffaqiyatli qo'shildi!");
+    }
+  </script>
 </body>
 </html>

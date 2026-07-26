@@ -17,59 +17,44 @@
       --accent-orange: #f97316;
       --text-main: #f8fafc;
       --text-muted: #8e99a8;
-      --btn-bg: rgba(255, 255, 255, 0.05);
-      --green-paid: #10b981;
-      --orange-pending: #f59e0b;
+      --green-active: #10b981;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     body { background: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
 
-    /* LEFT SIDEBAR WITH CLEAN URLS AND VECTOR SVG ICONS */
-    .sidebar { width: 84px; background: var(--sidebar-bg); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 0.6rem; overflow-y: auto; z-index: 100; flex-shrink: 0; }
-    .sidebar-brand { width: 44px; height: 44px; background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(249, 115, 22, 0.2)); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; cursor: pointer; }
+    /* SIDEBAR */
+    .sidebar { width: 84px; background: var(--sidebar-bg); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 0.6rem; overflow-y: auto; flex-shrink: 0; }
+    .sidebar-brand { width: 44px; height: 44px; background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(249, 115, 22, 0.2)); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; }
 
-    .nav-item { width: 62px; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 0; border-radius: 12px; color: var(--text-muted); text-decoration: none; font-size: 0.68rem; font-weight: 600; transition: all 0.2s; cursor: pointer; }
+    .nav-item { width: 62px; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 0; border-radius: 12px; color: var(--text-muted); text-decoration: none; font-size: 0.68rem; font-weight: 600; transition: all 0.2s; }
     .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.04); }
     .nav-item.active { color: var(--accent-cyan); background: rgba(6, 182, 212, 0.12); border: 1px solid rgba(6, 182, 212, 0.3); }
     .svg-icon { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-    .sidebar-avatar { margin-top: auto; width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; border: 2px solid #22c55e; position: relative; }
-
-    /* MAIN WRAPPER */
+    /* MAIN CONTENT */
     .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: var(--bg-dark); }
     .top-header { display: flex; justify-content: space-between; align-items: center; padding: 1.1rem 2rem; border-bottom: 1px solid var(--card-border); }
     .header-left { display: flex; align-items: center; gap: 12px; font-size: 1.25rem; font-weight: 700; }
-    .btn-refresh { background: var(--btn-bg); border: 1px solid var(--card-border); color: var(--text-muted); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-    /* SALES CONTENT GRID */
-    .sales-container { padding: 1.8rem 2rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    .payments-container { padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem; }
 
-    /* FILTERS ROW */
-    .filters-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.25rem; display: flex; justify-content: space-between; align-items: center; }
-    .status-pills { display: flex; gap: 8px; background: rgba(255,255,255,0.04); padding: 4px; border-radius: 10px; }
-    .pill-btn { padding: 6px 16px; border-radius: 7px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; }
-    .pill-btn.active { background: var(--accent-orange); color: #fff; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3); }
-
-    .search-input { background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); border-radius: 10px; padding: 8px 14px; color: #fff; font-size: 0.88rem; outline: none; width: 260px; }
+    /* STAT CARDS */
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.25rem; display: flex; flex-direction: column; gap: 6px; }
+    .stat-val { font-size: 1.6rem; font-weight: 800; color: #fff; }
 
     /* TABLE */
     .table-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; overflow: hidden; }
-    .sales-table { width: 100%; border-collapse: collapse; text-align: left; }
-    .sales-table th { background: rgba(255,255,255,0.03); padding: 14px 18px; color: var(--text-muted); font-size: 0.82rem; font-weight: 700; border-bottom: 1px solid var(--card-border); }
-    .sales-table td { padding: 16px 18px; border-bottom: 1px solid var(--card-border); font-size: 0.9rem; }
-    .sales-table tr:last-child td { border-bottom: none; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { padding: 1rem 1.25rem; background: rgba(255,255,255,0.02); color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700; border-bottom: 1px solid var(--card-border); }
+    td { padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--card-border); font-size: 0.9rem; }
 
-    .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
-    .badge-paid { background: rgba(16, 185, 129, 0.15); color: var(--green-paid); border: 1px solid rgba(16, 185, 129, 0.3); }
-    .badge-pending { background: rgba(245, 158, 11, 0.15); color: var(--orange-pending); border: 1px solid rgba(245, 158, 11, 0.3); }
-
-    .btn-approve { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); border: 1px solid rgba(6, 182, 212, 0.3); padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-    .btn-approve:hover { background: var(--accent-cyan); color: #fff; }
+    .btn-tg-grant { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
   </style>
 </head>
 <body>
 
-  <!-- LEFT SIDEBAR WITH CLEAN URLS -->
+  <!-- LEFT SIDEBAR -->
   <aside class="sidebar">
     <a href="/" class="sidebar-brand">
       <svg class="svg-icon" style="stroke:var(--accent-cyan)" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
@@ -104,18 +89,6 @@
       <svg class="svg-icon" viewBox="0 0 24 24"><path d="m4 6 8-4 8 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6z"/><path d="M12 22V12"/></svg>
       <span>Maktabim</span>
     </a>
-
-    <a href="/messenger" class="nav-item">
-      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <span>Chats</span>
-    </a>
-
-    <a href="/courses" class="nav-item">
-      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-      <span>O'quvchi</span>
-    </a>
-
-    <div class="sidebar-avatar">H</div>
   </aside>
 
   <!-- MAIN WRAPPER -->
@@ -123,72 +96,62 @@
     <header class="top-header">
       <div class="header-left">
         <svg class="svg-icon" style="stroke:var(--accent-cyan)" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
-        <span>1. Sales & Invoices (To'lovlar va Bitimlar)</span>
-        <button class="btn-refresh">
-          <svg class="svg-icon" style="width:18px;height:18px" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
-        </button>
+        <span>1. Sales & Invoices (To'lovlar & Kommo CRM v4)</span>
       </div>
 
-      <div style="font-size:0.9rem;color:var(--text-muted)">Kommo CRM v4 Auto-Sync: <span style="color:var(--green-paid);font-weight:700">✓ Active</span></div>
+      <div style="font-size:0.85rem;color:var(--green-active);font-weight:700">● Kommo CRM Lead Auto-Sync Active</div>
     </header>
 
-    <div class="sales-container">
-      <!-- FILTERS CARD MATCHING SALES.HTML -->
-      <div class="filters-card">
-        <div class="status-pills">
-          <div class="pill-btn active">Barchasi (All)</div>
-          <div class="pill-btn">To'langan (Paid)</div>
-          <div class="pill-btn">Kutilmoqda (Pending)</div>
-          <div class="pill-btn">Bekor qilingan</div>
+    <div class="payments-container">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div style="font-size:0.8rem;color:var(--text-muted)">Umumiy Tushum</div>
+          <div class="stat-val" style="color:var(--accent-cyan)">2,150,000 UZS</div>
         </div>
-
-        <input type="text" class="search-input" placeholder="🔍 O'quvchi yoki Invoice ID qidirish..." />
+        <div class="stat-card">
+          <div style="font-size:0.8rem;color:var(--text-muted)">Kommo CRM v4 Lidlar</div>
+          <div class="stat-val" style="color:var(--accent-orange)">12 ta</div>
+        </div>
+        <div class="stat-card">
+          <div style="font-size:0.8rem;color:var(--text-muted)">Tasdiqlangan Bitimlar</div>
+          <div class="stat-val" style="color:var(--green-active)">2 ta</div>
+        </div>
       </div>
 
-      <!-- SALES / INVOICES TABLE MATCHING DEV.EXODE.BIZ -->
       <div class="table-card">
-        <table class="sales-table">
+        <table>
           <thead>
             <tr>
-              <th>INVOICE #</th>
-              <th>O'QUVCHI (STUDENT)</th>
-              <th>KURS / XIZMAT</th>
-              <th>SUMMA</th>
-              <th>TO'LOV USULI</th>
-              <th>HOLAT (STATUS)</th>
-              <th>SANA</th>
-              <th>AMAL (ACTION)</th>
+              <th>Invois / ID</th>
+              <th>Mijoz</th>
+              <th>Kurs</th>
+              <th>Summa</th>
+              <th>Status</th>
+              <th>Telegram Admin Ruxsati</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="paymentsTbody">
             <tr>
-              <td style="font-weight:700;color:var(--accent-cyan)">#INV-2026-001</td>
-              <td>
-                <div style="font-weight:700">Sardor Alimov</div>
-                <div style="font-size:0.78rem;color:var(--text-muted)">sardor@gmail.com</div>
-              </td>
+              <td style="font-weight:700">#INV-8821</td>
+              <td>Sardor Alimov</td>
               <td>Python & FastAPI Microservices</td>
-              <td style="font-weight:800;color:#fff">1,200,000 UZS</td>
-              <td>💬 Telegram Admin</td>
-              <td><span class="badge badge-paid">✓ Paid (To'langan)</span></td>
-              <td style="color:var(--text-muted)">25 Jul 2026</td>
-              <td><span style="color:var(--text-muted);font-size:0.8rem">Faollashtirilgan</span></td>
+              <td style="font-weight:800">1,200,000 UZS</td>
+              <td><span style="color:var(--green-active);font-weight:700">● Paid</span></td>
+              <td>
+                <button class="btn-tg-grant" onclick="grantAccess('Sardor Alimov')">
+                  ✈️ Telegram Admin Ruxsat Berish
+                </button>
+              </td>
             </tr>
-
             <tr>
-              <td style="font-weight:700;color:var(--accent-cyan)">#INV-2026-002</td>
+              <td style="font-weight:700">#INV-8822</td>
+              <td>Jasur Bekmurodov</td>
+              <td>High-Load Microservices</td>
+              <td style="font-weight:800">950,000 UZS</td>
+              <td><span style="color:var(--green-active);font-weight:700">● Paid</span></td>
               <td>
-                <div style="font-weight:700">Jasur Bekmurodov</div>
-                <div style="font-size:0.78rem;color:var(--text-muted)">jasur@mail.ru</div>
-              </td>
-              <td>Python & FastAPI Microservices</td>
-              <td style="font-weight:800;color:#fff">1,200,000 UZS</td>
-              <td>💬 Telegram Admin</td>
-              <td><span class="badge badge-pending">⏱️ Pending (Kutilmoqda)</span></td>
-              <td style="color:var(--text-muted)">25 Jul 2026</td>
-              <td>
-                <button class="btn-approve" onclick="alert('O\'quvchiga kurs va Telegram guruhiga kirish berildi!')">
-                  ✓ Kirish Berish
+                <button class="btn-tg-grant" onclick="grantAccess('Jasur Bekmurodov')">
+                  ✈️ Telegram Admin Ruxsat Berish
                 </button>
               </td>
             </tr>
@@ -197,5 +160,11 @@
       </div>
     </div>
   </main>
+
+  <script>
+    function grantAccess(name) {
+      alert(name + " uchun Telegram Admin (@exode_biz_support) orqali kursga ruxsat berildi va Kommo CRM ga lid o'tkazildi!");
+    }
+  </script>
 </body>
 </html>
