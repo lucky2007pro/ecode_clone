@@ -158,6 +158,7 @@
     </div>
   </main>
 
+  <script src="/auth_check.js"></script>
   <script>
     function addNewModule() {
       const name = prompt("Yangi modul nomini kiriting:");
@@ -168,16 +169,49 @@
       div.className = 'tree-item';
       div.innerHTML = `<span>${name}</span><span style="font-size:0.75rem;color:var(--accent-cyan)">📹 DRM Video</span>`;
       tree.insertBefore(div, btn);
-      alert("Yangi modul (" + name + ") yaratildi!");
     }
 
     function uploadKinescopeVideo() {
       alert("Kinescope DRM API (Key: a4200163-b642...) orqali video yuklandi va kodlandi!");
     }
 
-    function saveLesson() {
+    async function saveLesson() {
       const title = document.getElementById('lessonTitleInput').value;
-      alert("Dars (" + title + ") muvaffaqiyatli saqlandi!");
+      const desc = document.querySelector('textarea.form-input').value;
+      const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+      const btn = document.querySelector('.btn-save');
+
+      btn.innerText = 'Saqlanmoqda...';
+      btn.disabled = true;
+
+      try {
+        const token = localStorage.getItem('access_token');
+        const res = await fetch('/api/v1/courses/', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            title: title,
+            slug: slug,
+            description: desc,
+            price: 500000.0 // example price
+          })
+        });
+
+        if(res.ok) {
+          alert("Kurs (Dars) muvaffaqiyatli saqlandi!");
+        } else {
+          const err = await res.json();
+          alert("Xatolik: " + JSON.stringify(err));
+        }
+      } catch(e) {
+        alert("Server xatosi: " + e.message);
+      } finally {
+        btn.innerText = '💾 Darsni Saqlash';
+        btn.disabled = false;
+      }
     }
   </script>
 </body>

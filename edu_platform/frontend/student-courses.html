@@ -181,102 +181,76 @@
     </div>
 
     <!-- COURSES GRID -->
-    <div class="courses-grid">
-
-      <!-- COURSE 1: Active, 65% progress -->
-      <a href="/training/lesson/1" class="course-card" data-status="active" style="text-decoration:none">
-        <div class="course-thumb course-thumb-1">
-          <div class="play-overlay">
-            <svg style="width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          </div>
-        </div>
-        <div class="course-info">
-          <div style="display:flex;justify-content:space-between;align-items:start">
-            <div class="course-title">Python asoslari: Noldan dasturlash</div>
-            <span class="status-badge status-active">Faol</span>
-          </div>
-          <div class="course-school">dev.exode.biz maktabi</div>
-          <div class="progress-bar-wrap">
-            <div class="progress-fill green" style="width:65%"></div>
-          </div>
-          <div class="progress-label">
-            <span>65% yakunlangan</span>
-            <span>13 / 20 dars</span>
-          </div>
-          <div class="course-meta">
-            <span>20 ta dars</span>
-            <span class="meta-dot"></span>
-            <span>5 ta modul</span>
-            <span class="meta-dot"></span>
-            <span>3 ta vazifa</span>
-          </div>
-        </div>
-      </a>
-
-      <!-- COURSE 2: Active, 30% progress -->
-      <a href="/training/lesson/2" class="course-card" data-status="active" style="text-decoration:none">
-        <div class="course-thumb course-thumb-2">
-          <div class="play-overlay">
-            <svg style="width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          </div>
-        </div>
-        <div class="course-info">
-          <div style="display:flex;justify-content:space-between;align-items:start">
-            <div class="course-title">Web dasturlash: HTML, CSS, JavaScript</div>
-            <span class="status-badge status-active">Faol</span>
-          </div>
-          <div class="course-school">dev.exode.biz maktabi</div>
-          <div class="progress-bar-wrap">
-            <div class="progress-fill orange" style="width:30%"></div>
-          </div>
-          <div class="progress-label">
-            <span>30% yakunlangan</span>
-            <span>6 / 20 dars</span>
-          </div>
-          <div class="course-meta">
-            <span>20 ta dars</span>
-            <span class="meta-dot"></span>
-            <span>4 ta modul</span>
-            <span class="meta-dot"></span>
-            <span>5 ta vazifa</span>
-          </div>
-        </div>
-      </a>
-
-      <!-- COURSE 3: Completed, 100% progress -->
-      <a href="/training/lesson/3" class="course-card" data-status="completed" style="text-decoration:none">
-        <div class="course-thumb course-thumb-3">
-          <div class="play-overlay">
-            <svg style="width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-        </div>
-        <div class="course-info">
-          <div style="display:flex;justify-content:space-between;align-items:start">
-            <div class="course-title">Kompyuter savodxonligi asoslari</div>
-            <span class="status-badge status-completed">✓ Yakunlangan</span>
-          </div>
-          <div class="course-school">dev.exode.biz maktabi</div>
-          <div class="progress-bar-wrap">
-            <div class="progress-fill green" style="width:100%"></div>
-          </div>
-          <div class="progress-label">
-            <span>100% yakunlangan</span>
-            <span>10 / 10 dars</span>
-          </div>
-          <div class="course-meta">
-            <span>10 ta dars</span>
-            <span class="meta-dot"></span>
-            <span>3 ta modul</span>
-            <span class="meta-dot"></span>
-            <span>Sertifikat mavjud</span>
-          </div>
-        </div>
-      </a>
-
+    <div class="courses-grid" id="coursesGrid">
+      <!-- Dynamic courses will be rendered here -->
     </div>
   </main>
 
+  <script src="/auth_check.js"></script>
   <script>
+    document.addEventListener('DOMContentLoaded', loadCourses);
+
+    async function loadCourses() {
+      const grid = document.getElementById('coursesGrid');
+      grid.innerHTML = '<div style="color:var(--text-muted);grid-column:1/-1;text-align:center">Yuklanmoqda...</div>';
+      
+      try {
+        const token = localStorage.getItem('access_token');
+        const res = await fetch('/api/v1/courses/', {
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+        const courses = await res.json();
+        
+        if(res.ok) {
+          grid.innerHTML = '';
+          if(courses.length === 0) {
+            grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><svg class="empty-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg><div>Hali hech qanday kurs mavjud emas</div></div>';
+            return;
+          }
+
+          courses.forEach(c => {
+            const card = document.createElement('a');
+            card.href = '/training/lesson/' + c.id;
+            card.className = 'course-card';
+            card.dataset.status = 'active'; // mock status
+            card.style.textDecoration = 'none';
+
+            card.innerHTML = `
+              <div class="course-thumb course-thumb-1">
+                <div class="play-overlay">
+                  <svg style="width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                </div>
+              </div>
+              <div class="course-info">
+                <div style="display:flex;justify-content:space-between;align-items:start">
+                  <div class="course-title">${c.title}</div>
+                  <span class="status-badge status-active">Yangi</span>
+                </div>
+                <div class="course-school">${c.description || "Ta'rif kiritilmagan"}</div>
+                <div class="progress-bar-wrap">
+                  <div class="progress-fill green" style="width:0%"></div>
+                </div>
+                <div class="progress-label">
+                  <span>0% yakunlangan</span>
+                  <span>0 / 10 dars</span>
+                </div>
+                <div class="course-meta">
+                  <span>Narxi: ${c.price} UZS</span>
+                </div>
+              </div>
+            `;
+            grid.appendChild(card);
+          });
+        } else {
+          grid.innerHTML = '<div style="color:#ef4444;grid-column:1/-1;text-align:center">Ruxsat yo\'q yoki xatolik: ' + JSON.stringify(courses) + '</div>';
+        }
+      } catch(err) {
+        grid.innerHTML = '<div style="color:#ef4444;grid-column:1/-1;text-align:center">Server bilan ulanishda xatolik</div>';
+      }
+    }
+
     function filterCourses(status, el) {
       document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
       el.classList.add('active');
