@@ -7,7 +7,7 @@ from users.crud import get_user_by_email, create_user
 router = APIRouter()
 
 
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from users.schema import TokenResponse
 from users.auth import verify_password, create_access_token
 

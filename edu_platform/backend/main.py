@@ -2,8 +2,6 @@ import os
 from typing import List
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 from db import init_db
 
 # DOMAIN ROUTERS
@@ -18,11 +16,11 @@ from homeworks.router import router as homeworks_router
 
 app = FastAPI(
     title="Exode Education & ERP Platform API",
-    description="Multi-tenant online school platform backend API with Clean URLs and Realtime WebSockets",
+    description="Multi-tenant online school platform backend API",
     version="2.0.0"
 )
 
-# CORS MIDDLEWARE
+# CORS MIDDLEWARE (Allows frontend running on any port/domain to interact with backend API)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -73,189 +71,15 @@ async def websocket_chat_endpoint(websocket: WebSocket, client_id: str):
     except WebSocketDisconnect:
         manager.disconnect(websocket)
 
-# FRONTEND CLEAN URL SERVING MATCHING EXODE.BIZ ROUTES
-FRONTEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend"))
-
 @app.on_event("startup")
 async def on_startup():
     await init_db()
 
 @app.get("/")
 async def root():
-    return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
-
-@app.get("/training")
-@app.get("/student")
-async def serve_student_training():
-    return FileResponse(os.path.join(FRONTEND_DIR, "student.html"))
-
-# STUDENT PANEL CLEAN URL ROUTES
-@app.get("/training/courses")
-async def serve_student_courses():
-    return FileResponse(os.path.join(FRONTEND_DIR, "student-courses.html"))
-
-@app.get("/training/lesson/{lesson_id}")
-async def serve_student_lesson(lesson_id: str = "1"):
-    return FileResponse(os.path.join(FRONTEND_DIR, "student-lesson.html"))
-
-@app.get("/training/homework")
-async def serve_student_homework():
-    return FileResponse(os.path.join(FRONTEND_DIR, "student-homework.html"))
-
-@app.get("/training/certificates")
-async def serve_student_certificates():
-    return FileResponse(os.path.join(FRONTEND_DIR, "student-certificates.html"))
-
-@app.get("/training/profile")
-async def serve_student_profile():
-    return FileResponse(os.path.join(FRONTEND_DIR, "student-profile.html"))
-
-@app.get("/training/notifications")
-async def serve_student_notifications():
-    return FileResponse(os.path.join(FRONTEND_DIR, "student-notifications.html"))
-
-@app.get("/manage/dashboard")
-@app.get("/dashboard")
-async def serve_dashboard():
-    return FileResponse(os.path.join(FRONTEND_DIR, "dashboard.html"))
-
-@app.get("/manage/courses/{course_id}")
-@app.get("/course-builder")
-async def serve_course_builder(course_id: str = "1"):
-    return FileResponse(os.path.join(FRONTEND_DIR, "course-builder.html"))
-
-@app.get("/manage/invoices/{invoice_id}")
-@app.get("/payments")
-async def serve_payments(invoice_id: str = "1"):
-    return FileResponse(os.path.join(FRONTEND_DIR, "payments.html"))
-
-@app.get("/manage/homeworks/{homework_id}")
-@app.get("/homework")
-async def serve_homework(homework_id: str = "1"):
-    return FileResponse(os.path.join(FRONTEND_DIR, "homework.html"))
-
-@app.get("/manage/school/users/{user_id}")
-@app.get("/analytics")
-async def serve_analytics(user_id: str = "1"):
-    return FileResponse(os.path.join(FRONTEND_DIR, "analytics.html"))
-
-@app.get("/approval")
-async def serve_approval():
-    return FileResponse(os.path.join(FRONTEND_DIR, "approval.html"))
-
-# CURATOR PANEL CLEAN URL ROUTES
-@app.get("/manage/curator")
-async def serve_curator_dashboard():
-    return FileResponse(os.path.join(FRONTEND_DIR, "curator-dashboard.html"))
-
-@app.get("/manage/curator/homework")
-async def serve_curator_homework():
-    return FileResponse(os.path.join(FRONTEND_DIR, "curator-homework.html"))
-
-@app.get("/manage/curator/courses")
-async def serve_curator_courses():
-    return FileResponse(os.path.join(FRONTEND_DIR, "curator-courses.html"))
-
-@app.get("/manage/curator/students")
-async def serve_curator_students():
-    return FileResponse(os.path.join(FRONTEND_DIR, "curator-students.html"))
-
-@app.get("/manage/curator/comments")
-async def serve_curator_comments():
-    return FileResponse(os.path.join(FRONTEND_DIR, "curator-comments.html"))
-
-# MANAGER PANEL CLEAN URL ROUTES
-@app.get("/manage/manager")
-async def serve_manager_dashboard():
-    return FileResponse(os.path.join(FRONTEND_DIR, "manager-dashboard.html"))
-
-@app.get("/manage/manager/refunds")
-async def serve_manager_refunds():
-    return FileResponse(os.path.join(FRONTEND_DIR, "manager-refunds.html"))
-
-@app.get("/manage/manager/products")
-async def serve_manager_products():
-    return FileResponse(os.path.join(FRONTEND_DIR, "manager-products.html"))
-
-@app.get("/manage/manager/reports")
-async def serve_manager_reports():
-    return FileResponse(os.path.join(FRONTEND_DIR, "manager-reports.html"))
-
-# DEDICATED CLEAN URL ROUTES FOR SETTINGS SECTIONS
-@app.get("/manage/school/settings/basic")
-@app.get("/customization")
-async def serve_settings_basic():
-    return FileResponse(os.path.join(FRONTEND_DIR, "settings-basic.html"))
-
-@app.get("/manage/school/settings/team")
-async def serve_settings_team():
-    return FileResponse(os.path.join(FRONTEND_DIR, "settings-team.html"))
-
-@app.get("/manage/school/settings/legal")
-async def serve_settings_legal():
-    return FileResponse(os.path.join(FRONTEND_DIR, "settings-legal.html"))
-
-@app.get("/manage/school/settings/privacy")
-async def serve_settings_privacy():
-    return FileResponse(os.path.join(FRONTEND_DIR, "settings-privacy.html"))
-
-@app.get("/manage/school/settings/payments")
-async def serve_settings_payments():
-    return FileResponse(os.path.join(FRONTEND_DIR, "settings-payments.html"))
-
-@app.get("/manage/school/settings/media")
-async def serve_settings_media():
-    return FileResponse(os.path.join(FRONTEND_DIR, "settings-media.html"))
-
-@app.get("/manage/school/settings/dev")
-async def serve_settings_dev():
-    return FileResponse(os.path.join(FRONTEND_DIR, "settings-dev.html"))
-
-@app.get("/manage/school/settings/subscription")
-async def serve_settings_subscription():
-    return FileResponse(os.path.join(FRONTEND_DIR, "settings-subscription.html"))
-
-@app.get("/manage/school/settings/{setting_slug}")
-async def serve_generic_settings(setting_slug: str):
-    return FileResponse(os.path.join(FRONTEND_DIR, "settings-basic.html"))
-
-@app.get("/chat")
-@app.get("/messenger")
-async def serve_messenger():
-    return FileResponse(os.path.join(FRONTEND_DIR, "messenger.html"))
-
-@app.get("/courses")
-async def serve_courses():
-    return FileResponse(os.path.join(FRONTEND_DIR, "courses.html"))
-
-@app.get("/pricing")
-async def serve_pricing():
-    return FileResponse(os.path.join(FRONTEND_DIR, "pricing.html"))
-
-@app.get("/features")
-async def serve_features():
-    return FileResponse(os.path.join(FRONTEND_DIR, "features.html"))
-
-@app.get("/features/{feature_slug}")
-async def serve_feature_detail(feature_slug: str):
-    return FileResponse(os.path.join(FRONTEND_DIR, "feature-detail.html"))
-
-@app.get("/docs")
-async def serve_docs():
-    return FileResponse(os.path.join(FRONTEND_DIR, "docs.html"))
-
-@app.get("/login")
-async def serve_login():
-    return FileResponse(os.path.join(FRONTEND_DIR, "login.html"))
-
-@app.get("/register")
-async def serve_register():
-    return FileResponse(os.path.join(FRONTEND_DIR, "register.html"))
-
-# SERVE STATIC ASSETS DIRECTLY AT ROOT IF FILE EXISTS
-@app.get("/{file_path:path}")
-async def serve_static_file(file_path: str):
-    target = os.path.join(FRONTEND_DIR, file_path)
-    if os.path.isfile(target):
-        return FileResponse(target)
-    return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
+    return {
+        "status": "success",
+        "message": "Exode ERP Backend API ishlamoqda",
+        "docs": "/docs",
+        "version": "2.0.0"
+    }
