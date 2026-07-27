@@ -88,43 +88,38 @@
       </form>
     </div>
 
-    <!-- STEP 2: PERSONA SELECTION MATCHING USER SCREENSHOT 1-TO-1 -->
+    <div id="errorMessage" style="display:none; background:rgba(239, 68, 68, 0.15); border:1px solid rgba(239, 68, 68, 0.3); color:#ef4444; padding:12px; border-radius:10px; font-size:0.85rem; font-weight:700; text-align:center; margin-bottom:1rem"></div>
     <div id="step2" style="display:none">
       <h1 class="step-title">Choose the option that suits you</h1>
 
       <div class="options-list">
-        <div class="option-pill selected" onclick="selectPersona(this, 'I own an online school')">
+        <div class="option-pill selected" onclick="selectPersona(this, 'admin')">
           <span>I own an online school</span>
           <div class="radio-circle"><div class="radio-inner"></div></div>
         </div>
 
-        <div class="option-pill" onclick="selectPersona(this, 'I\'m an individual expert / teacher')">
+        <div class="option-pill" onclick="selectPersona(this, 'curator')">
           <span>I'm an individual expert / teacher</span>
           <div class="radio-circle"><div class="radio-inner"></div></div>
         </div>
 
-        <div class="option-pill" onclick="selectPersona(this, 'I\'m a producer')">
-          <span>I'm a producer</span>
+        <div class="option-pill" onclick="selectPersona(this, 'manager')">
+          <span>I'm a producer / manager</span>
           <div class="radio-circle"><div class="radio-inner"></div></div>
         </div>
 
-        <div class="option-pill" onclick="selectPersona(this, 'Corporate training')">
-          <span>Corporate training</span>
-          <div class="radio-circle"><div class="radio-inner"></div></div>
-        </div>
-
-        <div class="option-pill" onclick="selectPersona(this, 'Other')">
-          <span>Other</span>
+        <div class="option-pill" onclick="selectPersona(this, 'student')">
+          <span>I'm a student</span>
           <div class="radio-circle"><div class="radio-inner"></div></div>
         </div>
       </div>
 
-      <button class="btn-next" onclick="completeRegistration()" style="margin-top:1.5rem">⚡ Maktabni Yoqish</button>
+      <button id="registerBtn" class="btn-next" onclick="completeRegistration()" style="margin-top:1.5rem">⚡ Maktabni Yoqish</button>
     </div>
   </div>
 
   <script>
-    let selectedPersona = 'I own an online school';
+    let selectedRole = 'admin';
 
     function goToStep2(e) {
       e.preventDefault();
@@ -132,35 +127,53 @@
       document.getElementById('step2').style.display = 'block';
     }
 
-    function selectPersona(el, personaName) {
+    function selectPersona(el, role) {
       document.querySelectorAll('.option-pill').forEach(item => item.classList.remove('selected'));
       el.classList.add('selected');
-      selectedPersona = personaName;
+      selectedRole = role;
     }
 
     async function completeRegistration() {
-      const schoolName = document.getElementById('schoolNameInput').value;
-      const fullName = document.getElementById('fullNameInput').value;
       const email = document.getElementById('emailInput').value;
+      const fullName = document.getElementById('fullNameInput').value;
       const password = document.getElementById('passwordInput').value;
+      const errorDiv = document.getElementById('errorMessage');
+      const btn = document.getElementById('registerBtn');
+
+      errorDiv.style.display = 'none';
+      btn.innerText = 'Kutilmoqda...';
+      btn.disabled = true;
 
       try {
-        await fetch('/api/v1/users/register', {
+        const res = await fetch('/api/v1/users/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             full_name: fullName,
             email: email,
             password: password,
-            school_name: schoolName,
-            role: 'owner',
-            persona: selectedPersona
+            role: selectedRole
           })
         });
 
-        window.location.href = '/manage/school/settings/basic';
+        const data = await res.json();
+
+        if (res.ok) {
+          alert("Muvaffaqiyatli ro'yxatdan o'tdingiz. Tizimga kiring.");
+          window.location.href = '/login';
+        } else {
+          errorDiv.innerText = data.detail || "Xatolik yuz berdi";
+          errorDiv.style.display = 'block';
+          // Go back to step 1 to show error clearly
+          document.getElementById('step2').style.display = 'none';
+          document.getElementById('step1').style.display = 'block';
+        }
       } catch(err) {
-        window.location.href = '/manage/school/settings/basic';
+        errorDiv.innerText = "Server bilan aloqa yo'q";
+        errorDiv.style.display = 'block';
+      } finally {
+        btn.innerText = '⚡ Maktabni Yoqish';
+        btn.disabled = false;
       }
     }
   </script>
