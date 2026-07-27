@@ -1,11 +1,11 @@
 import uuid
 from pydantic import BaseModel, EmailStr
-from users.models import UserRole
+from permissions.enums import Role
 
 class UserBase(BaseModel):
     email: EmailStr
     full_name: str
-    role: UserRole = UserRole.school_owner
+    role: Role = Role.STUDENT
 
 class UserCreate(UserBase):
     password: str
