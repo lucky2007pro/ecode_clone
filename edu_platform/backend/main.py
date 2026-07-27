@@ -139,6 +139,27 @@ async def serve_homework(homework_id: str = "1"):
 async def serve_analytics(user_id: str = "1"):
     return FileResponse(os.path.join(FRONTEND_DIR, "analytics.html"))
 
+# CURATOR PANEL CLEAN URL ROUTES
+@app.get("/manage/curator")
+async def serve_curator_dashboard():
+    return FileResponse(os.path.join(FRONTEND_DIR, "curator-dashboard.html"))
+
+@app.get("/manage/curator/homework")
+async def serve_curator_homework():
+    return FileResponse(os.path.join(FRONTEND_DIR, "curator-homework.html"))
+
+@app.get("/manage/curator/courses")
+async def serve_curator_courses():
+    return FileResponse(os.path.join(FRONTEND_DIR, "curator-courses.html"))
+
+@app.get("/manage/curator/students")
+async def serve_curator_students():
+    return FileResponse(os.path.join(FRONTEND_DIR, "curator-students.html"))
+
+@app.get("/manage/curator/comments")
+async def serve_curator_comments():
+    return FileResponse(os.path.join(FRONTEND_DIR, "curator-comments.html"))
+
 # DEDICATED CLEAN URL ROUTES FOR SETTINGS SECTIONS
 @app.get("/manage/school/settings/basic")
 @app.get("/customization")
