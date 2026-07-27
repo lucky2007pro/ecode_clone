@@ -10,5 +10,5 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     hashed_password: Mapped[str] = mapped_column(String(255))
     full_name: Mapped[str] = mapped_column(String(255))
-    role: Mapped[Role] = mapped_column(default=Role.STUDENT)
+    role: Mapped[Role] = mapped_column(Enum(Role, values_callable=lambda x: [e.value for e in x]), default=Role.STUDENT)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)

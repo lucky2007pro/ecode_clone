@@ -40,9 +40,12 @@
 </head>
 <body>
   
-  <div class="header">
-    <h1 class="title">Kutilayotgan So'rovlar (Pending Approvals)</h1>
-    <p class="subtitle">Maktabingizga ulanishni xohlayotgan foydalanuvchilar ro'yxati</p>
+  <div class="header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+    <div>
+      <h1 class="title">Kutilayotgan So'rovlar (Pending Approvals)</h1>
+      <p class="subtitle">Maktabingizga ulanishni xohlayotgan foydalanuvchilar ro'yxati</p>
+    </div>
+    <button onclick="document.getElementById('addUserModal').style.display='flex'" style="background:var(--accent-orange); color:#fff; border:none; padding:12px 24px; border-radius:12px; font-weight:700; cursor:pointer; box-shadow:0 4px 15px rgba(249,115,22,0.3);">+ Yangi Qo'shish</button>
   </div>
 
   <div class="requests-grid" id="requestsGrid">
@@ -50,9 +53,90 @@
     <div style="color:var(--text-muted)">Yuklanmoqda...</div>
   </div>
 
+    <!-- Add User Modal -->
+    <div id="addUserModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); align-items:center; justify-content:center; z-index:100;">
+      <div style="background:var(--card-bg); padding:2rem; border-radius:16px; border:1px solid var(--card-border); width:400px; display:flex; flex-direction:column; gap:1rem;">
+        <h2 style="font-size:1.4rem; font-weight:800;">Yangi Foydalanuvchi Qo'shish</h2>
+        <div id="addErrorMsg" style="display:none; color:#ef4444; font-size:0.85rem; font-weight:700;"></div>
+        
+        <div style="display:flex; flex-direction:column; gap:4px;">
+          <label style="font-size:0.85rem; color:var(--text-muted);">Ism Familiya</label>
+          <input type="text" id="addName" style="padding:10px; border-radius:8px; border:1px solid var(--card-border); background:#121212; color:#fff; outline:none;" />
+        </div>
+        
+        <div style="display:flex; flex-direction:column; gap:4px;">
+          <label style="font-size:0.85rem; color:var(--text-muted);">Email</label>
+          <input type="email" id="addEmail" style="padding:10px; border-radius:8px; border:1px solid var(--card-border); background:#121212; color:#fff; outline:none;" />
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:4px;">
+          <label style="font-size:0.85rem; color:var(--text-muted);">Parol</label>
+          <input type="text" id="addPassword" style="padding:10px; border-radius:8px; border:1px solid var(--card-border); background:#121212; color:#fff; outline:none;" />
+        </div>
+        
+        <div style="display:flex; flex-direction:column; gap:4px;">
+          <label style="font-size:0.85rem; color:var(--text-muted);">Rol</label>
+          <select id="addRole" style="padding:10px; border-radius:8px; border:1px solid var(--card-border); background:#121212; color:#fff; outline:none;">
+            <option value="student">O'quvchi (Student)</option>
+            <option value="curator">Kurator / O'qituvchi</option>
+            <option value="manager">Menejer / Sotuvchi</option>
+          </select>
+        </div>
+        
+        <div style="display:flex; gap:1rem; margin-top:1rem;">
+          <button onclick="document.getElementById('addUserModal').style.display='none'" style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--card-border); background:transparent; color:#fff; cursor:pointer;">Bekor qilish</button>
+          <button id="addBtn" onclick="adminCreateUser()" style="flex:1; padding:10px; border-radius:8px; border:none; background:var(--accent-orange); color:#fff; font-weight:700; cursor:pointer;">Qo'shish</button>
+        </div>
+      </div>
+    </div>
+
   <script src="/auth_check.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', loadPendingUsers);
+
+    async function adminCreateUser() {
+      const name = document.getElementById('addName').value;
+      const email = document.getElementById('addEmail').value;
+      const password = document.getElementById('addPassword').value;
+      const role = document.getElementById('addRole').value;
+      const btn = document.getElementById('addBtn');
+      const err = document.getElementById('addErrorMsg');
+      
+      err.style.display = 'none';
+      btn.disabled = true;
+      btn.innerText = 'Kutilmoqda...';
+      
+      try {
+        const res = await fetch('/api/v1/users/admin-create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+          },
+          body: JSON.stringify({
+            full_name: name,
+            email: email,
+            password: password,
+            role: role
+          })
+        });
+        
+        const data = await res.json();
+        if(res.ok) {
+          alert("Foydalanuvchi muvaffaqiyatli qo'shildi!");
+          document.getElementById('addUserModal').style.display = 'none';
+        } else {
+          err.innerText = typeof data.detail === 'string' ? data.detail : (data.detail?.[0]?.msg || "Xato yuz berdi");
+          err.style.display = 'block';
+        }
+      } catch(e) {
+        err.innerText = "Server bilan aloqa yo'q";
+        err.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Qo'shish";
+      }
+    }
 
     async function loadPendingUsers() {
       const grid = document.getElementById('requestsGrid');

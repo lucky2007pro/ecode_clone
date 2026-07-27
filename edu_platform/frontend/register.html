@@ -114,12 +114,25 @@
         </div>
       </div>
 
-      <button id="registerBtn" class="btn-next" onclick="completeRegistration()" style="margin-top:1.5rem">⚡ Maktabni Yoqish</button>
+      <button id="registerBtn" class="btn-next" onclick="sendOtp()" style="margin-top:1.5rem">Davom Etish →</button>
+    </div>
+
+    <!-- STEP 3: OTP VERIFICATION -->
+    <div id="step3" style="display:none; text-align:center;">
+      <h2 style="font-size:1.6rem;font-weight:800;margin-bottom:0.4rem">Kodni Tasdiqlash</h2>
+      <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:1.5rem">Emailingizga 6-xonali kod jo'natildi. Iltimos, uni kiriting:</p>
+
+      <div class="form-group" style="text-align:left;">
+        <input type="text" id="otpInput" class="form-input" placeholder="123456" maxlength="6" style="text-align:center; font-size:1.2rem; letter-spacing:4px;" required />
+      </div>
+
+      <button id="verifyBtn" class="btn-next" onclick="verifyOtp()" style="margin-top:1.5rem; width:100%;">⚡ Maktabni Yoqish</button>
     </div>
   </div>
 
   <script>
     let selectedRole = 'admin';
+    let userPayload = {};
 
     function goToStep2(e) {
       e.preventDefault();
@@ -133,56 +146,87 @@
       selectedRole = role;
     }
 
-    async function completeRegistration() {
+    function showError(msg) {
+      const errorDiv = document.getElementById('errorMessage');
+      errorDiv.innerText = msg;
+      errorDiv.style.display = 'block';
+    }
+
+    async function sendOtp() {
       const email = document.getElementById('emailInput').value;
       const fullName = document.getElementById('fullNameInput').value;
       const password = document.getElementById('passwordInput').value;
       const schoolName = document.getElementById('schoolNameInput').value;
       const subdomain = schoolName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-      const errorDiv = document.getElementById('errorMessage');
       const btn = document.getElementById('registerBtn');
 
-      errorDiv.style.display = 'none';
-      btn.innerText = 'Kutilmoqda...';
+      document.getElementById('errorMessage').style.display = 'none';
+      btn.innerText = 'Kutib turing...';
       btn.disabled = true;
 
+      userPayload = {
+        full_name: fullName,
+        email: email,
+        password: password,
+        role: selectedRole,
+        school_name: schoolName,
+        subdomain: subdomain
+      };
+
       try {
-        const res = await fetch('/api/v1/users/register', {
+        const res = await fetch('/api/v1/users/register/send-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            full_name: fullName,
-            email: email,
-            password: password,
-            role: selectedRole,
-            school_name: schoolName,
-            subdomain: subdomain
-          })
+          body: JSON.stringify(userPayload)
         });
+        const data = await res.json();
 
+        if (res.ok) {
+          document.getElementById('step2').style.display = 'none';
+          document.getElementById('step3').style.display = 'block';
+        } else {
+          let errorMsg = typeof data.detail === 'string' ? data.detail : (data.detail?.[0]?.msg || JSON.stringify(data.detail));
+          showError(errorMsg);
+          document.getElementById('step2').style.display = 'none';
+          document.getElementById('step1').style.display = 'block';
+        }
+      } catch(err) {
+        showError("Server bilan aloqa yo'q");
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('step1').style.display = 'block';
+      } finally {
+        btn.innerText = 'Davom Etish →';
+        btn.disabled = false;
+      }
+    }
+
+    async function verifyOtp() {
+      const otpCode = document.getElementById('otpInput').value;
+      const btn = document.getElementById('verifyBtn');
+      if (!otpCode) return showError("Kodni kiriting");
+
+      document.getElementById('errorMessage').style.display = 'none';
+      btn.innerText = 'Tasdiqlanmoqda...';
+      btn.disabled = true;
+
+      const verifyPayload = { ...userPayload, otp_code: otpCode };
+
+      try {
+        const res = await fetch('/api/v1/users/register/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(verifyPayload)
+        });
         const data = await res.json();
 
         if (res.ok) {
           alert("Muvaffaqiyatli ro'yxatdan o'tdingiz. Tizimga kiring.");
           window.location.href = '/login';
         } else {
-          let errorMsg = "Xatolik yuz berdi";
-          if (typeof data.detail === 'string') {
-            errorMsg = data.detail;
-          } else if (Array.isArray(data.detail) && data.detail.length > 0) {
-            errorMsg = data.detail[0].msg;
-          } else if (typeof data.detail === 'object' && data.detail !== null) {
-            errorMsg = JSON.stringify(data.detail);
-          }
-          errorDiv.innerText = errorMsg;
-          errorDiv.style.display = 'block';
-          // Go back to step 1 to show error clearly
-          document.getElementById('step2').style.display = 'none';
-          document.getElementById('step1').style.display = 'block';
+          showError(typeof data.detail === 'string' ? data.detail : (data.detail?.[0]?.msg || JSON.stringify(data.detail)));
         }
       } catch(err) {
-        errorDiv.innerText = "Server bilan aloqa yo'q";
-        errorDiv.style.display = 'block';
+        showError("Server bilan aloqa yo'q");
       } finally {
         btn.innerText = '⚡ Maktabni Yoqish';
         btn.disabled = false;

@@ -12,6 +12,12 @@ class UserCreate(UserBase):
     school_name: str | None = None
     subdomain: str | None = None
 
+class UserRegisterVerify(UserCreate):
+    otp_code: str
+
+class UserAdminCreate(UserBase):
+    password: str
+
 class UserResponse(UserBase):
     id: uuid.UUID
     is_active: bool
