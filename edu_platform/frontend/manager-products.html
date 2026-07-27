@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="uz" class="notranslate" style="color-scheme: dark;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menejer Paneli — Mahsulotlar va Narxlar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #09090b;
+      --sidebar-bg: #121214;
+      --card-bg: #18181b;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-purple: #8b5cf6;
+      --green: #10b981;
+      --text-main: #f8fafc;
+      --text-muted: #8e99a8;
+      --input-bg: #121318;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+    .sidebar { width: 84px; background: var(--sidebar-bg); border-right: 1px solid var(--card-border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 0.6rem; overflow-y: auto; flex-shrink: 0; }
+    .sidebar-brand { width: 44px; height: 44px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2)); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem; text-decoration: none; }
+    .nav-item { width: 62px; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 0; border-radius: 12px; color: var(--text-muted); text-decoration: none; font-size: 0.68rem; font-weight: 600; transition: all 0.2s; cursor: pointer; }
+    .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.04); }
+    .nav-item.active { color: var(--accent-purple); background: rgba(139, 92, 246, 0.12); border: 1px solid rgba(139, 92, 246, 0.3); }
+    .svg-icon { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .sidebar-avatar { margin-top: auto; width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; border: 2px solid var(--green); position: relative; }
+
+    .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+    .top-header { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 2rem; border-bottom: 1px solid var(--card-border); flex-shrink: 0; }
+    .header-left { display: flex; align-items: center; gap: 12px; font-size: 1.25rem; font-weight: 800; }
+    
+    .filter-bar { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2rem; border-bottom: 1px solid var(--card-border); }
+    .tabs-group { display: flex; gap: 10px; }
+    .filter-tab { padding: 7px 18px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); cursor: pointer; transition: all 0.2s; }
+    .filter-tab.active { background: var(--accent-purple); color: #fff; border-color: var(--accent-purple); }
+    
+    .btn-create { background: var(--accent-purple); color: #fff; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 800; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
+
+    .content-container { padding: 2rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1.5rem; }
+
+    .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; position: relative; }
+    
+    .product-header { display: flex; justify-content: space-between; align-items: flex-start; }
+    .product-title { font-size: 1.15rem; font-weight: 800; color: #fff; margin-bottom: 4px; }
+    .product-status { background: rgba(16, 185, 129, 0.15); color: var(--green); padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; }
+    
+    .price-section { background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
+    .price-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 700; margin-bottom: 2px; }
+    .price-val { font-size: 1.5rem; font-weight: 800; color: #fff; }
+    .discount-badge { background: rgba(236, 72, 153, 0.15); color: var(--accent-pink); padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; margin-left: 8px; vertical-align: super; }
+
+    .promo-list { display: flex; flex-direction: column; gap: 8px; margin-top: 0.5rem; }
+    .promo-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px dashed var(--card-border); font-size: 0.85rem; }
+    .promo-code { font-family: monospace; font-weight: 800; color: var(--accent-purple); letter-spacing: 1px; }
+
+    .btn-edit-price { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 12px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; margin-top: auto; }
+    .btn-edit-price:hover { background: rgba(255,255,255,0.1); }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <a href="/manage/manager" class="sidebar-brand">
+      <svg style="width:24px;height:24px;stroke:var(--accent-purple);fill:none;stroke-width:2.5" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </a>
+    <a href="/manage/manager" class="nav-item">
+      <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span>Dashboard</span>
+    </a>
+    <a href="/manage/manager/products" class="nav-item active">
+      <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span>Sotuvlar</span>
+    </a>
+    <a href="/manage/manager/refunds" class="nav-item">
+      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Refundlar</span>
+    </a>
+    <a href="/manage/manager/reports" class="nav-item">
+      <svg class="svg-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>Hisobotlar</span>
+    </a>
+    <div class="sidebar-avatar">M</div>
+  </aside>
+
+  <main class="main-wrapper">
+    <header class="top-header">
+      <div class="header-left">
+        <span>🛍 Mahsulotlar va Narxlar</span>
+      </div>
+      <div style="font-size:0.85rem;color:var(--text-muted)">Jami: 3 ta kurs sotuvda</div>
+    </header>
+
+    <div class="filter-bar">
+      <div class="tabs-group">
+        <div class="filter-tab active">Barcha Kurslar</div>
+        <div class="filter-tab">Chegirmadagilar</div>
+        <div class="filter-tab">Promokodlar</div>
+      </div>
+      <button class="btn-create" onclick="alert('Yangi mahsulot / promokod qo\'shish')">
+        <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Yangi yaratish
+      </button>
+    </div>
+
+    <div class="content-container">
+      
+      <!-- PRODUCT 1 -->
+      <div class="product-card">
+        <div class="product-header">
+          <div>
+            <div class="product-title">Python asoslari: Noldan dasturlash</div>
+            <div style="font-size:0.8rem;color:var(--text-muted)">Dasturlash • 20 dars</div>
+          </div>
+          <div class="product-status">Faol</div>
+        </div>
+        
+        <div class="price-section">
+          <div>
+            <div class="price-label">Asosiy narx</div>
+            <div class="price-val">$120.00 <span class="discount-badge">-20%</span></div>
+          </div>
+          <div style="text-align:right">
+            <div class="price-label">Sotilgan</div>
+            <div style="font-weight:800;color:var(--green)">142 ta</div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:0.85rem;font-weight:700;color:#fff;margin-bottom:8px">Faol Promokodlar:</div>
+          <div class="promo-list">
+            <div class="promo-item">
+              <span><span class="promo-code">SUMMER26</span> (-30%)</span>
+              <span style="color:var(--text-muted);font-size:0.75rem">Tugaydi: 31 Avg</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-edit-price" onclick="alert('Narxni o\'zgartirish')">Narx va chegirmalarni tahrirlash</button>
+      </div>
+
+      <!-- PRODUCT 2 -->
+      <div class="product-card">
+        <div class="product-header">
+          <div>
+            <div class="product-title">Web dasturlash: HTML, CSS, JavaScript</div>
+            <div style="font-size:0.8rem;color:var(--text-muted)">Dasturlash • 20 dars</div>
+          </div>
+          <div class="product-status">Faol</div>
+        </div>
+        
+        <div class="price-section">
+          <div>
+            <div class="price-label">Asosiy narx</div>
+            <div class="price-val">$90.00</div>
+          </div>
+          <div style="text-align:right">
+            <div class="price-label">Sotilgan</div>
+            <div style="font-weight:800;color:var(--green)">98 ta</div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:0.85rem;font-weight:700;color:#fff;margin-bottom:8px">Faol Promokodlar:</div>
+          <div class="promo-list">
+            <div class="promo-item">
+              <span style="color:var(--text-muted)">Hozircha promokod yo'q</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-edit-price" onclick="alert('Narxni o\'zgartirish')">Narx va chegirmalarni tahrirlash</button>
+      </div>
+
+    </div>
+  </main>
+</body>
+</html>

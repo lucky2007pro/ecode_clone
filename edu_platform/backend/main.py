@@ -160,6 +160,23 @@ async def serve_curator_students():
 async def serve_curator_comments():
     return FileResponse(os.path.join(FRONTEND_DIR, "curator-comments.html"))
 
+# MANAGER PANEL CLEAN URL ROUTES
+@app.get("/manage/manager")
+async def serve_manager_dashboard():
+    return FileResponse(os.path.join(FRONTEND_DIR, "manager-dashboard.html"))
+
+@app.get("/manage/manager/refunds")
+async def serve_manager_refunds():
+    return FileResponse(os.path.join(FRONTEND_DIR, "manager-refunds.html"))
+
+@app.get("/manage/manager/products")
+async def serve_manager_products():
+    return FileResponse(os.path.join(FRONTEND_DIR, "manager-products.html"))
+
+@app.get("/manage/manager/reports")
+async def serve_manager_reports():
+    return FileResponse(os.path.join(FRONTEND_DIR, "manager-reports.html"))
+
 # DEDICATED CLEAN URL ROUTES FOR SETTINGS SECTIONS
 @app.get("/manage/school/settings/basic")
 @app.get("/customization")
