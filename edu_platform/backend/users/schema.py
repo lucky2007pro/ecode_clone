@@ -9,6 +9,8 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+    school_name: str | None = None
+    subdomain: str | None = None
 
 class UserResponse(UserBase):
     id: uuid.UUID

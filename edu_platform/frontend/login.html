@@ -108,7 +108,15 @@
           else if (payload && payload.role === 'manager') window.location.href = '/manage/manager';
           else window.location.href = '/manage/dashboard';
         } else {
-          errorDiv.innerText = data.detail || "Email yoki parol noto'g'ri";
+          let errorMsg = "Email yoki parol noto'g'ri";
+          if (typeof data.detail === 'string') {
+            errorMsg = data.detail;
+          } else if (Array.isArray(data.detail) && data.detail.length > 0) {
+            errorMsg = data.detail[0].msg;
+          } else if (typeof data.detail === 'object' && data.detail !== null) {
+            errorMsg = JSON.stringify(data.detail);
+          }
+          errorDiv.innerText = errorMsg;
           errorDiv.style.display = 'block';
         }
       } catch(err) {

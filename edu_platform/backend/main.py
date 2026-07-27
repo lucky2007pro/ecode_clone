@@ -139,6 +139,10 @@ async def serve_homework(homework_id: str = "1"):
 async def serve_analytics(user_id: str = "1"):
     return FileResponse(os.path.join(FRONTEND_DIR, "analytics.html"))
 
+@app.get("/approval")
+async def serve_approval():
+    return FileResponse(os.path.join(FRONTEND_DIR, "approval.html"))
+
 # CURATOR PANEL CLEAN URL ROUTES
 @app.get("/manage/curator")
 async def serve_curator_dashboard():

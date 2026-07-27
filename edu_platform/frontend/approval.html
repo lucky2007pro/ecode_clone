@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="uz" class="notranslate" style="color-scheme: dark;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arizalarni Tasdiqlash — Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #121212;
+      --card-bg: #1a1a1a;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-orange: #f97316;
+      --green: #22c55e;
+      --text-main: #f8fafc;
+      --text-muted: #8e99a8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: var(--bg-dark); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; padding: 3rem; }
+
+    .header { margin-bottom: 2rem; }
+    .title { font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem; }
+    .subtitle { font-size: 0.95rem; color: var(--text-muted); }
+
+    .requests-grid { display: flex; flex-direction: column; gap: 1rem; }
+    .request-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+    
+    .user-info { display: flex; flex-direction: column; gap: 4px; }
+    .user-name { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .user-email { font-size: 0.85rem; color: var(--text-muted); }
+    .user-role { font-size: 0.75rem; background: rgba(249, 115, 22, 0.15); color: var(--accent-orange); padding: 4px 10px; border-radius: 20px; font-weight: 700; width: fit-content; margin-top: 4px; }
+
+    .btn-approve { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); color: var(--green); padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+    .btn-approve:hover { background: var(--green); color: #fff; }
+
+    .empty-state { padding: 4rem; text-align: center; color: var(--text-muted); background: var(--card-bg); border-radius: 16px; border: 1px dashed var(--card-border); }
+  </style>
+</head>
+<body>
+  
+  <div class="header">
+    <h1 class="title">Kutilayotgan So'rovlar (Pending Approvals)</h1>
+    <p class="subtitle">Maktabingizga ulanishni xohlayotgan foydalanuvchilar ro'yxati</p>
+  </div>
+
+  <div class="requests-grid" id="requestsGrid">
+    <!-- Dinamik ravishda chiziladi -->
+    <div style="color:var(--text-muted)">Yuklanmoqda...</div>
+  </div>
+
+  <script src="/auth_check.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', loadPendingUsers);
+
+    async function loadPendingUsers() {
+      const grid = document.getElementById('requestsGrid');
+      const token = localStorage.getItem('access_token');
+      if (!token) return;
+
+      // JWT dan school_id ni ajratib olish
+      let schoolId = null;
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+        const payload = JSON.parse(jsonPayload);
+        schoolId = payload.school_id;
+      } catch(e) {}
+
+      if (!schoolId) {
+        grid.innerHTML = '<div class="empty-state">Maktab ID si topilmadi. Admin emassiz yoki tizimga qayta kiring.</div>';
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/v1/schools/${schoolId}/pending-users`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const users = await res.json();
+
+        if (res.ok) {
+          if (users.length === 0) {
+            grid.innerHTML = '<div class="empty-state">Hozircha hech qanday tasdiqlash uchun so\'rovlar yo\'q.</div>';
+            return;
+          }
+
+          grid.innerHTML = '';
+          users.forEach(u => {
+            const card = document.createElement('div');
+            card.className = 'request-card';
+            card.innerHTML = `
+              <div class="user-info">
+                <div class="user-name">${u.full_name}</div>
+                <div class="user-email">${u.email}</div>
+                <div class="user-role">${u.role.toUpperCase()}</div>
+              </div>
+              <button class="btn-approve" onclick="approveUser('${schoolId}', '${u.id}', this)">✓ Tasdiqlash</button>
+            `;
+            grid.appendChild(card);
+          });
+        } else {
+          grid.innerHTML = '<div class="empty-state">Xatolik yuz berdi: ' + JSON.stringify(users) + '</div>';
+        }
+      } catch(err) {
+        grid.innerHTML = '<div class="empty-state">Server bilan aloqa yo\'q.</div>';
+      }
+    }
+
+    async function approveUser(schoolId, userId, btnEl) {
+      const token = localStorage.getItem('access_token');
+      btnEl.innerText = 'Kutilmoqda...';
+      btnEl.disabled = true;
+
+      try {
+        const res = await fetch(`/api/v1/schools/${schoolId}/approve/${userId}`, {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        if (res.ok) {
+          alert('Foydalanuvchi muvaffaqiyatli tasdiqlandi!');
+          btnEl.closest('.request-card').remove();
+          
+          // Check if empty
+          if (document.querySelectorAll('.request-card').length === 0) {
+             document.getElementById('requestsGrid').innerHTML = '<div class="empty-state">Hozircha hech qanday tasdiqlash uchun so\'rovlar yo\'q.</div>';
+          }
+        } else {
+          alert('Tasdiqlashda xatolik yuz berdi.');
+          btnEl.innerText = '✓ Tasdiqlash';
+          btnEl.disabled = false;
+        }
+      } catch(e) {
+        alert('Tarmoq xatosi.');
+        btnEl.innerText = '✓ Tasdiqlash';
+        btnEl.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -65,7 +65,7 @@
 
       <form onsubmit="goToStep2(event)" style="display:flex;flex-direction:column;gap:1.25rem">
         <div class="form-group">
-          <label class="form-label">Maktabingiz Nomi</label>
+          <label class="form-label">Maktab Nomi yoki Domeni (O'quvchilar uchun)</label>
           <input type="text" id="schoolNameInput" class="form-input" value="dev" required />
         </div>
 
@@ -137,6 +137,8 @@
       const email = document.getElementById('emailInput').value;
       const fullName = document.getElementById('fullNameInput').value;
       const password = document.getElementById('passwordInput').value;
+      const schoolName = document.getElementById('schoolNameInput').value;
+      const subdomain = schoolName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
       const errorDiv = document.getElementById('errorMessage');
       const btn = document.getElementById('registerBtn');
 
@@ -152,7 +154,9 @@
             full_name: fullName,
             email: email,
             password: password,
-            role: selectedRole
+            role: selectedRole,
+            school_name: schoolName,
+            subdomain: subdomain
           })
         });
 
@@ -162,7 +166,15 @@
           alert("Muvaffaqiyatli ro'yxatdan o'tdingiz. Tizimga kiring.");
           window.location.href = '/login';
         } else {
-          errorDiv.innerText = data.detail || "Xatolik yuz berdi";
+          let errorMsg = "Xatolik yuz berdi";
+          if (typeof data.detail === 'string') {
+            errorMsg = data.detail;
+          } else if (Array.isArray(data.detail) && data.detail.length > 0) {
+            errorMsg = data.detail[0].msg;
+          } else if (typeof data.detail === 'object' && data.detail !== null) {
+            errorMsg = JSON.stringify(data.detail);
+          }
+          errorDiv.innerText = errorMsg;
           errorDiv.style.display = 'block';
           // Go back to step 1 to show error clearly
           document.getElementById('step2').style.display = 'none';
