@@ -9,6 +9,8 @@ from typing import List, Optional
 from db import get_db
 from payments.models import PaymentPlan, Subscription, PlanType, SubscriptionStatus, Transaction, TransactionType, SchoolSubscription
 from users.models import User
+from permissions.dependencies import RequirePermissions
+from permissions.enums import Permission
 
 router = APIRouter()
 
@@ -20,7 +22,7 @@ class PaymentPlanCreate(BaseModel):
     months: int = 1
 
 @router.post("/plans")
-async def create_payment_plan(plan_in: PaymentPlanCreate, db: AsyncSession = Depends(get_db)):
+async def create_payment_plan(plan_in: PaymentPlanCreate, db: AsyncSession = Depends(get_db), _=Depends(RequirePermissions([Permission.MANAGE_PRODUCTS]))):
     new_plan = PaymentPlan(**plan_in.dict())
     db.add(new_plan)
     await db.commit()
@@ -28,7 +30,7 @@ async def create_payment_plan(plan_in: PaymentPlanCreate, db: AsyncSession = Dep
     return new_plan
 
 @router.get("/plans/{course_id}")
-async def get_course_plans(course_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+async def get_course_plans(course_id: uuid.UUID, db: AsyncSession = Depends(get_db), _=Depends(RequirePermissions([Permission.VIEW_FINANCE]))):
     res = await db.execute(select(PaymentPlan).where(PaymentPlan.course_id == course_id))
     return res.scalars().all()
 
@@ -64,7 +66,7 @@ class SchoolSubscribeRequest(BaseModel):
     price: float
 
 @router.post("/school-subscribe")
-async def subscribe_school(req: SchoolSubscribeRequest, db: AsyncSession = Depends(get_db)):
+async def subscribe_school(req: SchoolSubscribeRequest, db: AsyncSession = Depends(get_db), _=Depends(RequirePermissions([Permission.MANAGE_PRODUCTS]))):
     user_res = await db.execute(select(User).where(User.id == req.user_id))
     user = user_res.scalar_one_or_none()
     if not user:
@@ -113,7 +115,7 @@ class TransactionResponse(BaseModel):
         orm_mode = True
 
 @router.get("/transactions/{school_id}", response_model=List[TransactionResponse])
-async def get_transactions(school_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+async def get_transactions(school_id: uuid.UUID, db: AsyncSession = Depends(get_db), _=Depends(RequirePermissions([Permission.VIEW_FINANCE]))):
     # We return all transactions for the users in this school?
     # Or transactions associated with this school.
     # We should return transactions where transaction.school_id == school_id 

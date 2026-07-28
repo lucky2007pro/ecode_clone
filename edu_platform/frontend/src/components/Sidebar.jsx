@@ -7,22 +7,22 @@ import './Sidebar.css';
 const Sidebar = () => {
   const { user } = useContext(AuthContext);
 
+  const role = user?.role;
   const menuItems = [
-    { name: 'Home', icon: <Home size={22} />, path: user?.role === 'student' ? '/student-dashboard' : '/' },
-    { name: 'Courses', icon: <Layers size={22} />, path: '/courses' },
+    { name: 'Home', icon: <Home size={22} />, path: role === 'student' ? '/student-dashboard' : '/' },
   ];
 
-  if (user && user.role !== 'student') {
+  if (['student', 'curator', 'teacher', 'manager', 'admin'].includes(role)) {
+    menuItems.push({ name: 'Courses', icon: <Layers size={22} />, path: '/courses' });
+  }
+  if (['curator', 'teacher', 'manager', 'admin'].includes(role)) {
     menuItems.push({ name: 'Practice', icon: <CheckSquare size={22} />, path: '/admin/homeworks' });
     menuItems.push({ name: 'People', icon: <Users size={22} />, path: '/students' });
   }
-
-  // Admin, Manager va Buxgalter ko'ra oladigan qismlar
-  if (user && (user.role === 'admin' || user.role === 'manager' || user.role === 'accountant')) {
+  if (['accountant', 'admin'].includes(role)) {
     menuItems.push({ name: 'Sales', icon: <CreditCard size={22} />, path: '/payments' });
   }
-  
-  if (user && user.role === 'admin') {
+  if (role === 'admin') {
     menuItems.push({ name: 'Settings', icon: <Settings size={22} />, path: '/settings' });
   }
 
