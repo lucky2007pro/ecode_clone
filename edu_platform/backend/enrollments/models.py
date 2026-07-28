@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 import enum
 from sqlalchemy import ForeignKey, Enum as SqlEnum, Float, DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -24,4 +24,4 @@ class Enrollment(Base):
     )
     progress: Mapped[float] = mapped_column(Float, default=0.0)
     source: Mapped[str] = mapped_column(String(20), default="self")
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))

@@ -247,3 +247,61 @@
     max-height: 300px;
   }
 }
+
+/* Ichki tab'lar (talabalar / analitika) */
+.cv-tab-container {
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.cv-student-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.cv-student-row:last-child {
+  border-bottom: none;
+}
+
+.cv-student-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+}
+
+.cv-student-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.cv-student-status {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.cv-progress-track {
+  background: #f1f5f9;
+  border-radius: 100px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.cv-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  border-radius: 100px;
+  transition: width 0.3s;
+}
+
+.cv-percent {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  min-width: 44px;
+  text-align: right;
+}

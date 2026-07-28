@@ -42,6 +42,7 @@ import CourseView from './pages/student/CourseView';
 import Chat from './pages/student/Chat';
 import Settings from './pages/admin/Settings';
 import Payments from './pages/admin/Payments';
+import NotificationsPage from './pages/NotificationsPage';
 
 const App = () => {
   return (
@@ -75,7 +76,7 @@ const App = () => {
                     {/* Qolgan yo'nalishlar */}
                     <Route path="/videos" element={<RoleRoute allowedRoles={['admin']}><div className="card"><h2>Videolar sahifasi</h2><p>Tez orada...</p></div></RoleRoute>} />
                     <Route path="/payments" element={<RoleRoute allowedRoles={['admin', 'accountant']}><Payments /></RoleRoute>} />
-                    <Route path="/notifications" element={<RoleRoute allowedRoles={['admin']}><div className="card"><h2>Bildirishnomalar</h2><p>Tez orada...</p></div></RoleRoute>} />
+                    <Route path="/notifications" element={<RoleRoute allowedRoles={['student', 'accountant', 'curator', 'teacher', 'manager', 'admin']}><NotificationsPage /></RoleRoute>} />
                   </Routes>
                 </main>
                 </div>

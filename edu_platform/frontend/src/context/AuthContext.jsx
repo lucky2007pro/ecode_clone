@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { api } from '../api';
 
 export const AuthContext = createContext();
 
@@ -14,25 +15,15 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem('token');
       if (token) {
         try {
-          const userRes = await fetch('http://localhost:8000/api/v1/users/me', {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          const schoolRes = await fetch('http://localhost:8000/api/v1/schools/my', {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          
-          if (userRes.ok && schoolRes.ok) {
-            const userData = await userRes.json();
-            const schoolData = await schoolRes.json();
-            setUser(userData);
-            setSchool(schoolData);
-          } else {
-            localStorage.removeItem('token');
-            setUser(null);
-            setSchool(null);
-          }
+          const userData = await api('/users/me');
+          const schoolData = await api('/schools/my');
+          setUser(userData);
+          setSchool(schoolData);
         } catch (error) {
           console.error("Ma'lumotlarni olishda xatolik:", error);
+          localStorage.removeItem('token');
+          setUser(null);
+          setSchool(null);
         }
       }
       setLoading(false);
@@ -44,20 +35,11 @@ export const AuthProvider = ({ children }) => {
   const login = async (token) => {
     localStorage.setItem('token', token);
     try {
-      const userRes = await fetch('http://localhost:8000/api/v1/users/me', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const schoolRes = await fetch('http://localhost:8000/api/v1/schools/my', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      
-      if (userRes.ok && schoolRes.ok) {
-        const userData = await userRes.json();
-        const schoolData = await schoolRes.json();
-        setUser(userData);
-        setSchool(schoolData);
-        navigate('/');
-      }
+      const userData = await api('/users/me');
+      const schoolData = await api('/schools/my');
+      setUser(userData);
+      setSchool(schoolData);
+      navigate('/');
     } catch (error) {
       console.error("Login vaqtida xatolik:", error);
     }
@@ -70,8 +52,14 @@ export const AuthProvider = ({ children }) => {
     navigate('/login');
   };
 
+  const refreshUser = async () => {
+    if (!localStorage.getItem('token')) return;
+    const userData = await api('/users/me');
+    setUser(userData);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, school, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, school, loading, login, logout, refreshUser }}>
       {!loading && children}
     </AuthContext.Provider>
   );

@@ -2,79 +2,104 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { PlayCircle, CheckCircle, Lock, ArrowLeft, HelpCircle, MessageCircle, CreditCard, BookOpen, Users, BarChart2, ChevronDown } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
+import { api } from '../../api';
 import HomeworkForm from './HomeworkForm';
 import QuizView from './QuizView';
+import Chat from './Chat';
 import './CourseView.css';
 
 const CourseView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  const { user, school, refreshUser } = useContext(AuthContext);
   const [course, setCourse] = useState(null);
   const [modules, setModules] = useState([]);
   const [lessons, setLessons] = useState([]);
   const [activeLesson, setActiveLesson] = useState(null);
   const [expandedModules, setExpandedModules] = useState({});
-  const [plans, setPlans] = useState([]);
   const [botLink, setBotLink] = useState(null);
   const [loading, setLoading] = useState(true);
   const [enrolled, setEnrolled] = useState(false);
   const [activeCourseTab, setActiveCourseTab] = useState('lessons');
+  const [completedLessons, setCompletedLessons] = useState([]);
+  const [courseStudents, setCourseStudents] = useState([]);
+  const [quizResults, setQuizResults] = useState([]);
+  const [quizTitles, setQuizTitles] = useState({});
+
+  // Ichki tab'lar uchun ma'lumotlar
+  useEffect(() => {
+    if (activeCourseTab === 'students') fetchCourseStudents();
+    if (activeCourseTab === 'analytics') fetchMyAnalytics();
+  }, [activeCourseTab, id, lessons]);
+
+  const fetchCourseStudents = async () => {
+    try {
+      const data = await api(`/enrollments/course/${id}`);
+      setCourseStudents(data);
+    } catch (err) { console.error(err); }
+  };
+
+  const fetchMyAnalytics = async () => {
+    try {
+      const results = await api('/quizzes/results/my');
+      const quizLessons = lessons.filter(l => l.lesson_type === 'quiz');
+      const quizzes = await Promise.all(
+        quizLessons.map(l => api(`/quizzes/lesson/${l.id}`).catch(() => null))
+      );
+      const titles = {};
+      quizzes.forEach(q => { if (q) titles[q.id] = q.title; });
+      setQuizTitles(titles);
+      setQuizResults(results.filter(r => titles[r.quiz_id] !== undefined));
+    } catch (err) { console.error(err); }
+  };
+
+  const completedCount = lessons.filter(l => completedLessons.includes(l.id)).length;
+  const completionPercent = lessons.length > 0 ? Math.round(completedCount * 100 / lessons.length) : 0;
 
   useEffect(() => {
     fetchCourseDetails();
     fetchLessons();
-    fetchPlans();
     fetchBotSettings();
     checkEnrollment();
-  }, [id, user]);
+  }, [id, user, school]);
+
+  // Tugatilgan darslar localStorage'da saqlanadi (backend endpointi hali yo'q)
+  useEffect(() => {
+    if (!user) return;
+    try {
+      setCompletedLessons(JSON.parse(localStorage.getItem(`completed_lessons_${user.id}`)) || []);
+    } catch { setCompletedLessons([]); }
+  }, [user]);
+
+  const handleCompleteLesson = () => {
+    if (!user || !activeLesson) return;
+    const updated = [...new Set([...completedLessons, activeLesson.id])];
+    setCompletedLessons(updated);
+    localStorage.setItem(`completed_lessons_${user.id}`, JSON.stringify(updated));
+  };
 
   const checkEnrollment = async () => {
     if (!user) return;
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/api/v1/enrollments/user/${user.id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const enrollments = await response.json();
-        const isEnrolled = enrollments.some(e => e.course_id === id);
-        setEnrolled(isEnrolled || user.role === 'admin' || user.role === 'manager' || user.role === 'teacher');
-      }
+      const enrollments = await api(`/enrollments/user/${user.id}`);
+      const isEnrolled = enrollments.some(e => e.course_id === id);
+      setEnrolled(isEnrolled || user.role === 'admin' || user.role === 'manager' || user.role === 'teacher');
     } catch (err) { console.error(err); }
-  };
-
-  const fetchPlans = async () => {
-    try {
-      const res = await fetch(`http://localhost:8000/api/v1/payments/plans/${id}`);
-      if(res.ok) setPlans(await res.json());
-    } catch(err) { console.error(err); }
   };
 
   const fetchBotSettings = async () => {
     try {
-      const schoolId = "00000000-0000-0000-0000-000000000000";
-      const res = await fetch(`http://localhost:8000/api/v1/bot/${schoolId}/get-invite`, {
-        method: 'POST'
-      });
-      if(res.ok) {
-        const data = await res.json();
-        if(data.invite_link) setBotLink(data.invite_link);
-      }
+      if (!school?.id) return;
+      const data = await api(`/bot/${school.id}/get-invite`, { method: 'POST' });
+      if (data.invite_link) setBotLink(data.invite_link);
     } catch(err) { console.error(err); }
   };
 
   const fetchCourseDetails = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:8000/api/v1/courses/', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const courses = await res.json();
-        const found = courses.find(c => c.id === id);
-        if (found) setCourse(found);
-      }
+      const courses = await api('/courses/');
+      const found = courses.find(c => c.id === id);
+      if (found) setCourse(found);
     } catch (err) {
       console.error(err);
     }
@@ -82,25 +107,18 @@ const CourseView = () => {
 
   const fetchLessons = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const [modRes, lesRes] = await Promise.all([
-        fetch(`http://localhost:8000/api/v1/lessons/course/${id}/modules`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`http://localhost:8000/api/v1/lessons/course/${id}`, { headers: { 'Authorization': `Bearer ${token}` } })
+      const [mods, data] = await Promise.all([
+        api(`/lessons/course/${id}/modules`).catch(() => []),
+        api(`/lessons/course/${id}`).catch(() => [])
       ]);
-      
-      if (modRes.ok) {
-        const mods = await modRes.json();
-        setModules(mods);
-        const exp = {};
-        mods.forEach(m => exp[m.id] = true);
-        setExpandedModules(exp);
-      }
-      
-      if (lesRes.ok) {
-        const data = await lesRes.json();
-        setLessons(data);
-        if (data.length > 0) setActiveLesson(data[0]);
-      }
+
+      setModules(mods);
+      const exp = {};
+      mods.forEach(m => exp[m.id] = true);
+      setExpandedModules(exp);
+
+      setLessons(data);
+      if (data.length > 0) setActiveLesson(data[0]);
     } catch (err) {
       console.error(err);
     } finally {
@@ -113,29 +131,28 @@ const CourseView = () => {
   };
 
   const handlePurchase = async () => {
-    if (!window.confirm("Kursni xarid qilishni xohlaysizmi? Balansingizdan pul yechib olinadi.")) return;
+    const price = Number(course?.price) || 0;
+    const msg = price > 0
+      ? `Kurs narxi ${price.toLocaleString('uz-UZ')} so'm. Balansingizdan yechilsinmi?`
+      : "Bu bepul kursga yozilmoqchimisiz?";
+    if (!window.confirm(msg)) return;
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/api/v1/enrollments/`, {
+      await api('/enrollments/purchase', {
         method: 'POST',
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          user_id: user.id,
-          course_id: id
-        })
+        body: { course_id: id }
       });
-      if (response.ok) {
-        alert("Kurs muvaffaqiyatli sotib olindi!");
-        setEnrolled(true);
-        window.location.reload();
+      await refreshUser();
+      alert(price > 0 ? "Kurs muvaffaqiyatli sotib olindi!" : "Kursga muvaffaqiyatli yozildingiz!");
+      setEnrolled(true);
+      window.location.reload();
+    } catch (err) {
+      const m = err.message || '';
+      if (m.includes('yetarli emas')) {
+        alert(`${m}\n\nIltimos, admin yoki menejerga murojaat qilib balansingizni to'ldiring.`);
       } else {
-        const errorData = await response.json();
-        alert(`Xatolik: ${errorData.detail}`);
+        alert(`Xatolik: ${m}`);
       }
-    } catch (err) { console.error(err); }
+    }
   };
 
   if (loading) return <div className="loading-state"><div className="spinner"></div></div>;
@@ -205,7 +222,8 @@ const CourseView = () => {
                               onClick={() => setActiveLesson(lesson)}
                               style={{ padding: '8px 12px', marginBottom: '4px' }}
                             >
-                              <div className="lesson-nav-info-new">
+                              <div className="lesson-nav-info-new" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+                                {completedLessons.includes(lesson.id) && <CheckCircle size={14} color="#10b981" />}
                                 <span className="lesson-title-new" style={{fontSize: '13px'}}>{lesson.title}</span>
                               </div>
                             </div>
@@ -225,7 +243,8 @@ const CourseView = () => {
                           className={`lesson-nav-item-new ${activeLesson?.id === lesson.id ? 'active' : ''}`}
                           onClick={() => setActiveLesson(lesson)}
                         >
-                          <div className="lesson-nav-info-new">
+                          <div className="lesson-nav-info-new" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+                            {completedLessons.includes(lesson.id) && <CheckCircle size={14} color="#10b981" />}
                             <span className="lesson-title-new">{lesson.title}</span>
                           </div>
                         </div>
@@ -252,17 +271,21 @@ const CourseView = () => {
               
               {(!enrolled && user && user.role === 'student') && (
                 <div className="course-info-card mt-4">
-                  <h3 className="course-info-card-title">Sotib olish</h3>
+                  <h3 className="course-info-card-title">{Number(course?.price) > 0 ? 'Kursni sotib olish' : 'Kursga yozilish'}</h3>
                   <div style={{ marginTop: '12px' }}>
                     <div style={{padding: '12px', background: '#f8fafc', borderRadius: '8px', marginBottom: '8px', border: '1px solid #e2e8f0'}}>
                       <div style={{fontWeight: '600', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px'}}>
-                        <CreditCard size={14} /> To'liq kurs to'lovi
+                        <CreditCard size={14} /> {Number(course?.price) > 0 ? `${Number(course.price).toLocaleString('uz-UZ')} so'm` : 'Bepul'}
                       </div>
-                      <div style={{fontSize: '14px', color: '#3b82f6', fontWeight: 'bold', marginTop: '4px'}}>
-                        {course?.price ? course.price.toLocaleString() : '0'} UZS
+                      <div style={{fontSize: '13px', color: '#64748b', marginTop: '4px'}}>
+                        {Number(course?.price) > 0
+                          ? `To'lov balansingizdan yechiladi. Balans: ${Number(user.balance || 0).toLocaleString('uz-UZ')} so'm`
+                          : "Bu kursga bepul yozilishingiz mumkin."}
                       </div>
                     </div>
-                    <button className="btn-primary full-width mt-2" onClick={handlePurchase}>Sotib olish</button>
+                    <button className="btn-primary full-width mt-2" onClick={handlePurchase}>
+                      {Number(course?.price) > 0 ? 'Sotib olish' : 'Kursga yozilish'}
+                    </button>
                   </div>
                 </div>
               )}
@@ -305,8 +328,14 @@ const CourseView = () => {
                   <HomeworkForm lessonId={activeLesson.id} />
                   
                   <div className="lesson-footer">
-                    <button className="btn-primary">
-                      <CheckCircle size={18} style={{marginRight: '8px'}} /> Darsni tugatish
+                    <button
+                      className="btn-primary"
+                      onClick={handleCompleteLesson}
+                      disabled={completedLessons.includes(activeLesson.id)}
+                      style={completedLessons.includes(activeLesson.id) ? { background: '#10b981', cursor: 'default' } : undefined}
+                    >
+                      <CheckCircle size={18} style={{marginRight: '8px'}} />
+                      {completedLessons.includes(activeLesson.id) ? 'Tugatilgan' : 'Darsni tugatish'}
                     </button>
                   </div>
                 </div>
@@ -320,11 +349,81 @@ const CourseView = () => {
             )}
           </div>
         </>
+      ) : activeCourseTab === 'chat' ? (
+        <div className="course-main-content" style={{ flex: 1, padding: '24px' }}>
+          <Chat courseId={id} />
+        </div>
+      ) : activeCourseTab === 'students' ? (
+        <div className="course-main-content" style={{ flex: 1, padding: '24px' }}>
+          <div className="cv-tab-container">
+            <div className="course-info-card" style={{ marginTop: 0 }}>
+              <h3 className="course-info-card-title">Kurs talabalari ({courseStudents.filter(s => s.role === 'student').length})</h3>
+              {courseStudents.filter(s => s.role === 'student').length === 0 ? (
+                <p className="course-info-card-text">Bu kursga hali hech kim yozilmagan.</p>
+              ) : (
+                courseStudents.filter(s => s.role === 'student').map(s => (
+                  <div key={s.id} className="cv-student-row">
+                    <div className="cv-student-info">
+                      <span className="cv-student-name">{s.full_name || "Noma'lum"}</span>
+                      <span className="cv-student-status">{s.status === 'active' ? 'Faol' : s.status}</span>
+                    </div>
+                    <div className="cv-progress-track" style={{ flex: 1, maxWidth: '220px' }}>
+                      <div className="cv-progress-fill" style={{ width: `${Math.min(100, Math.round(s.progress))}%` }}></div>
+                    </div>
+                    <span className="cv-percent">{Math.round(s.progress)}%</span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      ) : activeCourseTab === 'payments' ? (
+        <div className="course-main-content" style={{ flex: 1, padding: '24px' }}>
+          <div className="cv-tab-container">
+            <div className="course-info-card" style={{ marginTop: 0 }}>
+              <h3 className="course-info-card-title">Kurs to'lovi</h3>
+              <p className="course-info-card-text">
+                Kurs narxi: <b>{course?.price > 0 ? `${Number(course.price).toLocaleString('uz-UZ')} so'm` : 'Bepul'}</b>
+              </p>
+              <div style={{ marginTop: '12px', padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                <div style={{ fontWeight: '600', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
+                  <CreditCard size={14} /> Balansdan to'lov
+                </div>
+                <div style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>
+                  Kurs to'lovi balansingizdan yechiladi. Balans: {Number(user?.balance || 0).toLocaleString('uz-UZ')} so'm
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       ) : (
-        <div className="course-main-content" style={{ flex: 1, padding: '40px' }}>
-          <div className="empty-state card" style={{ height: '100%', justifyContent: 'center' }}>
-            <h2>{activeCourseTab.charAt(0).toUpperCase() + activeCourseTab.slice(1)} sahifasi</h2>
-            <p className="text-muted">Bu bo'lim tez orada ishga tushadi.</p>
+        <div className="course-main-content" style={{ flex: 1, padding: '24px' }}>
+          <div className="cv-tab-container">
+            <div className="course-info-card" style={{ marginTop: 0 }}>
+              <h3 className="course-info-card-title">Darslarni o'zlashtirish</h3>
+              <p className="course-info-card-text">
+                {lessons.length} ta darsdan {completedCount} tasi tugatilgan ({completionPercent}%)
+              </p>
+              <div className="cv-progress-track" style={{ marginTop: '10px' }}>
+                <div className="cv-progress-fill" style={{ width: `${completionPercent}%` }}></div>
+              </div>
+            </div>
+            <div className="course-info-card">
+              <h3 className="course-info-card-title">Test natijalarim</h3>
+              {quizResults.length === 0 ? (
+                <p className="course-info-card-text">Bu kursda hali test topshirmagansiz.</p>
+              ) : (
+                quizResults.map(r => (
+                  <div key={r.id} className="cv-student-row">
+                    <div className="cv-student-info">
+                      <span className="cv-student-name">{quizTitles[r.quiz_id] || 'Test'}</span>
+                      <span className="cv-student-status">{new Date(r.created_at + (r.created_at.endsWith('Z') ? '' : 'Z')).toLocaleDateString('uz-UZ')}</span>
+                    </div>
+                    <span className="cv-percent">{r.score}/{r.total} ({r.total > 0 ? Math.round(r.score * 100 / r.total) : 0}%)</span>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
       )}

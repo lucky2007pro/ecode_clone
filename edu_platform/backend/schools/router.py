@@ -32,13 +32,13 @@ async def add_school(school_in: SchoolCreate, owner_id: uuid.UUID, db: AsyncSess
 async def get_school_users(school_id: uuid.UUID, db: AsyncSession = Depends(get_db), token_school_id=Depends(get_current_school_id), _=Depends(RequirePermissions([Permission.VIEW_USERS]))):
     if school_id != token_school_id: raise HTTPException(status_code=403, detail="Boshqa maktabga kirish taqiqlangan")
     res = await db.execute(
-        select(User.id, User.full_name, User.email, User.role, User.is_active)
+        select(User.id, User.full_name, User.email, User.role, User.is_active, User.balance)
         .join(UserSchool, User.id == UserSchool.user_id)
         .where(UserSchool.school_id == school_id)
         .where(UserSchool.status == MembershipStatus.APPROVED)
     )
     users = res.all()
-    return [{"id": u.id, "full_name": u.full_name, "email": u.email, "role": u.role, "is_active": u.is_active} for u in users]
+    return [{"id": u.id, "full_name": u.full_name, "email": u.email, "role": u.role, "is_active": u.is_active, "balance": float(u.balance)} for u in users]
 
 @router.post("/{school_id}/users", status_code=status.HTTP_201_CREATED)
 async def add_school_user(

@@ -1,0 +1,18 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Env secrets
+.env
+
+# Node / frontend build
+node_modules/
+dist/
+
+# Uploaded media (runtime)
+uploads/
+
+# Archives / local backups
+*.zip

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Palette, Globe, User, Save, CheckCircle, Target, MessageCircle, Key, Briefcase, CreditCard } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
+import { api } from '../../api';
 import './Settings.css';
 
 const Settings = () => {
-  const { user, school } = useContext(AuthContext);
+  const { user, school, refreshUser } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState('school');
   const [schoolData, setSchoolData] = useState({ name: school?.name || '', custom_domain: school?.custom_domain || '', primary_color: school?.primary_color || '#3b82f6' });
   const [userData, setUserData] = useState({ full_name: user?.full_name || '', email: user?.email || '' });
@@ -14,7 +15,41 @@ const Settings = () => {
   const [apiKeyName, setApiKeyName] = useState('');
   const [generatedKey, setGeneratedKey] = useState(null);
   const [saved, setSaved] = useState(false);
-  
+  const [profileError, setProfileError] = useState('');
+  const [plans, setPlans] = useState([]);
+  const [subscription, setSubscription] = useState(null);
+  const [subLoading, setSubLoading] = useState(false);
+  const [subMessage, setSubMessage] = useState({ type: '', text: '' });
+
+  useEffect(() => {
+    if (activeTab === 'subscription') {
+      (async () => {
+        try {
+          const [plansData, subData] = await Promise.all([
+            api('/payments/plans'),
+            api('/payments/school-subscription'),
+          ]);
+          setPlans(plansData || []);
+          setSubscription(subData);
+        } catch (err) { console.error(err); }
+      })();
+    }
+  }, [activeTab]);
+
+  const handleSubscribe = async (planId) => {
+    setSubLoading(true);
+    setSubMessage({ type: '', text: '' });
+    try {
+      const sub = await api('/payments/subscribe', { method: 'POST', body: { plan_id: planId } });
+      setSubscription(sub);
+      setSubMessage({ type: 'success', text: 'Obuna muvaffaqiyatli faollashtirildi!' });
+      await refreshUser();
+    } catch (err) {
+      setSubMessage({ type: 'error', text: err.message || "To'lovda xatolik yuz berdi" });
+    }
+    setSubLoading(false);
+  };
+
   useEffect(() => {
     if (school) {
       setSchoolData({ name: school.name, custom_domain: school.custom_domain || '', primary_color: school.primary_color || '#3b82f6' });
@@ -40,19 +75,12 @@ const Settings = () => {
     e.preventDefault();
     if (!schoolId) return;
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:8000/api/v1/schools/${schoolId}`, {
+      await api(`/schools/${schoolId}`, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(schoolData)
+        body: schoolData
       });
-      if (res.ok) {
-        setSaved(true);
-        setTimeout(() => setSaved(false), 3000);
-      }
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
     } catch (err) {
       console.error(err);
     }
@@ -61,10 +89,9 @@ const Settings = () => {
   const handleSaveMarketing = async (e) => {
     e.preventDefault();
     try {
-      await fetch(`http://localhost:8000/api/v1/marketing/${schoolId}`, {
+      await api(`/marketing/${schoolId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(marketingData)
+        body: marketingData
       });
       setSaved(true); setTimeout(() => setSaved(false), 3000);
     } catch(err) { console.error(err); }
@@ -73,10 +100,9 @@ const Settings = () => {
   const handleSaveBot = async (e) => {
     e.preventDefault();
     try {
-      await fetch(`http://localhost:8000/api/v1/bot/${schoolId}`, {
+      await api(`/bot/${schoolId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(botData)
+        body: botData
       });
       setSaved(true); setTimeout(() => setSaved(false), 3000);
     } catch(err) { console.error(err); }
@@ -85,12 +111,10 @@ const Settings = () => {
   const generateApiKey = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/keys/keys/${schoolId}`, {
+      const data = await api(`/keys/keys/${schoolId}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: apiKeyName || 'New API Key' })
+        body: { name: apiKeyName || 'New API Key' }
       });
-      const data = await res.json();
       setGeneratedKey(data.api_key);
     } catch(err) { console.error(err); }
   };
@@ -98,40 +122,28 @@ const Settings = () => {
   const handleSaveKommo = async (e) => {
     e.preventDefault();
     try {
-      await fetch(`http://localhost:8000/api/v1/crm/settings/${schoolId}`, {
+      await api(`/crm/settings/${schoolId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(kommoData)
+        body: kommoData
       });
       setSaved(true); setTimeout(() => setSaved(false), 3000);
     } catch(err) { console.error(err); }
   };
 
-  const handleSubscribePlatform = async () => {
-    if (!window.confirm("Platforma uchun 500,000 UZS to'lov qilasizmi? Balansingizdan yechiladi.")) return;
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    if (!user) return;
+    setProfileError('');
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/api/v1/payments/school-subscribe`, {
-        method: 'POST',
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          user_id: user.id,
-          school_id: school.id,
-          plan_name: 'Pro Tarif',
-          price: 500000
-        })
+      await api(`/users/${user.id}`, {
+        method: 'PUT',
+        body: { full_name: userData.full_name }
       });
-      if (response.ok) {
-        alert("Platforma obunasi muvaffaqiyatli xarid qilindi!");
-        window.location.reload();
-      } else {
-        const errorData = await response.json();
-        alert(`Xatolik: ${errorData.detail}`);
-      }
-    } catch(err) { console.error(err); }
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setProfileError(err.message || "Saqlashda xatolik yuz berdi");
+    }
   };
 
   return (
@@ -263,7 +275,9 @@ const Settings = () => {
                 <p className="text-muted">Shaxsiy ma'lumotlaringizni tahrirlang</p>
               </div>
               
-              <form className="settings-form">
+              {saved && <div className="alert-success"><CheckCircle size={18} /> Saqlandi!</div>}
+              {profileError && <div style={{ color: '#b91c1c', background: '#fee2e2', padding: '10px', borderRadius: '8px', marginBottom: '12px', fontSize: '13px' }}>{profileError}</div>}
+              <form className="settings-form" onSubmit={handleSaveProfile}>
                 <div className="form-group">
                   <label>To'liq Ism</label>
                   <input 
@@ -283,7 +297,7 @@ const Settings = () => {
                 </div>
                 
                 <div className="form-actions">
-                  <button type="button" className="btn-primary" onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 3000); }}>
+                  <button type="submit" className="btn-primary">
                     <Save size={18} style={{marginRight: '8px'}} /> Saqlash
                   </button>
                 </div>
@@ -298,15 +312,73 @@ const Settings = () => {
                 <p className="text-muted">Maktabingiz uchun oylik tarifni boshqaring</p>
               </div>
               <div style={{ marginTop: '20px' }}>
-                <div style={{padding: '20px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                  <div>
-                    <h3 style={{ margin: 0 }}>Pro Tarif</h3>
-                    <p style={{ margin: '5px 0 0', color: '#64748b' }}>Barcha imkoniyatlar (CRM, Bot, 1000 gacha o'quvchi)</p>
+                {subMessage.text && (
+                  <div style={{
+                    padding: '10px 14px', borderRadius: '8px', marginBottom: '16px', fontSize: '13px',
+                    ...(subMessage.type === 'success'
+                      ? { color: '#166534', background: '#dcfce7', border: '1px solid #bbf7d0' }
+                      : { color: '#b91c1c', background: '#fee2e2', border: '1px solid #fecaca' })
+                  }}>
+                    {subMessage.text}
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{fontSize: '18px', color: '#3b82f6', fontWeight: 'bold'}}>500,000 UZS / oy</div>
-                    <button className="btn-primary mt-2" onClick={handleSubscribePlatform}>Sotib olish / Yangilash</button>
+                )}
+
+                <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
+                  <div style={{ flex: 1, minWidth: '180px', padding: '16px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                    <p className="text-muted" style={{ margin: 0, fontSize: '13px' }}>Joriy balans</p>
+                    <h3 style={{ margin: '4px 0 0' }}>{(user?.balance || 0).toLocaleString()} UZS</h3>
                   </div>
+                  <div style={{ flex: 1, minWidth: '180px', padding: '16px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                    <p className="text-muted" style={{ margin: 0, fontSize: '13px' }}>Joriy obuna</p>
+                    {subscription ? (
+                      <>
+                        <h3 style={{ margin: '4px 0 0' }}>{subscription.plan_name}</h3>
+                        <p className="text-muted" style={{ margin: '2px 0 0', fontSize: '12px' }}>
+                          {subscription.status === 'active' ? 'Faol' : subscription.status} · {new Date(subscription.expires_at).toLocaleDateString()} gacha
+                        </p>
+                      </>
+                    ) : (
+                      <p style={{ margin: '4px 0 0', color: '#f59e0b', fontSize: '14px' }}>Obuna faol emas</p>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                  {plans.map((plan) => {
+                    const isRecommended = plan.id === 'standard';
+                    const isCurrent = subscription && subscription.plan_name === plan.name;
+                    return (
+                      <div key={plan.id} style={{
+                        padding: '20px', borderRadius: '10px', background: '#fff', position: 'relative',
+                        border: isRecommended ? '2px solid #3b82f6' : '1px solid #e2e8f0'
+                      }}>
+                        {isRecommended && (
+                          <span style={{
+                            position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)',
+                            background: '#3b82f6', color: '#fff', fontSize: '11px', padding: '2px 10px',
+                            borderRadius: '999px', whiteSpace: 'nowrap'
+                          }}>
+                            Tavsiya etiladi
+                          </span>
+                        )}
+                        <h3 style={{ margin: 0 }}>{plan.name}</h3>
+                        <p style={{ margin: '8px 0 12px', fontSize: '20px', fontWeight: 600 }}>
+                          {plan.price.toLocaleString()} <span className="text-muted" style={{ fontSize: '13px', fontWeight: 400 }}>UZS/oy</span>
+                        </p>
+                        <ul style={{ margin: '0 0 16px', paddingLeft: '18px', color: '#475569', fontSize: '13px', lineHeight: '1.8' }}>
+                          {plan.features.filter((f) => f !== 'Tavsiya etiladi').map((f) => <li key={f}>{f}</li>)}
+                        </ul>
+                        <button
+                          className="btn-primary"
+                          style={{ width: '100%', opacity: (subLoading || isCurrent) ? 0.6 : 1 }}
+                          disabled={subLoading || isCurrent}
+                          onClick={() => handleSubscribe(plan.id)}
+                        >
+                          {isCurrent ? 'Faol obuna' : 'Tanlash'}
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>

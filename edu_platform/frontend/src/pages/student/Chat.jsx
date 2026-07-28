@@ -1,12 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Send, User } from 'lucide-react';
+import { api, WS_URL } from '../../api';
+import { AuthContext } from '../../context/AuthContext';
 import './Chat.css';
 
-const Chat = () => {
+const Chat = ({ courseId = null }) => {
+  const { user } = useContext(AuthContext);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [ws, setWs] = useState(null);
   const messagesEndRef = useRef(null);
+
+  const myName = user?.full_name || user?.email;
 
   // Scroll to bottom
   const scrollToBottom = () => {
@@ -14,13 +19,14 @@ const Chat = () => {
   };
 
   useEffect(() => {
+    setMessages([]);
     fetchHistory();
-    // Connect WebSocket
-    // Client id could be from JWT, but we mock it for MVP
-    const clientId = Math.floor(Math.random() * 1000); 
-    // We updated main.py WS endpoint to just /ws
-    const socket = new WebSocket(`ws://localhost:8000/api/v1/messages/ws`);
-    
+    // Connect WebSocket (backend JWT ni query param orqali talab qiladi)
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    const url = `${WS_URL}/messages/ws?token=${token}${courseId ? `&course_id=${courseId}` : ''}`;
+    const socket = new WebSocket(url);
+
     socket.onopen = () => {
       console.log("WebSocket connected");
     };
@@ -36,7 +42,7 @@ const Chat = () => {
     return () => {
       socket.close();
     };
-  }, []);
+  }, [courseId]);
 
   useEffect(() => {
     scrollToBottom();
@@ -44,17 +50,13 @@ const Chat = () => {
 
   const fetchHistory = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/v1/messages/history');
-      if (res.ok) {
-        const data = await res.json();
-        // format data to match websocket data
-        const formatted = data.map(m => ({
-          id: m.id,
-          sender: m.sender_id === "00000000-0000-0000-0000-000000000000" ? "User" : "System/Other",
-          text: m.content
-        }));
-        setMessages(formatted);
-      }
+      const data = await api(`/messages/history${courseId ? `?course_id=${courseId}` : ''}`);
+      const formatted = data.map(m => ({
+        id: m.id,
+        sender: m.sender ?? '—',
+        text: m.content
+      }));
+      setMessages(formatted);
     } catch (err) {
       console.error(err);
     }
@@ -63,7 +65,7 @@ const Chat = () => {
   const sendMessage = (e) => {
     e.preventDefault();
     if (!input.trim() || !ws) return;
-    
+
     ws.send(input);
     // Note: The websocket server is currently broadcasting to ALL including sender.
     // If it didn't echo back, we'd add it to local state here.
@@ -73,8 +75,12 @@ const Chat = () => {
   return (
     <div className="chat-container">
       <div className="chat-header card">
-        <h2>Global O'quvchilar Chati</h2>
-        <p className="text-muted">Real vaqtda (WebSocket) barcha o'quvchilar va o'qituvchilar bilan muloqot qiling</p>
+        <h2>{courseId ? 'Kurs Chati' : "Global O'quvchilar Chati"}</h2>
+        <p className="text-muted">
+          {courseId
+            ? "Faqat shu kursga yozilgan o'quvchilar va o'qituvchilar bilan muloqot"
+            : "Real vaqtda (WebSocket) barcha o'quvchilar va o'qituvchilar bilan muloqot qiling"}
+        </p>
       </div>
 
       <div className="chat-messages-area card">
@@ -84,7 +90,7 @@ const Chat = () => {
           </div>
         ) : (
           messages.map((msg, idx) => (
-            <div key={msg.id || idx} className={`chat-message ${msg.sender === 'System' ? 'system-msg' : (msg.sender === 'User' ? 'my-msg' : 'other-msg')}`}>
+            <div key={msg.id || idx} className={`chat-message ${msg.sender === 'System' ? 'system-msg' : (msg.sender === myName ? 'my-msg' : 'other-msg')}`}>
               <div className="chat-avatar">
                 <User size={16} />
               </div>
@@ -100,9 +106,9 @@ const Chat = () => {
 
       <div className="chat-input-area card">
         <form onSubmit={sendMessage}>
-          <input 
-            type="text" 
-            placeholder="Xabar yozing..." 
+          <input
+            type="text"
+            placeholder="Xabar yozing..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
           />

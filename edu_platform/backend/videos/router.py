@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File
 from pydantic import BaseModel
 from videos.kinescope import init_video_upload
 import uuid
@@ -23,31 +23,54 @@ async def upload_video_init(data: VideoUploadInit):
     except RuntimeError as exc:
         raise HTTPException(status_code=502, detail=str(exc))
 
-''' Legacy local upload endpoint kept disabled in favor of direct Tus upload to Kinescope.
 @router.post("/upload")
 async def upload_video(file: UploadFile = File(...)):
     """
-    Kinescope ga video yuklash (Hozircha lokal saqlanib, Kinescope API mock qilinadi).
-    Kelajakda httpx orqali Kinescope ga jo'natiladi.
+    Lokal video yuklash — Kinescope sozlanmagan holatda ishlatiladi.
+    Fayl ./uploads ga saqlanadi va statik URL qaytariladi.
     """
-    if not file.content_type.startswith("video/"):
+    if not (file.content_type or "").startswith("video/"):
         raise HTTPException(status_code=400, detail="Faqat video format ruxsat etilgan!")
 
-    file_extension = file.filename.split(".")[-1]
-    unique_filename = f"kinescope_{uuid.uuid4().hex}.{file_extension}"
+    file_extension = (file.filename or "video.mp4").split(".")[-1]
+    unique_filename = f"video_{uuid.uuid4().hex}.{file_extension}"
     file_path = os.path.join(UPLOAD_DIR, unique_filename)
 
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    # Fake Kinescope URL qaytaramiz (aslida backenddagi lokal URL)
-    # Agar frontend localhost:8000 da ishlayotgan bo'lsa
-    video_url = f"http://localhost:8000/uploads/{unique_filename}"
-    
     return {
-        "status": "success", 
-        "kinescope_id": unique_filename,
-        "video_url": video_url,
-        "message": "Video Kinescope (simulated) serveriga muvaffaqiyatli yuklandi!"
+        "status": "success",
+        "video_url": f"/uploads/{unique_filename}",
+        "message": "Video serverga muvaffaqiyatli yuklandi!",
     }
-'''
+
+# Rasm, hujjat va prezentatsiya fayllari uchun umumiy endpoint
+ALLOWED_ASSET_TYPES = (
+    "image/",
+    "application/pdf",
+    "application/vnd.ms-powerpoint",
+    "application/vnd.openxmlformats-officedocument",
+    "application/msword",
+    "text/",
+)
+
+@router.post("/upload/asset")
+async def upload_asset(file: UploadFile = File(...)):
+    content_type = file.content_type or ""
+    if not any(content_type.startswith(t) for t in ALLOWED_ASSET_TYPES):
+        raise HTTPException(status_code=400, detail="Bu fayl turi ruxsat etilmagan!")
+
+    original = file.filename or "file"
+    file_extension = original.split(".")[-1]
+    unique_filename = f"asset_{uuid.uuid4().hex}.{file_extension}"
+    file_path = os.path.join(UPLOAD_DIR, unique_filename)
+
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    return {
+        "status": "success",
+        "url": f"/uploads/{unique_filename}",
+        "filename": original,
+    }

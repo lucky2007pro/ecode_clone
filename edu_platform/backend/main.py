@@ -1,9 +1,10 @@
 import os
-from typing import List
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from dotenv import load_dotenv
+load_dotenv()  # .env dagi o'zgaruvchilarni birinchi navbatda yuklaymiz
+
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from db import init_db
 from redis_client import get_redis, close_redis
 
 # DOMAIN ROUTERS
@@ -31,10 +32,11 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS sozlamalari
+# CORS sozlamalari — ruxsat berilgan originlar env orqali boshqariladi
+ALLOWED_ORIGINS = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -58,17 +60,15 @@ app.include_router(marketing_router, prefix="/api/v1/marketing", tags=["Marketin
 app.include_router(bot_router, prefix="/api/v1/bot", tags=["Telegram Bot"])
 app.include_router(api_keys_router, prefix="/api/v1/keys", tags=["API Keys"])
 app.include_router(saas_router, prefix="/saas", tags=["SaaS External API"])
-app.include_router(videos_router, prefix="/api/v1/videos", tags=["Videos & Kinescope"])
 
 # Serve uploaded videos statically
-import os
 if not os.path.exists("uploads"):
     os.makedirs("uploads")
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 @app.on_event("startup")
 async def on_startup():
-    await init_db()
+    # DB sxemasi Alembic migratsiyalari orqali boshqariladi
     redis = await get_redis()
     await redis.ping()
 
@@ -78,9 +78,12 @@ async def on_shutdown():
 
 @app.get("/health", tags=["General"])
 async def health():
-    redis = await get_redis()
-    await redis.ping()
-    return {"status": "ok", "redis": "ok"}
+    try:
+        redis = await get_redis()
+        await redis.ping()
+        return {"status": "ok", "redis": "ok"}
+    except Exception:
+        return {"status": "degraded", "redis": "unavailable"}
 
 # Ildiz endpoint
 @app.get("/", tags=["General"])
@@ -89,5 +92,5 @@ async def root():
         "status": "success",
         "message": "Exode ERP Backend API ishlamoqda",
         "docs": "/docs",
-        "version": "2.0.0"
+        "version": app.version
     }

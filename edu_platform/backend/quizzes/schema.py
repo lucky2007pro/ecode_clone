@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel
 
@@ -45,6 +46,47 @@ class QuizResponse(BaseModel):
     lesson_id: uuid.UUID
     title: str
     passing_score: int
+
+    class Config:
+        from_attributes = True
+
+
+class QuizTakeAnswer(BaseModel):
+    id: uuid.UUID
+    text: str
+
+    class Config:
+        from_attributes = True
+
+
+class QuizQuestionTake(BaseModel):
+    id: uuid.UUID
+    text: str
+    order: int
+    answers: List[QuizTakeAnswer] = []
+
+    class Config:
+        from_attributes = True
+
+
+class QuizSubmitRequest(BaseModel):
+    # question_id -> tanlangan answer_id
+    answers: dict[uuid.UUID, uuid.UUID]
+
+
+class QuizSubmitResponse(BaseModel):
+    score: int
+    total: int
+    percent: int
+
+
+class QuizResultResponse(BaseModel):
+    id: uuid.UUID
+    quiz_id: uuid.UUID
+    student_id: uuid.UUID
+    score: int
+    total: int
+    created_at: datetime
 
     class Config:
         from_attributes = True

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
+import { api } from '../../api';
 import './Auth.css';
 
 const Login = () => {
@@ -22,19 +23,10 @@ const Login = () => {
       formData.append('username', email);
       formData.append('password', password);
 
-      const response = await fetch('http://localhost:8000/api/v1/users/login', {
+      const data = await api('/users/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
         body: formData,
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.detail || 'Tizimga kirishda xatolik yuz berdi');
-      }
 
       await login(data.access_token);
     } catch (err) {
@@ -81,7 +73,6 @@ const Login = () => {
             <label className="checkbox-label">
               <input type="checkbox" /> Eslab qolish
             </label>
-            <a href="#" className="forgot-password">Parolni unutdingizmi?</a>
           </div>
           
           <button type="submit" className="btn-primary full-width" disabled={loading}>

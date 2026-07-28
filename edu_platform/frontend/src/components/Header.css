@@ -224,3 +224,24 @@
   color: var(--text-muted);
   margin-top: 4px;
 }
+
+.notification-item.unread {
+  font-weight: 600;
+  border-left: 3px solid #f97316;
+}
+
+.notification-item {
+  cursor: pointer;
+}
+
+.notif-read-all {
+  border: none;
+  background: none;
+  color: #f97316;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+  text-align: center;
+}
+

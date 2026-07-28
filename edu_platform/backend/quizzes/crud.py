@@ -1,12 +1,17 @@
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from quizzes.models import Quiz, QuizQuestion, QuizAnswer
+from quizzes.models import Quiz, QuizQuestion, QuizAnswer, QuizResult
 from quizzes.schema import QuizCreate, QuizQuestionCreate
 
 
 async def get_quiz_by_lesson(db: AsyncSession, lesson_id: uuid.UUID, school_id):
     res = await db.execute(select(Quiz).where(Quiz.lesson_id == lesson_id).where(Quiz.school_id == school_id))
+    return res.scalar_one_or_none()
+
+
+async def get_quiz_by_id(db: AsyncSession, quiz_id: uuid.UUID, school_id):
+    res = await db.execute(select(Quiz).where(Quiz.id == quiz_id).where(Quiz.school_id == school_id))
     return res.scalar_one_or_none()
 
 
@@ -41,6 +46,24 @@ async def add_question_with_answers(db: AsyncSession, quiz_id: uuid.UUID, q_in: 
     for ans_in in q_in.answers:
         ans = QuizAnswer(question_id=question.id, text=ans_in.text, is_correct=ans_in.is_correct)
         db.add(ans)
-    
+
     await db.commit()
     return question
+
+
+async def save_quiz_result(db: AsyncSession, quiz_id: uuid.UUID, student_id: uuid.UUID, school_id, score: int, total: int) -> QuizResult:
+    result = QuizResult(quiz_id=quiz_id, student_id=student_id, school_id=school_id, score=score, total=total)
+    db.add(result)
+    await db.commit()
+    await db.refresh(result)
+    return result
+
+
+async def get_quiz_results_by_student(db: AsyncSession, student_id: uuid.UUID, school_id) -> list[QuizResult]:
+    res = await db.execute(
+        select(QuizResult)
+        .where(QuizResult.student_id == student_id)
+        .where(QuizResult.school_id == school_id)
+        .order_by(QuizResult.created_at.desc())
+    )
+    return res.scalars().all()

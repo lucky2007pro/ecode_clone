@@ -9,6 +9,7 @@ class CourseCreate(BaseModel):
 
 class CourseResponse(CourseCreate):
     id: uuid.UUID
+    teacher_id: uuid.UUID | None = None
     lessons_count: int = 0
     
     class Config:

@@ -1,42 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Send, CheckCircle } from 'lucide-react';
+import { AuthContext } from '../../context/AuthContext';
+import { api } from '../../api';
 import './HomeworkForm.css';
 
 const HomeworkForm = ({ lessonId }) => {
+  const { user } = useContext(AuthContext);
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!text.trim()) return;
+    if (!text.trim() || !user) return;
 
     setLoading(true);
+    setError('');
     try {
-      const token = localStorage.getItem('token');
-      // Assume student ID is decoded from token in a real app, for MVP we pass a mocked one or backend reads from token
-      // Wait, backend requires student_id in schema. Let's assume backend extracts it from Depends(get_current_user) in future.
-      // For MVP without JWT decode in frontend, let's just mock student_id:
-      const mockStudentId = "00000000-0000-0000-0000-000000000000"; // Fake UUID
-
-      const response = await fetch('http://localhost:8000/api/v1/homeworks/', {
+      await api('/homeworks/', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+        body: {
           lesson_id: lessonId,
-          student_id: mockStudentId,
+          student_id: user.id,
           submission_text: text
-        })
+        }
       });
 
-      if (response.ok) {
-        setSubmitted(true);
-      }
+      setSubmitted(true);
     } catch (err) {
-      console.error("Uy vazifasini yuborishda xatolik", err);
+      setError(err.message || "Vazifani yuborishda xatolik yuz berdi");
     } finally {
       setLoading(false);
     }
@@ -67,6 +60,8 @@ const HomeworkForm = ({ lessonId }) => {
           required
         ></textarea>
         
+        {error && <p style={{ color: 'var(--danger)', marginTop: '8px', fontSize: '13px' }}>{error}</p>}
+
         <div className="form-footer">
           <button type="submit" className="btn-primary" disabled={loading || !text.trim()}>
             {loading ? 'Yuborilmoqda...' : <><Send size={18} style={{marginRight: '8px'}} /> Yuborish</>}

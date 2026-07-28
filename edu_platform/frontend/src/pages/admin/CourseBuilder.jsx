@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Plus, Video, FileText, LayoutList, ChevronDown, ChevronRight, Settings, Image as ImageIcon, File, MonitorPlay, MessageSquare, Table, Edit3, Trash2 } from 'lucide-react';
+import { api, API_ORIGIN } from '../../api';
 import './CourseBuilder.css';
 
 const CourseBuilder = () => {
@@ -21,7 +22,12 @@ const CourseBuilder = () => {
   const [newLessonTitle, setNewLessonTitle] = useState('');
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [activeTool, setActiveTool] = useState('Text');
   const videoInputRef = useRef(null);
+  const imageInputRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const presentationInputRef = useRef(null);
+  const contentRef = useRef(null);
 
   // Expand/Collapse modules
   const [expandedModules, setExpandedModules] = useState({});
@@ -33,33 +39,19 @@ const CourseBuilder = () => {
 
   const fetchCourseDetails = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/api/v1/courses/${id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-        setCourse(await response.json());
-      } else {
-        setCourse({ id, title: "Kursni Tahrirlash" }); // fallback
-      }
+      setCourse(await api(`/courses/${id}`));
     } catch(err) {
-       setCourse({ id, title: "Kursni Tahrirlash" });
+      setError(err.message || "Kurs ma'lumotlarini yuklashda xatolik");
     }
   };
 
   const fetchModulesAndLessons = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const [modRes, lesRes] = await Promise.all([
-        fetch(`http://localhost:8000/api/v1/lessons/course/${id}/modules`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`http://localhost:8000/api/v1/lessons/course/${id}`, { headers: { 'Authorization': `Bearer ${token}` } })
+      const [mods, less] = await Promise.all([
+        api(`/lessons/course/${id}/modules`).catch(() => []),
+        api(`/lessons/course/${id}`).catch(() => [])
       ]);
-      
-      let mods = [];
-      let less = [];
-      if (modRes.ok) mods = await modRes.json();
-      if (lesRes.ok) less = await lesRes.json();
-      
+
       setModules(mods);
       setLessons(less);
       
@@ -81,20 +73,13 @@ const CourseBuilder = () => {
     if(!newModuleTitle.trim()) return;
     setError('');
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:8000/api/v1/lessons/modules`, {
+      await api(`/lessons/modules`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ course_id: id, title: newModuleTitle, order: modules.length + 1 })
+        body: { course_id: id, title: newModuleTitle, order: modules.length + 1 }
       });
-      if (res.ok) {
-        setNewModuleTitle('');
-        setShowModuleForm(false);
-        fetchModulesAndLessons();
-      } else {
-        const body = await res.json().catch(() => ({}));
-        setError(body.detail || `Modul qo'shilmadi (${res.status})`);
-      }
+      setNewModuleTitle('');
+      setShowModuleForm(false);
+      fetchModulesAndLessons();
     } catch(err) { setError(err.message || 'Serverga ulanishda xatolik'); }
   };
 
@@ -102,29 +87,21 @@ const CourseBuilder = () => {
     if(!newLessonTitle.trim() || !activeModule) return;
     setError('');
     try {
-      const token = localStorage.getItem('token');
       const modLessons = lessons.filter(l => l.module_id === activeModule);
-      const res = await fetch(`http://localhost:8000/api/v1/lessons/`, {
+      const newL = await api(`/lessons/`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          course_id: id, 
+        body: {
+          course_id: id,
           module_id: activeModule,
-          title: newLessonTitle, 
+          title: newLessonTitle,
           lesson_type: 'video',
-          order: modLessons.length + 1 
-        })
+          order: modLessons.length + 1
+        }
       });
-      if (res.ok) {
-        setNewLessonTitle('');
-        setShowLessonForm(false);
-        const newL = await res.json();
-        setActiveLesson(newL);
-        fetchModulesAndLessons();
-      } else {
-        const body = await res.json().catch(() => ({}));
-        setError(body.detail || `Dars qo'shilmadi (${res.status})`);
-      }
+      setNewLessonTitle('');
+      setShowLessonForm(false);
+      setActiveLesson(newL);
+      fetchModulesAndLessons();
     } catch(err) { setError(err.message || 'Serverga ulanishda xatolik'); }
   };
 
@@ -132,20 +109,31 @@ const CourseBuilder = () => {
     setExpandedModules(prev => ({...prev, [modId]: !prev[modId]}));
   };
 
+  const handleDeleteLesson = async () => {
+    if (!activeLesson) return;
+    if (!window.confirm(`"${activeLesson.title}" darsini o'chirishga ishonchingiz komilmi?`)) return;
+    setError('');
+    try {
+      await api(`/lessons/${activeLesson.id}`, { method: 'DELETE' });
+      setActiveLesson(null);
+      fetchModulesAndLessons();
+    } catch(err) { setError(err.message || "Darsni o'chirishda xatolik"); }
+  };
+
   const handleSaveLesson = async () => {
     if(!activeLesson) return;
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:8000/api/v1/lessons/${activeLesson.id}`, {
+      await api(`/lessons/${activeLesson.id}`, {
         method: 'PUT',
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(activeLesson)
+        body: activeLesson
       });
-      if (res.ok) {
-        alert("Saqlandi!");
-        fetchModulesAndLessons();
-      }
+      alert("Saqlandi!");
+      fetchModulesAndLessons();
     } catch(err) { console.error(err); }
+  };
+
+  const insertToContent = (snippet) => {
+    setActiveLesson(prev => ({ ...prev, content: `${prev.content || ''}\n${snippet}\n` }));
   };
 
   const handleVideoUpload = async (event) => {
@@ -154,29 +142,36 @@ const CourseBuilder = () => {
     setError('');
     setUploading(true);
     try {
-      const token = localStorage.getItem('token');
-      const initResponse = await fetch('http://localhost:8000/api/v1/videos/upload/init', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename: file.name, title: activeLesson.title, filesize: file.size }),
-      });
-      const initData = await initResponse.json();
-      if (!initResponse.ok) throw new Error(initData.detail || 'Kinescope upload boshlanmadi');
-      const { Upload } = await import('tus-js-client');
-      await new Promise((resolve, reject) => {
-        const upload = new Upload(file, {
-          uploadUrl: initData.upload_url,
-          chunkSize: 10 * 1024 * 1024,
-          retryDelays: [0, 3000, 5000, 10000],
-          metadata: { filename: file.name, filetype: file.type },
-          onError: reject,
-          onSuccess: resolve,
+      try {
+        // Kinescope sozlangan bo'lsa — to'g'ridan-to'g'ri u yerga yuklaymiz
+        const initData = await api('/videos/upload/init', {
+          method: 'POST',
+          body: { filename: file.name, title: activeLesson.title, filesize: file.size },
         });
-        upload.start();
-      });
-      const videoUrl = initData.video_id ? `https://kinescope.io/embed/${initData.video_id}` : initData.upload_url;
-      setActiveLesson({ ...activeLesson, video_url: videoUrl, lesson_type: 'video' });
-      setError('Video Kinescope’ga yuklandi. Saqlash uchun “Publish lesson”ni bosing.');
+        const { Upload } = await import('tus-js-client');
+        await new Promise((resolve, reject) => {
+          const upload = new Upload(file, {
+            uploadUrl: initData.upload_url,
+            chunkSize: 10 * 1024 * 1024,
+            retryDelays: [0, 3000, 5000, 10000],
+            metadata: { filename: file.name, filetype: file.type },
+            onError: reject,
+            onSuccess: resolve,
+          });
+          upload.start();
+        });
+        const videoUrl = initData.video_id ? `https://kinescope.io/embed/${initData.video_id}` : initData.upload_url;
+        setActiveLesson({ ...activeLesson, video_url: videoUrl, lesson_type: 'video' });
+        setError("Video Kinescope'ga yuklandi. Saqlash uchun 'Publish lesson'ni bosing.");
+      } catch (kinescopeErr) {
+        // Kinescope sozlanmagan bo'lsa — lokal serverga yuklaymiz
+        if (!String(kinescopeErr.message).includes('sozlanmagan')) throw kinescopeErr;
+        const form = new FormData();
+        form.append('file', file);
+        const res = await api('/videos/upload', { method: 'POST', body: form });
+        setActiveLesson({ ...activeLesson, video_url: `${API_ORIGIN}${res.video_url}`, lesson_type: 'video' });
+        setError("");
+      }
     } catch (err) {
       setError(err.message || 'Video yuklashda xatolik');
     } finally {
@@ -184,6 +179,52 @@ const CourseBuilder = () => {
       event.target.value = '';
     }
   };
+
+  const handleAssetUpload = async (event, kind) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file || !activeLesson) return;
+    setError('');
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const res = await api('/videos/upload/asset', { method: 'POST', body: form });
+      const url = `${API_ORIGIN}${res.url}`;
+      insertToContent(kind === 'Image' ? `![${res.filename}](${url})` : `[${res.filename}](${url})`);
+    } catch (err) {
+      setError(err.message || 'Fayl yuklashda xatolik');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleToolClick = (tool) => {
+    setActiveTool(tool);
+    if (tool === 'Text') {
+      contentRef.current?.focus();
+    } else if (tool === 'Video') {
+      videoInputRef.current?.click();
+    } else if (tool === 'Image') {
+      imageInputRef.current?.click();
+    } else if (tool === 'File') {
+      fileInputRef.current?.click();
+    } else if (tool === 'Presentation') {
+      presentationInputRef.current?.click();
+    } else if (tool === 'Table') {
+      insertToContent('| Ustun 1 | Ustun 2 |\n| --- | --- |\n|  |  |');
+      contentRef.current?.focus();
+    }
+  };
+
+  const TOOLS = [
+    { name: 'Text', icon: <FileText size={18}/> },
+    { name: 'Video', icon: <Video size={18}/> },
+    { name: 'Image', icon: <ImageIcon size={18}/> },
+    { name: 'File', icon: <File size={18}/> },
+    { name: 'Presentation', icon: <MonitorPlay size={18}/> },
+    { name: 'Table', icon: <Table size={18}/> },
+  ];
 
   if (loading) return <div className="cb-loading">Yuklanmoqda...</div>;
 
@@ -279,7 +320,7 @@ const CourseBuilder = () => {
               <div className="cb-main-actions">
                 <button className="cb-publish-btn" onClick={handleSaveLesson}>Publish lesson</button>
                 <button className="cb-icon-btn"><Plus size={18}/></button>
-                <button className="cb-icon-btn"><Trash2 size={18}/></button>
+                <button className="cb-icon-btn" onClick={handleDeleteLesson}><Trash2 size={18}/></button>
               </div>
             </div>
 
@@ -294,7 +335,11 @@ const CourseBuilder = () => {
               <div className="cb-cover-area">
                 <div className="cb-cover-placeholder">
                   {activeLesson.video_url ? (
-                    <div style={{color: '#fff', fontSize: '18px'}}>Video: {activeLesson.video_url}</div>
+                    activeLesson.video_url.includes('kinescope') ? (
+                      <div style={{color: '#fff', fontSize: '18px'}}>Video: {activeLesson.video_url}</div>
+                    ) : (
+                      <video controls src={activeLesson.video_url} style={{maxWidth: '100%', maxHeight: '100%'}} />
+                    )
                   ) : (
                     <MonitorPlay size={48} color="rgba(255,255,255,0.8)" />
                   )}
@@ -302,20 +347,29 @@ const CourseBuilder = () => {
                     <Edit3 size={16}/> {uploading ? 'Uploading...' : 'Upload video'}
                   </button>
                   <input ref={videoInputRef} type="file" accept="video/*" hidden onChange={handleVideoUpload} />
+                  <input ref={imageInputRef} type="file" accept="image/*" hidden onChange={e => handleAssetUpload(e, 'Image')} />
+                  <input ref={fileInputRef} type="file" hidden onChange={e => handleAssetUpload(e, 'File')} />
+                  <input ref={presentationInputRef} type="file" accept=".pdf,.ppt,.pptx,.key,.odp" hidden onChange={e => handleAssetUpload(e, 'Presentation')} />
                 </div>
               </div>
 
               <div className="cb-toolbar">
-                <div className="cb-tool"><div className="cb-tool-icon"><FileText size={18}/></div><span>Text</span></div>
-                <div className="cb-tool"><div className="cb-tool-icon"><Video size={18}/></div><span>Video</span></div>
-                <div className="cb-tool"><div className="cb-tool-icon"><ImageIcon size={18}/></div><span>Image</span></div>
-                <div className="cb-tool active"><div className="cb-tool-icon"><File size={18} color="#FF5F00"/></div><span style={{color: '#FF5F00'}}>File</span></div>
-                <div className="cb-tool"><div className="cb-tool-icon"><MonitorPlay size={18}/></div><span>Presentation</span></div>
-                <div className="cb-tool"><div className="cb-tool-icon"><Table size={18}/></div><span>Table</span></div>
+                {TOOLS.map(tool => (
+                  <div
+                    key={tool.name}
+                    className={`cb-tool ${activeTool === tool.name ? 'active' : ''}`}
+                    onClick={() => handleToolClick(tool.name)}
+                    style={{cursor: 'pointer'}}
+                  >
+                    <div className="cb-tool-icon">{tool.icon}</div>
+                    <span style={activeTool === tool.name ? {color: '#FF5F00'} : undefined}>{tool.name}</span>
+                  </div>
+                ))}
               </div>
 
               <div className="cb-content-editor">
-                <textarea 
+                <textarea
+                  ref={contentRef}
                   placeholder="Type '/' for commands or start writing..."
                   value={activeLesson.content || ''}
                   onChange={e => setActiveLesson({...activeLesson, content: e.target.value})}

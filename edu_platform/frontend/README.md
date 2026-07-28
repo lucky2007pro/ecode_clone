@@ -1,16 +1,20 @@
-# React + Vite
+# Edu Platform — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Ta'lim platformasi (ERP/LMS) uchun frontend qismi. React + Vite asosida yozilgan bo'lib, kurslar, darslar, testlar, uy vazifalari, talabalar va analitika bo'limlarini o'z ichiga oladi. Backend sifatida FastAPI serveri ishlatiladi.
 
-Currently, two official plugins are available:
+## Ishga tushirish
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm ci
+cp .env.example .env   # kerak bo'lsa, VITE_API_URL ni o'zgartiring
+npm run dev
+```
 
-## React Compiler
+Backend standart ravishda `http://localhost:8000` da ishlashi kerak. Boshqa manzil ishlatmoqchi bo'lsangiz, `.env` faylida `VITE_API_URL` ni belgilang.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Buyruqlar
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+- `npm run dev` — lokal development server
+- `npm run build` — production build
+- `npm run preview` — build natijasini ko'rish
+- `npm run lint` — kod tekshiruvi

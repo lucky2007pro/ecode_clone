@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Check, X, MessageSquare, AlertCircle } from 'lucide-react';
+import { api } from '../../api';
 import './HomeworkReview.css';
 
 const HomeworkReview = () => {
@@ -18,14 +19,8 @@ const HomeworkReview = () => {
 
   const fetchSubmissions = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:8000/api/v1/homeworks/', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setSubmissions(data);
-      }
+      const data = await api('/homeworks/');
+      setSubmissions(data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -36,23 +31,16 @@ const HomeworkReview = () => {
   const handleGradeSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:8000/api/v1/homeworks/${activeSubmission.id}/grade`, {
+      await api(`/homeworks/${activeSubmission.id}/grade`, {
         method: 'POST',
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json' 
-        },
-        body: JSON.stringify({
+        body: {
           grade: parseInt(grade),
           status: status,
           feedback: feedback
-        })
+        }
       });
-      if (res.ok) {
-        setActiveSubmission(null);
-        fetchSubmissions();
-      }
+      setActiveSubmission(null);
+      fetchSubmissions();
     } catch (err) {
       console.error(err);
     }

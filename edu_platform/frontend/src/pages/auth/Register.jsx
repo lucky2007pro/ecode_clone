@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { api } from '../../api';
 import './Auth.css';
 
 const Register = () => {
@@ -46,32 +47,17 @@ const Register = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/users/register/send-otp', {
+      await api('/users/register/send-otp', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: {
           full_name: formData.full_name,
           email: formData.email,
           password: formData.password,
           role: formData.role,
           subdomain: formData.subdomain,
           school_name: formData.subdomain
-        }),
+        },
       });
-      const data = await response.json();
-      if (!response.ok) {
-        let errorMsg = 'Xatolik yuz berdi';
-        if (data.detail) {
-          if (Array.isArray(data.detail)) {
-            errorMsg = data.detail.map(d => d.msg || d.type).join(', ');
-          } else if (typeof data.detail === 'object') {
-            errorMsg = JSON.stringify(data.detail);
-          } else {
-            errorMsg = String(data.detail);
-          }
-        }
-        throw new Error(errorMsg);
-      }
       setStep(4);
     } catch (err) {
       setError(err.message);
@@ -96,26 +82,11 @@ const Register = () => {
         otp_code: otpCode 
       };
       
-      const response = await fetch('http://localhost:8000/api/v1/users/register/verify', {
+      await api('/users/register/verify', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: payload,
       });
-      const data = await response.json();
-      if (!response.ok) {
-        let errorMsg = 'Noto\'g\'ri kod';
-        if (data.detail) {
-          if (Array.isArray(data.detail)) {
-            errorMsg = data.detail.map(d => d.msg || d.type).join(', ');
-          } else if (typeof data.detail === 'object') {
-            errorMsg = JSON.stringify(data.detail);
-          } else {
-            errorMsg = String(data.detail);
-          }
-        }
-        throw new Error(errorMsg);
-      }
-      
+
       alert("Muvaffaqiyatli ro'yxatdan o'tdingiz!");
       navigate('/login');
     } catch (err) {

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Layers, CreditCard, CheckSquare, Users, Settings, Sparkles } from 'lucide-react';
+import { Home, Layers, CreditCard, CheckSquare, Users, Settings, Sparkles, Bell } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import './Sidebar.css';
 
@@ -10,6 +10,7 @@ const Sidebar = () => {
   const role = user?.role;
   const menuItems = [
     { name: 'Home', icon: <Home size={22} />, path: role === 'student' ? '/student-dashboard' : '/' },
+    { name: 'Bildirishnomalar', icon: <Bell size={22} />, path: '/notifications' },
   ];
 
   if (['student', 'curator', 'teacher', 'manager', 'admin'].includes(role)) {

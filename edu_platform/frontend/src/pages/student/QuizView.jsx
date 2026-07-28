@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { HelpCircle, CheckCircle, XCircle } from 'lucide-react';
+import { api } from '../../api';
 import './QuizView.css';
 
 const QuizView = ({ lessonId }) => {
@@ -7,7 +8,8 @@ const QuizView = ({ lessonId }) => {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
-  const [score, setScore] = useState(0);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,24 +18,13 @@ const QuizView = ({ lessonId }) => {
 
   const fetchQuizData = async () => {
     try {
-      const token = localStorage.getItem('token');
-      // Fetch quiz
-      const qRes = await fetch(`http://localhost:8000/api/v1/quizzes/lesson/${lessonId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (qRes.ok) {
-        const qData = await qRes.json();
-        setQuiz(qData);
-        
-        // Fetch questions
-        const qsRes = await fetch(`http://localhost:8000/api/v1/quizzes/${qData.id}/questions/full`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (qsRes.ok) {
-          const qsData = await qsRes.json();
-          setQuestions(qsData);
-        }
-      }
+      // Test ma'lumotlari
+      const qData = await api(`/quizzes/lesson/${lessonId}`);
+      setQuiz(qData);
+
+      // Savollar (is_correct serverda yashiringan)
+      const qsData = await api(`/quizzes/${qData.id}/take`);
+      setQuestions(qsData);
     } catch (err) {
       console.error(err);
     } finally {
@@ -49,19 +40,16 @@ const QuizView = ({ lessonId }) => {
     });
   };
 
-  const calculateScore = () => {
-    let correctCount = 0;
-    questions.forEach(q => {
-      const selectedAnsId = answers[q.id];
-      const selectedAns = q.answers.find(a => a.id === selectedAnsId);
-      if (selectedAns && selectedAns.is_correct) {
-        correctCount++;
-      }
-    });
-    
-    const finalScore = Math.round((correctCount / questions.length) * 100);
-    setScore(finalScore);
-    setSubmitted(true);
+  const handleSubmit = async () => {
+    setError('');
+    try {
+      // Baholash serverda bajariladi va natija saqlanadi
+      const res = await api(`/quizzes/${quiz.id}/submit`, { method: 'POST', body: { answers } });
+      setResult(res);
+      setSubmitted(true);
+    } catch (err) {
+      setError("Natijani saqlashda xatolik yuz berdi. Qayta urinib ko'ring.");
+    }
   };
 
   if (loading) return <div className="p-4 text-center">Test yuklanmoqda...</div>;
@@ -74,13 +62,15 @@ const QuizView = ({ lessonId }) => {
         <p className="text-muted">O'tish balli: {quiz.passing_score}%</p>
       </div>
 
-      {submitted && (
-        <div className={`quiz-result card ${score >= quiz.passing_score ? 'passed' : 'failed'}`}>
-          {score >= quiz.passing_score ? <CheckCircle size={48} /> : <XCircle size={48} />}
-          <h2>Natija: {score}%</h2>
-          <p>{score >= quiz.passing_score ? "Tabriklaymiz, testdan o'tdingiz!" : "Afsuski, yetarli ball to'play olmadingiz."}</p>
+      {submitted && result && (
+        <div className={`quiz-result card ${result.percent >= quiz.passing_score ? 'passed' : 'failed'}`}>
+          {result.percent >= quiz.passing_score ? <CheckCircle size={48} /> : <XCircle size={48} />}
+          <h2>Natija: {result.percent}%</h2>
+          <p>{result.score}/{result.total} to'g'ri — {result.percent >= quiz.passing_score ? "Tabriklaymiz, testdan o'tdingiz!" : "Afsuski, yetarli ball to'play olmadingiz."}</p>
         </div>
       )}
+
+      {error && <div className="card text-danger p-4">{error}</div>}
 
       <div className="questions-list">
         {questions.map((q, idx) => (
@@ -90,17 +80,11 @@ const QuizView = ({ lessonId }) => {
               {q.answers.map(ans => {
                 const isSelected = answers[q.id] === ans.id;
                 let answerClass = "answer-item";
-                
-                if (submitted) {
-                  if (ans.is_correct) answerClass += " correct";
-                  else if (isSelected && !ans.is_correct) answerClass += " incorrect";
-                } else if (isSelected) {
-                  answerClass += " selected";
-                }
+                if (isSelected) answerClass += " selected";
 
                 return (
-                  <div 
-                    key={ans.id} 
+                  <div
+                    key={ans.id}
                     className={answerClass}
                     onClick={() => handleSelectAnswer(q.id, ans.id)}
                   >
@@ -118,9 +102,9 @@ const QuizView = ({ lessonId }) => {
 
       {!submitted && questions.length > 0 && (
         <div className="quiz-footer">
-          <button 
-            className="btn-primary full-width" 
-            onClick={calculateScore}
+          <button
+            className="btn-primary full-width"
+            onClick={handleSubmit}
             disabled={Object.keys(answers).length < questions.length}
           >
             Natijani bilish

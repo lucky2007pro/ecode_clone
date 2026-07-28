@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Users, Plus, X, UserCheck, Shield } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
+import { api } from '../../api';
 
 const Students = () => {
   const { school, user } = useContext(AuthContext);
@@ -20,37 +21,29 @@ const Students = () => {
 
   const fetchStudents = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/api/v1/schools/${school.id}/users`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-        let data = await response.json();
+      let data = await api(`/schools/${school.id}/users`);
 
-        if (user && user.role === 'teacher') {
-          const enrollResponse = await fetch(`http://localhost:8000/api/v1/enrollments/user/${user.id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          if (enrollResponse.ok) {
-            const enrollData = await enrollResponse.json();
-            const courseIds = enrollData.map(e => e.course_id);
-            
-            let allowedUserIds = new Set();
-            for (let cid of courseIds) {
-               const cResp = await fetch(`http://localhost:8000/api/v1/enrollments/course/${cid}`, {
-                 headers: { 'Authorization': `Bearer ${token}` }
-               });
-               if (cResp.ok) {
-                  const cData = await cResp.json();
-                  cData.forEach(enroll => allowedUserIds.add(enroll.user_id));
-               }
-            }
-            data = data.filter(u => allowedUserIds.has(u.id));
+      if (user && user.role === 'teacher') {
+        try {
+          const enrollData = await api(`/enrollments/user/${user.id}`);
+          const courseIds = enrollData.map(e => e.course_id);
+
+          let allowedUserIds = new Set();
+          for (let cid of courseIds) {
+             try {
+                const cData = await api(`/enrollments/course/${cid}`);
+                cData.forEach(enroll => allowedUserIds.add(enroll.user_id));
+             } catch (err) {
+                console.error("Kurs o'quvchilarini yuklashda xatolik:", err);
+             }
           }
+          data = data.filter(u => allowedUserIds.has(u.id));
+        } catch (err) {
+          console.error("Biriktirilgan kurslarni yuklashda xatolik:", err);
         }
-
-        setStudents(data);
       }
+
+      setStudents(data);
     } catch (err) {
       console.error("Xatolik:", err);
     } finally {
@@ -62,17 +55,34 @@ const Students = () => {
   const [userCourses, setUserCourses] = useState([]);
   const [modalTab, setModalTab] = useState('info'); // 'info' or 'courses'
   const [selectedCourseId, setSelectedCourseId] = useState('');
+  const [topupAmount, setTopupAmount] = useState('');
+  const [topupDesc, setTopupDesc] = useState('');
+  const [topupError, setTopupError] = useState('');
+  const [topupLoading, setTopupLoading] = useState(false);
+
+  const handleTopup = async () => {
+    const amount = parseFloat(topupAmount);
+    if (!amount || amount <= 0) { setTopupError("Summa musbat bo'lishi kerak"); return; }
+    setTopupLoading(true);
+    setTopupError('');
+    try {
+      await api('/payments/topup', {
+        method: 'POST',
+        body: { user_id: selectedStudent.id, amount, description: topupDesc || undefined }
+      });
+      setSelectedStudent(prev => ({ ...prev, balance: (prev.balance || 0) + amount }));
+      setTopupAmount('');
+      setTopupDesc('');
+    } catch (err) {
+      setTopupError(err.message || "To'ldirishda xatolik yuz berdi");
+    }
+    setTopupLoading(false);
+  };
 
   const fetchAllCourses = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8000/api/v1/courses/', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setAllCourses(data);
-      }
+      const data = await api('/courses/');
+      setAllCourses(data);
     } catch (err) {
       console.error("Kurslarni yuklashda xatolik:", err);
     }
@@ -80,14 +90,8 @@ const Students = () => {
 
   const fetchUserCourses = async (userId) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/api/v1/enrollments/user/${userId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setUserCourses(data);
-      }
+      const data = await api(`/enrollments/user/${userId}`);
+      setUserCourses(data);
     } catch (err) {
       console.error("Foydalanuvchi kurslarini yuklashda xatolik:", err);
     }
@@ -100,49 +104,31 @@ const Students = () => {
   const handleAssignCourse = async () => {
     if (!selectedCourseId || !selectedStudent) return;
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8000/api/v1/enrollments/', {
+      await api('/enrollments/', {
         method: 'POST',
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ user_id: selectedStudent.id, course_id: selectedCourseId })
+        body: { user_id: selectedStudent.id, course_id: selectedCourseId }
       });
-      if (response.ok) {
-        // Refresh the user's courses
-        fetchUserCourses(selectedStudent.id);
-        setSelectedCourseId('');
-      } else {
-        const data = await response.json();
-        alert(data.detail || "Xatolik yuz berdi");
-      }
+      // Refresh the user's courses
+      fetchUserCourses(selectedStudent.id);
+      setSelectedCourseId('');
     } catch (err) {
-      alert("Serverga ulanishda xatolik");
+      alert(err.message || "Serverga ulanishda xatolik");
     }
   };
 
   const handleUnassignCourse = async (enrollmentId) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/api/v1/enrollments/${enrollmentId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+      await api(`/enrollments/${enrollmentId}`, {
+        method: 'DELETE'
       });
-      if (response.ok) {
-        fetchUserCourses(selectedStudent.id);
-      } else {
-        alert("O'chirishda xatolik yuz berdi");
-      }
+      fetchUserCourses(selectedStudent.id);
     } catch (err) {
-      alert("Serverga ulanishda xatolik");
+      alert(err.message || "Serverga ulanishda xatolik");
     }
   };
 
   const handleUpdateUser = async () => {
     try {
-      const token = localStorage.getItem('token');
-      
       const payload = {
         full_name: selectedStudent.full_name,
         email: selectedStudent.email,
@@ -154,25 +140,16 @@ const Students = () => {
         payload.password = selectedStudent.new_password;
       }
 
-      const response = await fetch(`http://localhost:8000/api/v1/users/${selectedStudent.id}`, {
+      await api(`/users/${selectedStudent.id}`, {
         method: 'PUT',
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
+        body: payload
       });
 
-      if (response.ok) {
-        alert("Ma'lumotlar muvaffaqiyatli saqlandi!");
-        fetchStudents(); // Ro'yxatni yangilash
-        setShowProfileModal(false);
-      } else {
-        const data = await response.json();
-        alert(data.detail || "Saqlashda xatolik yuz berdi");
-      }
+      alert("Ma'lumotlar muvaffaqiyatli saqlandi!");
+      fetchStudents(); // Ro'yxatni yangilash
+      setShowProfileModal(false);
     } catch (err) {
-      alert("Serverga ulanishda xatolik");
+      alert(err.message || "Serverga ulanishda xatolik");
     }
   };
 
@@ -183,25 +160,13 @@ const Students = () => {
     e.preventDefault();
     setError('');
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8000/api/v1/schools/${school.id}/users`, {
+      const data = await api(`/schools/${school.id}/users`, {
         method: 'POST',
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newUser)
+        body: newUser
       });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setStudents([...students, data]);
-        setShowModal(false);
-        setNewUser({ full_name: '', email: '', password: '', role: 'student' });
-      } else {
-        const errData = await response.json();
-        setError(errData.detail || 'Xatolik yuz berdi');
-      }
+      setStudents([...students, data]);
+      setShowModal(false);
+      setNewUser({ full_name: '', email: '', password: '', role: 'student' });
     } catch (err) {
       setError(err?.message || "Serverga ulanishda xatolik");
     }
@@ -445,6 +410,37 @@ const Students = () => {
                     <button className="btn-primary full-width" onClick={handleUpdateUser}>
                       O'zgarishlarni Saqlash
                     </button>
+                  )}
+
+                  <div style={{ marginTop: '15px', padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '13px', color: '#64748b' }}>Balans</span>
+                    <strong>{(selectedStudent.balance || 0).toLocaleString()} UZS</strong>
+                  </div>
+
+                  {user && ['admin', 'manager', 'accountant'].includes(user.role) && (
+                    <div style={{ marginTop: '15px', padding: '15px', border: '1px solid #e5e7eb', borderRadius: '8px' }}>
+                      <label style={{ fontWeight: 600, fontSize: '14px', display: 'block', marginBottom: '10px' }}>Balansni to'ldirish</label>
+                      {topupError && <div style={{ color: '#b91c1c', background: '#fee2e2', padding: '8px', borderRadius: '6px', marginBottom: '10px', fontSize: '13px' }}>{topupError}</div>}
+                      <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                        <input
+                          type="number"
+                          placeholder="Summa (UZS)"
+                          value={topupAmount}
+                          onChange={e => setTopupAmount(e.target.value)}
+                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb' }}
+                        />
+                        <input
+                          type="text"
+                          placeholder="Izoh (ixtiyoriy)"
+                          value={topupDesc}
+                          onChange={e => setTopupDesc(e.target.value)}
+                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb' }}
+                        />
+                      </div>
+                      <button className="btn-primary full-width" onClick={handleTopup} disabled={topupLoading || !topupAmount}>
+                        {topupLoading ? 'Yuklanmoqda...' : "To'ldirish"}
+                      </button>
+                    </div>
                   )}
                 </div>
               )}

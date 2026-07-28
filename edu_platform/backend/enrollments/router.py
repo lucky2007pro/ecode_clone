@@ -4,11 +4,20 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from db import get_db
-from enrollments.schema import EnrollmentCreate, EnrollmentResponse
-from enrollments.crud import get_enrollments_by_user, get_enrollments_by_course, get_enrollment, create_enrollment
-from courses.crud import get_courses
-from users.crud import get_user_by_email
-from permissions.dependencies import get_current_school_id
+from enrollments.schema import EnrollmentCreate, EnrollmentResponse, PurchaseRequest
+from enrollments.crud import (
+    get_enrollments_by_user,
+    get_enrollments_by_course,
+    get_enrollment,
+    create_enrollment,
+    delete_enrollment,
+)
+from users.models import User
+from courses.models import Course
+from permissions.dependencies import get_current_user, get_current_school_id
+from permissions.enums import Role
+from payments.models import Transaction, TransactionType
+from notifications.crud import create_notification, get_school_admin_ids
 
 router = APIRouter()
 
@@ -25,61 +34,91 @@ async def list_course_enrollments(course_id: uuid.UUID, db: AsyncSession = Depen
     return await get_enrollments_by_course(db, course_id, school_id)
 
 
-from users.models import User
-from courses.models import Course
-from payments.models import Transaction, TransactionType
-from permissions.dependencies import get_current_user, get_current_school_id
-
 @router.post("/", response_model=EnrollmentResponse, status_code=status.HTTP_201_CREATED)
 async def enroll_user(
-    enroll_in: EnrollmentCreate, 
+    enroll_in: EnrollmentCreate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-    school_id=Depends(get_current_school_id)
+    school_id=Depends(get_current_school_id),
 ):
-    """Foydalanuvchini kursga yozish (bonus balansdan kamaytiriladi)."""
+    """Foydalanuvchini kursga yozish (bepul — admin biriktiradi yoki student o'zi yoziladi)."""
     # Tekshirish: allaqachon yozilganmi
     existing = await get_enrollment(db, enroll_in.user_id, enroll_in.course_id)
     if existing:
         raise HTTPException(status_code=400, detail="Foydalanuvchi allaqachon bu kursga yozilgan")
-        
-    # Get user and course
+
+    # Foydalanuvchi va kurs mavjudligini tekshirish
     user_res = await db.execute(select(User).where(User.id == enroll_in.user_id))
-    user = user_res.scalar_one_or_none()
-    if not user:
+    if not user_res.scalar_one_or_none():
         raise HTTPException(status_code=404, detail="Foydalanuvchi topilmadi")
-        
+
     course_res = await db.execute(select(Course).where(Course.id == enroll_in.course_id).where(Course.school_id == school_id))
+    if not course_res.scalar_one_or_none():
+        raise HTTPException(status_code=404, detail="Kurs topilmadi")
+
+    return await create_enrollment(db, enroll_in, school_id)
+
+
+@router.post("/purchase", response_model=EnrollmentResponse, status_code=status.HTTP_201_CREATED)
+async def purchase_course(
+    req: PurchaseRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    school_id=Depends(get_current_school_id),
+):
+    """O'quvchi kursni o'z balansidan sotib oladi. Admin/teacher POST / ishlatadi."""
+    role = current_user.role if isinstance(current_user.role, Role) else Role(current_user.role)
+    if role != Role.STUDENT:
+        raise HTTPException(status_code=400, detail="Faqat o'quvchilar kurs sotib olishi mumkin. Xodimlar POST / dan foydalanadi.")
+
+    course_res = await db.execute(select(Course).where(Course.id == req.course_id).where(Course.school_id == school_id))
     course = course_res.scalar_one_or_none()
     if not course:
         raise HTTPException(status_code=404, detail="Kurs topilmadi")
-        
-    # To'lovni yechish: Faqat o'quvchi o'zi sotib olayotgan bo'lsa
-    # Agar admin / manager / o'qituvchi biriktirayotgan bo'lsa, to'lov yechilmaydi.
-    if user.role.value == "student" and current_user.role.value == "student":
-        course_price = course.price or 0.0
-        if user.balance < course_price:
-            raise HTTPException(status_code=400, detail="Balansda yetarli mablag' mavjud emas")
-            
-        user.balance -= course_price
-        db.add(user)
-        
-        transaction = Transaction(
-            user_id=user.id,
-            amount=course_price,
-            type=TransactionType.OUT,
-            description=f"Kurs xaridi: {course.title}"
-        )
-        db.add(transaction)
-        
-    return await create_enrollment(db, enroll_in, school_id)
 
-from enrollments.crud import delete_enrollment
+    existing = await get_enrollment(db, current_user.id, req.course_id)
+    if existing:
+        raise HTTPException(status_code=400, detail="Siz allaqachon bu kursga yozilgansiz")
+
+    price = float(course.price or 0)
+    if price > 0:
+        if float(current_user.balance) < price:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Balans yetarli emas. Kerak: {price:,.0f} UZS, mavjud: {float(current_user.balance):,.0f} UZS"
+            )
+        current_user.balance = float(current_user.balance) - price
+        db.add(Transaction(
+            user_id=current_user.id, school_id=school_id, amount=price,
+            type=TransactionType.OUT, description=f"Kurs sotib olindi: {course.title}"
+        ))
+
+    enrollment = await create_enrollment(db, EnrollmentCreate(user_id=current_user.id, course_id=req.course_id), school_id)
+
+    if price > 0:
+        for admin_id in await get_school_admin_ids(db, school_id):
+            await create_notification(
+                db, admin_id, school_id,
+                "Kurs sotib olindi",
+                f"{current_user.full_name} \"{course.title}\" kursini {price:,.0f} UZS ga sotib oldi"
+            )
+        await create_notification(
+            db, current_user.id, school_id,
+            "Kurs sotib olindi",
+            f"Siz \"{course.title}\" kursini {price:,.0f} UZS ga sotib oldingiz"
+        )
+
+    return enrollment
+
 
 @router.delete("/{enrollment_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def unenroll_user(enrollment_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
-    """Foydalanuvchini kursdan o'chirish."""
-    success = await delete_enrollment(db, enrollment_id)
+async def unenroll_user(
+    enrollment_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    school_id=Depends(get_current_school_id),
+):
+    """Foydalanuvchini kursdan o'chirish (faqat o'z maktabidagi yozilishlarni)."""
+    success = await delete_enrollment(db, enrollment_id, school_id)
     if not success:
         raise HTTPException(status_code=404, detail="Yozilish topilmadi")
     return None

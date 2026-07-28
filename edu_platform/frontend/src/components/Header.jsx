@@ -2,13 +2,27 @@ import React, { useContext, useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Bell, UserCircle, Settings, User, CreditCard, LogOut, ChevronDown } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
+import { api } from '../api';
 import './Header.css';
+
+// Backend created_at'ni naive UTC saqlaydi, shuning uchun 'Z' qo'shib parse qilamiz
+export const timeAgo = (dateStr) => {
+  const seconds = Math.floor((Date.now() - new Date(dateStr + 'Z').getTime()) / 1000);
+  if (seconds < 60) return 'hozirgina';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} daqiqa oldin`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} soat oldin`;
+  return `${Math.floor(hours / 24)} kun oldin`;
+};
 
 const Header = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifications, setNotifications] = useState([]);
   const profileMenuRef = useRef(null);
 
   useEffect(() => {
@@ -21,6 +35,49 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Bildirishnomalarni yuklash va har 30 soniyada yangilab turish
+  useEffect(() => {
+    let cancelled = false;
+    const fetchNotifications = async () => {
+      try {
+        const data = await api('/notifications/');
+        if (!cancelled) {
+          setUnreadCount(data.unread_count);
+          setNotifications(data.results);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => { cancelled = true; clearInterval(interval); };
+  }, []);
+
+  const handleReadAll = async () => {
+    try {
+      await api('/notifications/read-all', { method: 'POST' });
+      setUnreadCount(0);
+      setNotifications(notifications.map(n => ({ ...n, is_read: true })));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleOpenNotification = async (notification) => {
+    if (!notification.is_read) {
+      try {
+        await api(`/notifications/${notification.id}/read`, { method: 'POST' });
+        setUnreadCount(Math.max(unreadCount - 1, 0));
+        setNotifications(notifications.map(n => n.id === notification.id ? { ...n, is_read: true } : n));
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    setShowNotifications(false);
+    navigate('/notifications');
+  };
+
   return (
     <header className="header">
       <div className="header-search">
@@ -30,25 +87,35 @@ const Header = () => {
 
       <div className="header-actions">
         <div className="notification-wrapper">
-          <button 
-            className="icon-btn" 
+          <button
+            className="icon-btn"
             onClick={() => setShowNotifications(!showNotifications)}
           >
             <Bell size={20} />
-            <span className="badge">3</span>
+            {unreadCount > 0 && <span className="badge">{unreadCount > 99 ? '99+' : unreadCount}</span>}
           </button>
-          
+
           {showNotifications && (
             <div className="notifications-dropdown card">
               <h4>Bildirishnomalar</h4>
-              <div className="notification-item">
-                <p><strong>Yangi o'quvchi</strong> ro'yxatdan o'tdi</p>
-                <span className="time">2 daqiqa oldin</span>
-              </div>
-              <div className="notification-item">
-                <p><strong>Uy vazifasi</strong> yuborildi</p>
-                <span className="time">1 soat oldin</span>
-              </div>
+              {notifications.length === 0 && (
+                <p style={{ padding: '10px', color: '#9ca3af', fontSize: '13px' }}>Hozircha bildirishnomalar yo'q</p>
+              )}
+              {notifications.slice(0, 5).map(notification => (
+                <div
+                  key={notification.id}
+                  className={`notification-item ${notification.is_read ? '' : 'unread'}`}
+                  onClick={() => handleOpenNotification(notification)}
+                >
+                  {notification.title}
+                  <span className="time">{timeAgo(notification.created_at)}</span>
+                </div>
+              ))}
+              {unreadCount > 0 && (
+                <button className="notif-read-all" onClick={handleReadAll}>
+                  Hammasini o'qilgan deb belgilash
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -72,7 +139,7 @@ const Header = () => {
 
           {showProfileMenu && (
             <div className="profile-dropdown card">
-              <div className="profile-dropdown-item" onClick={() => { setShowProfileMenu(false); alert("Profil sahifasi") }}>
+              <div className="profile-dropdown-item" onClick={() => { setShowProfileMenu(false); navigate('/settings'); }}>
                 <div className="profile-dropdown-icon text-blue">
                   <User size={20} />
                 </div>
@@ -81,8 +148,8 @@ const Header = () => {
                   <p>Ma'lumotlaringizni tahrirlash</p>
                 </div>
               </div>
-              
-              <div className="profile-dropdown-item" onClick={() => { setShowProfileMenu(false); alert("Sozlamalar") }}>
+
+              <div className="profile-dropdown-item" onClick={() => { setShowProfileMenu(false); navigate('/settings'); }}>
                 <div className="profile-dropdown-icon text-orange">
                   <Settings size={20} />
                 </div>
@@ -93,8 +160,8 @@ const Header = () => {
               </div>
 
               {user && (user.role === 'admin' || user.role === 'student') && (
-                <div className="profile-dropdown-item" onClick={() => { 
-                  setShowProfileMenu(false); 
+                <div className="profile-dropdown-item" onClick={() => {
+                  setShowProfileMenu(false);
                   if (user.role === 'admin') {
                     navigate("/settings");
                   } else if (user.role === 'student') {

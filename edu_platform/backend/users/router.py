@@ -7,7 +7,7 @@ from users.crud import get_user_by_email, create_user
 router = APIRouter()
 
 
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordRequestForm
 from users.schema import TokenResponse
 from users.auth import verify_password, create_access_token
 
@@ -19,7 +19,7 @@ import json
 from redis_client import get_redis
 from notifications.email import send_email_otp
 from users.schema import UserRegisterVerify, UserAdminCreate
-from permissions.dependencies import RequirePermissions, get_current_user_role
+from permissions.dependencies import RequirePermissions
 from permissions.enums import Permission
 
 @router.post("/register/send-otp")
@@ -77,6 +77,14 @@ async def verify_registration_otp(verify_in: UserRegisterVerify, db: AsyncSessio
         school = await get_school_by_subdomain(db, user_data.subdomain)
         new_user = await create_user(db, user_data)
         await create_user_school(db, new_user.id, school.id, MembershipStatus.PENDING)
+        # Maktab adminlariga yangi a'zo haqida bildirishnoma
+        from notifications.crud import create_notification, get_school_admin_ids
+        for admin_id in await get_school_admin_ids(db, school.id):
+            await create_notification(
+                db, admin_id, school.id,
+                "Yangi o'quvchi qo'shildi",
+                f"{new_user.full_name} {school.name} maktabiga a'zo bo'ldi"
+            )
 
     # Kod ishlatilgach o'chiramiz
     await redis.delete(f"otp:{verify_in.email}")
@@ -84,32 +92,23 @@ async def verify_registration_otp(verify_in: UserRegisterVerify, db: AsyncSessio
 
     return new_user
 
-from jose import jwt
-from users.auth import SECRET_KEY, ALGORITHM
-
-async def get_current_school_id(token: str = Depends(OAuth2PasswordBearer(tokenUrl="login"))):
-    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    return payload.get("school_id")
+from permissions.dependencies import get_current_school_id
 
 @router.post("/admin-create", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def admin_create_user(
-    user_in: UserAdminCreate, 
+    user_in: UserAdminCreate,
     db: AsyncSession = Depends(get_db),
     has_perm: bool = Depends(RequirePermissions([Permission.MANAGE_USERS])),
-    school_id: str = Depends(get_current_school_id)
+    school_id=Depends(get_current_school_id)
 ):
-    if not school_id:
-        raise HTTPException(status_code=403, detail="Maktabingiz topilmadi")
-        
     existing = await get_user_by_email(db, user_in.email)
     if existing:
         raise HTTPException(status_code=400, detail="Bunday email allaqachon mavjud")
-        
+
     # Parol bilan o'quvchi yaratish
     new_user = await create_user(db, user_in)
-    import uuid
     # To'g'ridan to'g'ri maktabga qabul qilish
-    await create_user_school(db, new_user.id, uuid.UUID(school_id), MembershipStatus.APPROVED)
+    await create_user_school(db, new_user.id, school_id, MembershipStatus.APPROVED)
     return new_user
 
 from sqlalchemy import select

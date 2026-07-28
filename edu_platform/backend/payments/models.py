@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import String, Numeric, Float, ForeignKey, DateTime, Boolean, Enum as SQLAlchemyEnum
 from sqlalchemy.orm import Mapped, mapped_column
 from db import Base
@@ -61,7 +61,7 @@ class Transaction(Base):
     amount: Mapped[float] = mapped_column(Numeric(10, 2))
     type: Mapped[TransactionType] = mapped_column(SQLAlchemyEnum(TransactionType))
     description: Mapped[str] = mapped_column(String(255))
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
 
 class SchoolSubscription(Base):
     """Maktabning platforma uchun obunasi"""
@@ -72,4 +72,4 @@ class SchoolSubscription(Base):
     plan_name: Mapped[str] = mapped_column(String(100))
     status: Mapped[SubscriptionStatus] = mapped_column(SQLAlchemyEnum(SubscriptionStatus), default=SubscriptionStatus.ACTIVE)
     expires_at: Mapped[datetime] = mapped_column(DateTime)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))

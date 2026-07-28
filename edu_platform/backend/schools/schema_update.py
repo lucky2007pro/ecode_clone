@@ -1,4 +1,4 @@
-import { BaseModel } from 'pydantic'
+from pydantic import BaseModel
 from typing import Optional
 
 class SchoolUpdate(BaseModel):

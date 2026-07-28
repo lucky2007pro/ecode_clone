@@ -7,9 +7,11 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.ext.asyncio import AsyncAttrs
 
-DB_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:hojiakbar@localhost:5432/exode_db")
+DB_URL = os.getenv("DATABASE_URL")
+if not DB_URL:
+    raise RuntimeError("DATABASE_URL environment variable is required")
 
-engine = create_async_engine(DB_URL, echo=True, future=True)
+engine = create_async_engine(DB_URL, echo=os.getenv("DB_ECHO", "false").lower() == "true", future=True)
 AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 

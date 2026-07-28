@@ -2,20 +2,17 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Users, CheckCircle, Activity, TrendingUp } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { AuthContext } from '../context/AuthContext';
+import { api } from '../api';
 import './Dashboard.css';
 
 const Dashboard = () => {
-  const { user } = useContext(AuthContext);
+  const { user, school } = useContext(AuthContext);
   const isTeacher = user?.role === 'teacher';
   const [analytics, setAnalytics] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-    fetch('http://localhost:8000/api/v1/analytics/dashboard', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((response) => response.ok ? response.json() : Promise.reject())
+    if (!localStorage.getItem('token')) return;
+    api('/analytics/dashboard')
       .then(setAnalytics)
       .catch(() => setAnalytics(null));
   }, []);
@@ -71,7 +68,7 @@ const Dashboard = () => {
             <div>
               <h3>Monthly activity</h3>
               <div className="chart-subtitle">
-                <span className="dot orange-dot"></span> Tech Onboarding - 2026
+                <span className="dot orange-dot"></span> {school?.name || 'Maktab'} - {new Date().getFullYear()}
               </div>
             </div>
             <div className="icon-wrapper-small orange-light">
