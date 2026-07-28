@@ -3,7 +3,7 @@ Gmail Email OTP va Telegram Notifications Router.
 """
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, EmailStr
-from notifications.email import send_email_otp, send_smtp_email
+from notifications.email import send_email_otp, send_smtp_email_task
 from notifications.telegram import send_telegram_msg
 
 router = APIRouter()
@@ -28,7 +28,5 @@ async def send_otp(req: EmailOTPRequest):
 @router.post("/send-email", status_code=status.HTTP_200_OK)
 async def send_custom_email(email: EmailStr, subject: str, message: str):
     """Gmail orqali xabar jo'natish."""
-    success = await send_smtp_email(email, subject, f"<p>{message}</p>")
-    if not success:
-        raise HTTPException(status_code=500, detail="Email yuborishda xatolik")
+    send_smtp_email_task.delay(email, subject, f"<p>{message}</p>")
     return {"status": "sent"}

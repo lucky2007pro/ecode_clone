@@ -12,3 +12,5 @@ class User(Base):
     full_name: Mapped[str] = mapped_column(String(255))
     role: Mapped[Role] = mapped_column(Enum(Role, values_callable=lambda x: [e.value for e in x]), default=Role.STUDENT)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    balance: Mapped[float] = mapped_column(default=1000000.0)
+

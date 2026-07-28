@@ -31,6 +31,8 @@ class Role(str, enum.Enum):
     STUDENT = "student"
     CURATOR = "curator"
     MANAGER = "manager"
+    ACCOUNTANT = "accountant"
+    TEACHER = "teacher"
     ADMIN = "admin"
 
 # Mapping of roles to their default permissions (MVP approach)
@@ -47,12 +49,24 @@ ROLE_PERMISSIONS = {
         Permission.VIEW_USERS,
         Permission.MODERATE_COMMENTS
     ],
+    Role.TEACHER: [
+        Permission.VIEW_DASHBOARD,
+        Permission.VIEW_COURSES,
+        Permission.MANAGE_COURSES,
+        Permission.GRADE_HOMEWORKS,
+        Permission.VIEW_USERS
+    ],
     Role.MANAGER: [
         Permission.VIEW_DASHBOARD,
         Permission.VIEW_FINANCE,
         Permission.MANAGE_REFUNDS,
         Permission.MANAGE_PRODUCTS,
         Permission.VIEW_USERS
+    ],
+    Role.ACCOUNTANT: [
+        Permission.VIEW_DASHBOARD,
+        Permission.VIEW_FINANCE,
+        Permission.MANAGE_REFUNDS
     ],
     Role.ADMIN: [
         p for p in Permission # Admin has all permissions

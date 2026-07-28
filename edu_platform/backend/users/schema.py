@@ -21,6 +21,7 @@ class UserAdminCreate(UserBase):
 class UserResponse(UserBase):
     id: uuid.UUID
     is_active: bool
+    balance: float
     class Config:
         from_attributes = True
 

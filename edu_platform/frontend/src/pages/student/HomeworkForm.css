@@ -1,0 +1,50 @@
+.homework-form-container {
+  margin-top: 32px;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+}
+
+.homework-textarea {
+  width: 100%;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--background-color);
+  color: var(--text-color);
+  resize: vertical;
+  font-family: inherit;
+  margin-bottom: 16px;
+  transition: border-color 0.2s;
+}
+
+.homework-textarea:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.homework-success {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.success-icon {
+  color: var(--success);
+  margin-bottom: 16px;
+}
+
+.homework-success h3 {
+  color: var(--success);
+  margin-bottom: 8px;
+}

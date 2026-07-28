@@ -60,7 +60,7 @@ async def verify_registration_otp(verify_in: UserRegisterVerify, db: AsyncSessio
     redis = await get_redis()
     saved_otp = await redis.get(f"otp:{verify_in.email}")
     
-    if not saved_otp or saved_otp != verify_in.otp_code:
+    if not saved_otp or str(saved_otp) != str(verify_in.otp_code).strip():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="OTP kod noto'g'ri yoki muddati o'tgan")
         
     saved_data_str = await redis.get(f"reg_data:{verify_in.email}")
@@ -141,3 +141,10 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSessi
 
     access_token = create_access_token(user_id=str(user.id), role=user.role.value, school_id=str(user_school.school_id))
     return {"access_token": access_token, "token_type": "bearer"}
+
+from permissions.dependencies import get_current_user
+
+@router.get("/me", response_model=UserResponse)
+async def get_my_profile(current_user = Depends(get_current_user)):
+    """Tizimga kirgan foydalanuvchining ma'lumotlarini qaytaradi."""
+    return current_user

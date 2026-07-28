@@ -2,25 +2,36 @@ import os
 from typing import List
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from db import init_db
+from redis_client import get_redis, close_redis
 
 # DOMAIN ROUTERS
 from users.router import router as users_router
 from schools.router import router as schools_router
 from courses.router import router as courses_router
-from videos.router import router as videos_router
+from lessons.router import router as lessons_router
+from enrollments.router import router as enrollments_router
 from crm.router import router as crm_router
 from payments.router import router as payments_router
 from notifications.router import router as notifications_router
 from homeworks.router import router as homeworks_router
+from quizzes.router import router as quizzes_router
+from analytics.router import router as analytics_router
+from messages.router import router as messages_router
+from marketing.router import router as marketing_router
+from bot.router import router as bot_router
+from api_keys.router import router as api_keys_router
+from api_keys.router import saas_router
+from videos.router import router as videos_router
 
 app = FastAPI(
     title="Exode Education & ERP Platform API",
-    description="Multi-tenant online school platform backend API",
-    version="2.0.0"
+    description="Multi-tenant ERP va Ta'lim platformasi uchun Backend API",
+    version="1.0.0"
 )
 
-# CORS MIDDLEWARE (Allows frontend running on any port/domain to interact with backend API)
+# CORS sozlamalari
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -29,53 +40,50 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# INCLUDE API ROUTERS WITH /api/v1 PREFIX
-app.include_router(users_router, prefix="/api/v1/users", tags=["Users & Auth"])
+# Routerlarni ulash
+app.include_router(users_router, prefix="/api/v1/users", tags=["Users & Authentication"])
 app.include_router(schools_router, prefix="/api/v1/schools", tags=["Schools & Multi-Tenancy"])
-app.include_router(courses_router, prefix="/api/v1/courses", tags=["Courses & Modules"])
+app.include_router(courses_router, prefix="/api/v1/courses", tags=["Courses & E-learning"])
 app.include_router(videos_router, prefix="/api/v1/videos", tags=["Kinescope Video Integration"])
 app.include_router(crm_router, prefix="/api/v1/crm", tags=["Kommo CRM Integration"])
 app.include_router(payments_router, prefix="/api/v1/payments", tags=["Telegram Admin Payments"])
 app.include_router(notifications_router, prefix="/api/v1/notifications", tags=["Gmail Free SMTP Notifications"])
 app.include_router(homeworks_router, prefix="/api/v1/homeworks", tags=["Homework & Practice Submissions"])
+app.include_router(lessons_router, prefix="/api/v1/lessons", tags=["Lessons & Course Content"])
+app.include_router(enrollments_router, prefix="/api/v1/enrollments", tags=["Student Enrollments"])
+app.include_router(quizzes_router, prefix="/api/v1/quizzes", tags=["Quizzes & Tests"])
+app.include_router(analytics_router, prefix="/api/v1/analytics", tags=["Analytics & Reporting"])
+app.include_router(messages_router, prefix="/api/v1/messages", tags=["Chat & Messenger"])
+app.include_router(marketing_router, prefix="/api/v1/marketing", tags=["Marketing & Sales"])
+app.include_router(bot_router, prefix="/api/v1/bot", tags=["Telegram Bot"])
+app.include_router(api_keys_router, prefix="/api/v1/keys", tags=["API Keys"])
+app.include_router(saas_router, prefix="/saas", tags=["SaaS External API"])
+app.include_router(videos_router, prefix="/api/v1/videos", tags=["Videos & Kinescope"])
 
-# REALTIME WEBSOCKET CONNECTION MANAGER
-class ConnectionManager:
-    def __init__(self):
-        self.active_connections: List[WebSocket] = []
-
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections.append(websocket)
-
-    def disconnect(self, websocket: WebSocket):
-        if websocket in self.active_connections:
-            self.active_connections.remove(websocket)
-
-    async def broadcast(self, message: str):
-        for connection in self.active_connections:
-            try:
-                await connection.send_text(message)
-            except Exception:
-                pass
-
-manager = ConnectionManager()
-
-@app.websocket("/ws/chat/{client_id}")
-async def websocket_chat_endpoint(websocket: WebSocket, client_id: str):
-    await manager.connect(websocket)
-    try:
-        while True:
-            data = await websocket.receive_text()
-            await manager.broadcast(data)
-    except WebSocketDisconnect:
-        manager.disconnect(websocket)
+# Serve uploaded videos statically
+import os
+if not os.path.exists("uploads"):
+    os.makedirs("uploads")
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 @app.on_event("startup")
 async def on_startup():
     await init_db()
+    redis = await get_redis()
+    await redis.ping()
 
-@app.get("/")
+@app.on_event("shutdown")
+async def on_shutdown():
+    await close_redis()
+
+@app.get("/health", tags=["General"])
+async def health():
+    redis = await get_redis()
+    await redis.ping()
+    return {"status": "ok", "redis": "ok"}
+
+# Ildiz endpoint
+@app.get("/", tags=["General"])
 async def root():
     return {
         "status": "success",

@@ -7,17 +7,22 @@ import logging
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from celery_app import celery_app
 
 logger = logging.getLogger("email_service")
 
 SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
-SMTP_USER = os.getenv("SMTP_USER", "usa20070302@gmail.com")
-SMTP_PASS = os.getenv("SMTP_PASS", "zgrj syhw cuby dopg")
+SMTP_USER = os.getenv("SMTP_USER", "")
+SMTP_PASS = os.getenv("SMTP_PASS", "")
 
 
-async def send_smtp_email(to_email: str, subject: str, body_html: str) -> bool:
-    """Gmail SMTP orqali HTML email jo'natadi."""
+@celery_app.task(name="send_smtp_email_task")
+def send_smtp_email_task(to_email: str, subject: str, body_html: str) -> bool:
+    """Gmail SMTP orqali HTML email jo'natadi (Celery worker)."""
+    if not SMTP_USER or not SMTP_PASS:
+        logger.warning("SMTP sozlanmagan; email yuborilmadi (development mode)")
+        return False
     try:
         msg = MIMEMultipart("alternative")
         msg["Subject"] = subject
@@ -55,5 +60,5 @@ async def send_email_otp(to_email: str) -> str:
         <p style="font-size: 11px; color: #64748b; text-align: center;">Exode.biz — Onlayn Maktab va Kurslar Platformasi</p>
     </div>
     """
-    await send_smtp_email(to_email, subject, body)
+    send_smtp_email_task.delay(to_email, subject, body)
     return otp_code
