@@ -5,40 +5,40 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from db import get_db
 from homeworks.schema import HomeworkSubmissionCreate, HomeworkSubmissionResponse, GradeRequest
 from homeworks.crud import submit_homework, get_all_submissions, get_lesson_submissions, get_student_submissions, grade_submission
-from permissions.dependencies import RequirePermissions
+from permissions.dependencies import RequirePermissions, get_current_school_id
 from permissions.enums import Permission
 
 router = APIRouter()
 
 
 @router.post("/", response_model=HomeworkSubmissionResponse, status_code=status.HTTP_201_CREATED)
-async def create_submission(sub_in: HomeworkSubmissionCreate, db: AsyncSession = Depends(get_db)):
+async def create_submission(sub_in: HomeworkSubmissionCreate, db: AsyncSession = Depends(get_db), school_id=Depends(get_current_school_id)):
     """O'quvchi tomonidan uy vazifasi yuborish."""
-    return await submit_homework(db, sub_in)
+    return await submit_homework(db, sub_in, school_id)
 
 
 @router.get("/", response_model=List[HomeworkSubmissionResponse])
 async def list_all_submissions(db: AsyncSession = Depends(get_db), _=Depends(RequirePermissions([Permission.GRADE_HOMEWORKS]))):
     """Barcha uy vazifalarini ko'rish (Curator/Admin uchun)."""
-    return await get_all_submissions(db)
+    return await get_all_submissions(db, school_id)
 
 
 @router.get("/student/{student_id}", response_model=List[HomeworkSubmissionResponse])
 async def list_student_submissions(student_id: uuid.UUID, db: AsyncSession = Depends(get_db), _=Depends(RequirePermissions([Permission.GRADE_HOMEWORKS]))):
     """Muayyan o'quvchining uy vazifalarini ko'rish."""
-    return await get_student_submissions(db, student_id)
+    return await get_student_submissions(db, student_id, school_id)
 
 
 @router.get("/lesson/{lesson_id}", response_model=List[HomeworkSubmissionResponse])
 async def list_lesson_submissions(lesson_id: uuid.UUID, db: AsyncSession = Depends(get_db), _=Depends(RequirePermissions([Permission.GRADE_HOMEWORKS]))):
     """Muayyan darsning uy vazifalarini ko'rish."""
-    return await get_lesson_submissions(db, lesson_id)
+    return await get_lesson_submissions(db, lesson_id, school_id)
 
 
 @router.post("/{sub_id}/grade", response_model=HomeworkSubmissionResponse)
 async def grade_homework(sub_id: uuid.UUID, req: GradeRequest, db: AsyncSession = Depends(get_db), _=Depends(RequirePermissions([Permission.GRADE_HOMEWORKS]))):
     """Uy vazifasini baholash va fikr bildirish (Curator)."""
-    submission = await grade_submission(db, sub_id, req)
+    submission = await grade_submission(db, sub_id, req, school_id)
     if not submission:
         raise HTTPException(status_code=404, detail="Uy vazifasi topilmadi")
     return submission

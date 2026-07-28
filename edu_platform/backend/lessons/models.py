@@ -14,6 +14,7 @@ class LessonType(str, enum.Enum):
 class CourseModule(Base):
     __tablename__ = "modules"
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    school_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("schools.id", ondelete="CASCADE"), index=True)
     course_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("courses.id"), index=True)
     title: Mapped[str] = mapped_column(String(255))
     order: Mapped[int] = mapped_column(Integer, default=0)
@@ -21,6 +22,7 @@ class CourseModule(Base):
 class Lesson(Base):
     __tablename__ = "lessons"
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    school_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("schools.id", ondelete="CASCADE"), index=True)
     course_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("courses.id"), index=True)
     module_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("modules.id"), nullable=True, index=True)
     title: Mapped[str] = mapped_column(String(255))

@@ -1,5 +1,5 @@
 import uuid
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from permissions.enums import Role
 
 class UserBase(BaseModel):
@@ -8,7 +8,7 @@ class UserBase(BaseModel):
     role: Role = Role.STUDENT
 
 class UserCreate(UserBase):
-    password: str
+    password: str = Field(min_length=8, max_length=72)
     school_name: str | None = None
     subdomain: str | None = None
 
@@ -16,7 +16,7 @@ class UserRegisterVerify(UserCreate):
     otp_code: str
 
 class UserAdminCreate(UserBase):
-    password: str
+    password: str = Field(min_length=8, max_length=72)
 
 class UserUpdate(BaseModel):
     full_name: str | None = None

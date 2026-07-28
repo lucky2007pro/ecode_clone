@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Plus, Video, FileText, LayoutList, ChevronDown, ChevronRight, Settings, Image as ImageIcon, File, MonitorPlay, MessageSquare, Table, Edit3, Trash2 } from 'lucide-react';
 import './CourseBuilder.css';
@@ -19,6 +19,9 @@ const CourseBuilder = () => {
   const [showLessonForm, setShowLessonForm] = useState(false);
   const [newModuleTitle, setNewModuleTitle] = useState('');
   const [newLessonTitle, setNewLessonTitle] = useState('');
+  const [error, setError] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const videoInputRef = useRef(null);
 
   // Expand/Collapse modules
   const [expandedModules, setExpandedModules] = useState({});
@@ -76,6 +79,7 @@ const CourseBuilder = () => {
 
   const handleAddModule = async () => {
     if(!newModuleTitle.trim()) return;
+    setError('');
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`http://localhost:8000/api/v1/lessons/modules`, {
@@ -87,12 +91,16 @@ const CourseBuilder = () => {
         setNewModuleTitle('');
         setShowModuleForm(false);
         fetchModulesAndLessons();
+      } else {
+        const body = await res.json().catch(() => ({}));
+        setError(body.detail || `Modul qo'shilmadi (${res.status})`);
       }
-    } catch(err) { console.error(err); }
+    } catch(err) { setError(err.message || 'Serverga ulanishda xatolik'); }
   };
 
   const handleAddLesson = async () => {
     if(!newLessonTitle.trim() || !activeModule) return;
+    setError('');
     try {
       const token = localStorage.getItem('token');
       const modLessons = lessons.filter(l => l.module_id === activeModule);
@@ -113,8 +121,11 @@ const CourseBuilder = () => {
         const newL = await res.json();
         setActiveLesson(newL);
         fetchModulesAndLessons();
+      } else {
+        const body = await res.json().catch(() => ({}));
+        setError(body.detail || `Dars qo'shilmadi (${res.status})`);
       }
-    } catch(err) { console.error(err); }
+    } catch(err) { setError(err.message || 'Serverga ulanishda xatolik'); }
   };
 
   const toggleModule = (modId) => {
@@ -137,6 +148,43 @@ const CourseBuilder = () => {
     } catch(err) { console.error(err); }
   };
 
+  const handleVideoUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file || !activeLesson) return;
+    setError('');
+    setUploading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const initResponse = await fetch('http://localhost:8000/api/v1/videos/upload/init', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, title: activeLesson.title, filesize: file.size }),
+      });
+      const initData = await initResponse.json();
+      if (!initResponse.ok) throw new Error(initData.detail || 'Kinescope upload boshlanmadi');
+      const { Upload } = await import('tus-js-client');
+      await new Promise((resolve, reject) => {
+        const upload = new Upload(file, {
+          uploadUrl: initData.upload_url,
+          chunkSize: 10 * 1024 * 1024,
+          retryDelays: [0, 3000, 5000, 10000],
+          metadata: { filename: file.name, filetype: file.type },
+          onError: reject,
+          onSuccess: resolve,
+        });
+        upload.start();
+      });
+      const videoUrl = initData.video_id ? `https://kinescope.io/embed/${initData.video_id}` : initData.upload_url;
+      setActiveLesson({ ...activeLesson, video_url: videoUrl, lesson_type: 'video' });
+      setError('Video Kinescope’ga yuklandi. Saqlash uchun “Publish lesson”ni bosing.');
+    } catch (err) {
+      setError(err.message || 'Video yuklashda xatolik');
+    } finally {
+      setUploading(false);
+      event.target.value = '';
+    }
+  };
+
   if (loading) return <div className="cb-loading">Yuklanmoqda...</div>;
 
   return (
@@ -152,6 +200,7 @@ const CourseBuilder = () => {
         </div>
 
         <div className="cb-modules">
+          {error && <div style={{color: '#b91c1c', background: '#fee2e2', padding: '10px', borderRadius: '8px', marginBottom: '12px', fontSize: '13px'}}>{error}</div>}
           {modules.map(mod => (
             <div key={mod.id} className="cb-module-group">
               <div className="cb-module-header" onClick={() => toggleModule(mod.id)}>
@@ -249,12 +298,10 @@ const CourseBuilder = () => {
                   ) : (
                     <MonitorPlay size={48} color="rgba(255,255,255,0.8)" />
                   )}
-                  <button className="cb-cover-edit-btn" onClick={() => {
-                    const url = prompt("Video URL kiriting:", activeLesson.video_url || "");
-                    if(url !== null) setActiveLesson({...activeLesson, video_url: url, lesson_type: 'video'});
-                  }}>
-                    <Edit3 size={16}/> Edit video
+                  <button className="cb-cover-edit-btn" onClick={() => videoInputRef.current?.click()} disabled={uploading}>
+                    <Edit3 size={16}/> {uploading ? 'Uploading...' : 'Upload video'}
                   </button>
+                  <input ref={videoInputRef} type="file" accept="video/*" hidden onChange={handleVideoUpload} />
                 </div>
               </div>
 

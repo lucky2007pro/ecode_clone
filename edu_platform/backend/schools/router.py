@@ -6,14 +6,15 @@ from schools.schema import SchoolCreate, SchoolResponse
 from schools.crud import create_school
 from schools.models import UserSchool, MembershipStatus, School
 from users.models import User
-from users.schema import UserCreate
+from users.schema import UserCreate, UserAdminCreate
 from users.crud import get_user_by_email, create_user
 from schools.crud import create_user_school
 import uuid
 
 router = APIRouter()
 
-from permissions.dependencies import get_current_user_school_id
+from permissions.dependencies import get_current_user_school_id, get_current_school_id, RequirePermissions
+from permissions.enums import Permission
 
 @router.get("/my", response_model=SchoolResponse)
 async def get_my_school(school_id: str = Depends(get_current_user_school_id), db: AsyncSession = Depends(get_db)):
@@ -28,7 +29,8 @@ async def add_school(school_in: SchoolCreate, owner_id: uuid.UUID, db: AsyncSess
     return await create_school(db, school_in.name, school_in.subdomain, owner_id)
 
 @router.get("/{school_id}/users")
-async def get_school_users(school_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+async def get_school_users(school_id: uuid.UUID, db: AsyncSession = Depends(get_db), token_school_id=Depends(get_current_school_id), _=Depends(RequirePermissions([Permission.VIEW_USERS]))):
+    if school_id != token_school_id: raise HTTPException(status_code=403, detail="Boshqa maktabga kirish taqiqlangan")
     res = await db.execute(
         select(User.id, User.full_name, User.email, User.role, User.is_active)
         .join(UserSchool, User.id == UserSchool.user_id)
@@ -39,7 +41,15 @@ async def get_school_users(school_id: uuid.UUID, db: AsyncSession = Depends(get_
     return [{"id": u.id, "full_name": u.full_name, "email": u.email, "role": u.role, "is_active": u.is_active} for u in users]
 
 @router.post("/{school_id}/users", status_code=status.HTTP_201_CREATED)
-async def add_school_user(school_id: uuid.UUID, user_in: UserCreate, db: AsyncSession = Depends(get_db)):
+async def add_school_user(
+    school_id: uuid.UUID,
+    user_in: UserAdminCreate,
+    db: AsyncSession = Depends(get_db),
+    token_school_id=Depends(get_current_school_id),
+    _=Depends(RequirePermissions([Permission.MANAGE_USERS]))
+):
+    if school_id != token_school_id:
+        raise HTTPException(status_code=403, detail="Boshqa maktabga user qo'shish taqiqlangan")
     existing = await get_user_by_email(db, user_in.email)
     if existing:
         raise HTTPException(status_code=400, detail="Bunday email allaqachon mavjud")
@@ -49,7 +59,8 @@ async def add_school_user(school_id: uuid.UUID, user_in: UserCreate, db: AsyncSe
     return {"id": new_user.id, "full_name": new_user.full_name, "email": new_user.email, "role": new_user.role}
 
 @router.get("/{school_id}/pending-users")
-async def get_pending_users(school_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+async def get_pending_users(school_id: uuid.UUID, db: AsyncSession = Depends(get_db), token_school_id=Depends(get_current_school_id), _=Depends(RequirePermissions([Permission.VIEW_USERS]))):
+    if school_id != token_school_id: raise HTTPException(status_code=403, detail="Boshqa maktabga kirish taqiqlangan")
     res = await db.execute(
         select(User.id, User.full_name, User.email, User.role, User.is_active)
         .join(UserSchool, User.id == UserSchool.user_id)
@@ -60,7 +71,8 @@ async def get_pending_users(school_id: uuid.UUID, db: AsyncSession = Depends(get
     return [{"id": u.id, "full_name": u.full_name, "email": u.email, "role": u.role, "is_active": u.is_active} for u in users]
 
 @router.post("/{school_id}/approve/{user_id}")
-async def approve_user(school_id: uuid.UUID, user_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+async def approve_user(school_id: uuid.UUID, user_id: uuid.UUID, db: AsyncSession = Depends(get_db), token_school_id=Depends(get_current_school_id), _=Depends(RequirePermissions([Permission.MANAGE_USERS]))):
+    if school_id != token_school_id: raise HTTPException(status_code=403, detail="Boshqa maktabga kirish taqiqlangan")
     res = await db.execute(
         update(UserSchool)
         .where(UserSchool.school_id == school_id)

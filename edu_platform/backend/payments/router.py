@@ -9,7 +9,7 @@ from typing import List, Optional
 from db import get_db
 from payments.models import PaymentPlan, Subscription, PlanType, SubscriptionStatus, Transaction, TransactionType, SchoolSubscription
 from users.models import User
-from permissions.dependencies import RequirePermissions
+from permissions.dependencies import RequirePermissions, get_current_school_id
 from permissions.enums import Permission
 
 router = APIRouter()
@@ -115,7 +115,9 @@ class TransactionResponse(BaseModel):
         orm_mode = True
 
 @router.get("/transactions/{school_id}", response_model=List[TransactionResponse])
-async def get_transactions(school_id: uuid.UUID, db: AsyncSession = Depends(get_db), _=Depends(RequirePermissions([Permission.VIEW_FINANCE]))):
+async def get_transactions(school_id: uuid.UUID, db: AsyncSession = Depends(get_db), token_school_id=Depends(get_current_school_id), _=Depends(RequirePermissions([Permission.VIEW_FINANCE]))):
+    if school_id != token_school_id:
+        raise HTTPException(status_code=403, detail="Boshqa maktab ma'lumotiga kirish taqiqlangan")
     # We return all transactions for the users in this school?
     # Or transactions associated with this school.
     # We should return transactions where transaction.school_id == school_id 
@@ -123,7 +125,7 @@ async def get_transactions(school_id: uuid.UUID, db: AsyncSession = Depends(get_
     # For now, let's just return all transactions (since it's a demo, we can just return all or fetch by school_id).
     # Since we didn't link all transactions to school_id initially in enrollments, we can fetch all for now,
     # or let's just fetch all transactions. The frontend will display them.
-    res = await db.execute(select(Transaction).order_by(Transaction.created_at.desc()))
+    res = await db.execute(select(Transaction).where(Transaction.school_id == token_school_id).order_by(Transaction.created_at.desc()))
     transactions = res.scalars().all()
     
     result = []

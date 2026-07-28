@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from pydantic import BaseModel
@@ -7,6 +7,7 @@ from typing import Optional
 
 from db import get_db
 from bot.models import TelegramBotSettings
+from permissions.dependencies import get_current_school_id
 
 router = APIRouter()
 
@@ -16,7 +17,8 @@ class BotUpdate(BaseModel):
     invite_link: Optional[str] = None
 
 @router.get("/{school_id}")
-async def get_bot_settings(school_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+async def get_bot_settings(school_id: uuid.UUID, db: AsyncSession = Depends(get_db), token_school_id=Depends(get_current_school_id)):
+    if school_id != token_school_id: raise HTTPException(status_code=403, detail="Boshqa maktabga kirish taqiqlangan")
     res = await db.execute(select(TelegramBotSettings).where(TelegramBotSettings.school_id == school_id))
     settings = res.scalar_one_or_none()
     if not settings:
@@ -32,7 +34,8 @@ async def get_bot_settings(school_id: uuid.UUID, db: AsyncSession = Depends(get_
     }
 
 @router.put("/{school_id}")
-async def update_bot_settings(school_id: uuid.UUID, data: BotUpdate, db: AsyncSession = Depends(get_db)):
+async def update_bot_settings(school_id: uuid.UUID, data: BotUpdate, db: AsyncSession = Depends(get_db), token_school_id=Depends(get_current_school_id)):
+    if school_id != token_school_id: raise HTTPException(status_code=403, detail="Boshqa maktabga kirish taqiqlangan")
     res = await db.execute(select(TelegramBotSettings).where(TelegramBotSettings.school_id == school_id))
     settings = res.scalar_one_or_none()
     if not settings:

@@ -203,7 +203,7 @@ const Students = () => {
         setError(errData.detail || 'Xatolik yuz berdi');
       }
     } catch (err) {
-      setError("Serverga ulanishda xatolik");
+      setError(err?.message || "Serverga ulanishda xatolik");
     }
   };
 

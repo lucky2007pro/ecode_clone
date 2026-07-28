@@ -14,6 +14,10 @@ from enrollments.models import Enrollment
 from homeworks.models import HomeworkSubmission
 from payments.models import Transaction, SchoolSubscription
 from quizzes.models import Quiz, QuizQuestion, QuizAnswer
+from crm.models import KommoSettings, CrmLead
+from bot.models import TelegramBotSettings
+from marketing.models import MarketingSettings
+from api_keys.models import APIKey
 from sqlalchemy import text
 
 async def reset_db():

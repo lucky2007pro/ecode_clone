@@ -14,6 +14,7 @@ class HomeworkStatus(str, enum.Enum):
 class HomeworkSubmission(Base):
     __tablename__ = "homework_submissions"
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    school_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("schools.id", ondelete="CASCADE"), index=True)
     lesson_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("lessons.id"), index=True)
     student_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), index=True)
     submission_text: Mapped[str] = mapped_column(Text)

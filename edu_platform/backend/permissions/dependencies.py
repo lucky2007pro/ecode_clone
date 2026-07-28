@@ -4,6 +4,7 @@ from typing import List
 from jose import jwt, JWTError
 from users.auth import SECRET_KEY, ALGORITHM
 from .enums import Permission, ROLE_PERMISSIONS, Role
+import uuid
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -32,6 +33,14 @@ async def get_current_user_school_id(token: str = Depends(oauth2_scheme)) -> str
         return school_id
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
+
+async def get_current_school_id(token: str = Depends(oauth2_scheme)) -> uuid.UUID:
+    """Tenant context: school_id is always taken from the signed JWT."""
+    school_id = await get_current_user_school_id(token)
+    try:
+        return uuid.UUID(school_id)
+    except (ValueError, AttributeError):
+        raise HTTPException(status_code=401, detail="Invalid school in token")
 async def get_current_user_role(token: str = Depends(oauth2_scheme)) -> Role:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])

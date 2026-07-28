@@ -8,6 +8,7 @@ from typing import Optional
 
 from db import get_db
 from crm.models import KommoSettings, CrmLead
+from permissions.dependencies import get_current_school_id
 
 router = APIRouter()
 
@@ -18,7 +19,8 @@ class KommoSettingsUpdate(BaseModel):
     access_token: Optional[str] = None
 
 @router.put("/settings/{school_id}")
-async def update_kommo_settings(school_id: uuid.UUID, data: KommoSettingsUpdate, db: AsyncSession = Depends(get_db)):
+async def update_kommo_settings(school_id: uuid.UUID, data: KommoSettingsUpdate, db: AsyncSession = Depends(get_db), token_school_id=Depends(get_current_school_id)):
+    if school_id != token_school_id: raise HTTPException(status_code=403, detail="Boshqa maktabga kirish taqiqlangan")
     result = await db.execute(select(KommoSettings).where(KommoSettings.school_id == school_id))
     settings = result.scalars().first()
 
@@ -42,7 +44,8 @@ class LeadCreate(BaseModel):
     student_id: Optional[uuid.UUID] = None
 
 @router.post("/lead")
-async def create_lead(data: LeadCreate, db: AsyncSession = Depends(get_db)):
+async def create_lead(data: LeadCreate, db: AsyncSession = Depends(get_db), token_school_id=Depends(get_current_school_id)):
+    if data.school_id != token_school_id: raise HTTPException(status_code=403, detail="Boshqa maktabga kirish taqiqlangan")
     # Maktabning kommo sozlamalarini olamiz
     result = await db.execute(select(KommoSettings).where(KommoSettings.school_id == data.school_id))
     settings = result.scalars().first()

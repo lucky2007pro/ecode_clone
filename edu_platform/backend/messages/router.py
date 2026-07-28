@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from db import get_db
 from messages.models import Message
+from permissions.dependencies import get_current_school_id
 import uuid
 
 router = APIRouter()
@@ -48,9 +49,9 @@ async def websocket_endpoint(websocket: WebSocket, db: AsyncSession = Depends(ge
 
 
 @router.get("/history")
-async def get_chat_history(db: AsyncSession = Depends(get_db)):
+async def get_chat_history(db: AsyncSession = Depends(get_db), school_id=Depends(get_current_school_id)):
     """Global chat tarixini olish."""
-    res = await db.execute(select(Message).order_by(Message.created_at.desc()).limit(50))
+    res = await db.execute(select(Message).where(Message.school_id == school_id).order_by(Message.created_at.desc()).limit(50))
     messages = res.scalars().all()
     # Teskari tartibda qaytaramizki xronologik to'g'ri bo'lsin
     return [{"id": m.id, "content": m.content, "sender_id": m.sender_id, "created_at": m.created_at} for m in messages[::-1]]

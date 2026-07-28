@@ -1,4 +1,6 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from videos.kinescope import init_video_upload
 import uuid
 import os
 import shutil
@@ -9,6 +11,19 @@ UPLOAD_DIR = "uploads"
 if not os.path.exists(UPLOAD_DIR):
     os.makedirs(UPLOAD_DIR)
 
+class VideoUploadInit(BaseModel):
+    filename: str
+    title: str | None = None
+    filesize: int
+
+@router.post("/upload/init")
+async def upload_video_init(data: VideoUploadInit):
+    try:
+        return await init_video_upload(data.filename, data.title or data.filename, data.filesize)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=502, detail=str(exc))
+
+''' Legacy local upload endpoint kept disabled in favor of direct Tus upload to Kinescope.
 @router.post("/upload")
 async def upload_video(file: UploadFile = File(...)):
     """
@@ -35,3 +50,4 @@ async def upload_video(file: UploadFile = File(...)):
         "video_url": video_url,
         "message": "Video Kinescope (simulated) serveriga muvaffaqiyatli yuklandi!"
     }
+'''

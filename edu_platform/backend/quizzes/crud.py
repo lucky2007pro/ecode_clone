@@ -5,14 +5,14 @@ from quizzes.models import Quiz, QuizQuestion, QuizAnswer
 from quizzes.schema import QuizCreate, QuizQuestionCreate
 
 
-async def get_quiz_by_lesson(db: AsyncSession, lesson_id: uuid.UUID):
-    res = await db.execute(select(Quiz).where(Quiz.lesson_id == lesson_id))
+async def get_quiz_by_lesson(db: AsyncSession, lesson_id: uuid.UUID, school_id):
+    res = await db.execute(select(Quiz).where(Quiz.lesson_id == lesson_id).where(Quiz.school_id == school_id))
     return res.scalar_one_or_none()
 
 
-async def create_quiz(db: AsyncSession, quiz_in: QuizCreate):
+async def create_quiz(db: AsyncSession, quiz_in: QuizCreate, school_id):
     quiz = Quiz(
-        lesson_id=quiz_in.lesson_id,
+        lesson_id=quiz_in.lesson_id, school_id=school_id,
         title=quiz_in.title,
         passing_score=quiz_in.passing_score
     )

@@ -7,6 +7,7 @@ from db import Base
 class Quiz(Base):
     __tablename__ = "quizzes"
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    school_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("schools.id", ondelete="CASCADE"), index=True)
     lesson_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("lessons.id"), index=True)
     title: Mapped[str] = mapped_column(String(255))
     passing_score: Mapped[int] = mapped_column(Integer, default=50)
