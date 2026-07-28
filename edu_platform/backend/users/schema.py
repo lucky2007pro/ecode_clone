@@ -18,6 +18,13 @@ class UserRegisterVerify(UserCreate):
 class UserAdminCreate(UserBase):
     password: str
 
+class UserUpdate(BaseModel):
+    full_name: str | None = None
+    email: EmailStr | None = None
+    role: Role | None = None
+    is_active: bool | None = None
+    password: str | None = None
+
 class UserResponse(UserBase):
     id: uuid.UUID
     is_active: bool

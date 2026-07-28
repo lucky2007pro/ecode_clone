@@ -8,16 +8,22 @@ const Sidebar = () => {
   const { user } = useContext(AuthContext);
 
   const menuItems = [
-    { name: 'Home', icon: <Home size={22} />, path: '/' },
+    { name: 'Home', icon: <Home size={22} />, path: user?.role === 'student' ? '/student-dashboard' : '/' },
     { name: 'Courses', icon: <Layers size={22} />, path: '/courses' },
-    { name: 'Practice', icon: <CheckSquare size={22} />, path: '/admin/homeworks' },
-    { name: 'People', icon: <Users size={22} />, path: '/students' },
   ];
 
-  // Admin and Manager ko'ra oladigan qismlar
-  if (user && (user.role === 'admin' || user.role === 'manager')) {
-    menuItems.splice(2, 0, { name: 'Sales', icon: <CreditCard size={22} />, path: '/payments' });
-    menuItems.push({ name: 'My school', icon: <Settings size={22} />, path: '/settings' });
+  if (user && user.role !== 'student') {
+    menuItems.push({ name: 'Practice', icon: <CheckSquare size={22} />, path: '/admin/homeworks' });
+    menuItems.push({ name: 'People', icon: <Users size={22} />, path: '/students' });
+  }
+
+  // Admin, Manager va Buxgalter ko'ra oladigan qismlar
+  if (user && (user.role === 'admin' || user.role === 'manager' || user.role === 'accountant')) {
+    menuItems.push({ name: 'Sales', icon: <CreditCard size={22} />, path: '/payments' });
+  }
+  
+  if (user && user.role === 'admin') {
+    menuItems.push({ name: 'Settings', icon: <Settings size={22} />, path: '/settings' });
   }
 
   return (

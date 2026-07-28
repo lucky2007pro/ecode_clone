@@ -13,10 +13,10 @@ const Students = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (school) {
+    if (school && user) {
       fetchStudents();
     }
-  }, [school]);
+  }, [school, user]);
 
   const fetchStudents = async () => {
     try {
@@ -25,7 +25,30 @@ const Students = () => {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
-        const data = await response.json();
+        let data = await response.json();
+
+        if (user && user.role === 'teacher') {
+          const enrollResponse = await fetch(`http://localhost:8000/api/v1/enrollments/user/${user.id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (enrollResponse.ok) {
+            const enrollData = await enrollResponse.json();
+            const courseIds = enrollData.map(e => e.course_id);
+            
+            let allowedUserIds = new Set();
+            for (let cid of courseIds) {
+               const cResp = await fetch(`http://localhost:8000/api/v1/enrollments/course/${cid}`, {
+                 headers: { 'Authorization': `Bearer ${token}` }
+               });
+               if (cResp.ok) {
+                  const cData = await cResp.json();
+                  cData.forEach(enroll => allowedUserIds.add(enroll.user_id));
+               }
+            }
+            data = data.filter(u => allowedUserIds.has(u.id));
+          }
+        }
+
         setStudents(data);
       }
     } catch (err) {
@@ -110,6 +133,43 @@ const Students = () => {
         fetchUserCourses(selectedStudent.id);
       } else {
         alert("O'chirishda xatolik yuz berdi");
+      }
+    } catch (err) {
+      alert("Serverga ulanishda xatolik");
+    }
+  };
+
+  const handleUpdateUser = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      const payload = {
+        full_name: selectedStudent.full_name,
+        email: selectedStudent.email,
+        role: selectedStudent.role,
+        is_active: selectedStudent.is_active
+      };
+
+      if (selectedStudent.new_password) {
+        payload.password = selectedStudent.new_password;
+      }
+
+      const response = await fetch(`http://localhost:8000/api/v1/users/${selectedStudent.id}`, {
+        method: 'PUT',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        alert("Ma'lumotlar muvaffaqiyatli saqlandi!");
+        fetchStudents(); // Ro'yxatni yangilash
+        setShowProfileModal(false);
+      } else {
+        const data = await response.json();
+        alert(data.detail || "Saqlashda xatolik yuz berdi");
       }
     } catch (err) {
       alert("Serverga ulanishda xatolik");
@@ -222,8 +282,16 @@ const Students = () => {
                       {getRoleStyle(student.role).label}
                     </span>
                   </td>
-                  <td style={{ padding: '12px', color: '#059669' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><UserCheck size={16} /> Faol</span>
+                  <td style={{ padding: '12px' }}>
+                    {student.is_active ? (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#059669' }}>
+                        <UserCheck size={16} /> Faol
+                      </span>
+                    ) : (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#ef4444' }}>
+                        <X size={16} /> Nofaol
+                      </span>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -313,32 +381,93 @@ const Students = () => {
               {modalTab === 'info' && (
                 <div>
                   <div className="form-group" style={{ marginBottom: '15px' }}>
-                    <label>Email</label>
-                    <input type="text" value={selectedStudent.email} disabled style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb', backgroundColor: '#f9fafb' }} />
+                    <label>Ism Familiya</label>
+                    <input 
+                      type="text" 
+                      value={selectedStudent.full_name} 
+                      onChange={e => setSelectedStudent({...selectedStudent, full_name: e.target.value})}
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb' }} 
+                      disabled={user && user.role === 'teacher'}
+                    />
                   </div>
-                  <p style={{ color: '#6b7280', fontSize: '13px', textAlign: 'center', marginTop: '30px' }}>
-                    Foydalanuvchi ma'lumotlarini tahrirlash funksiyasi tayyorlanmoqda.
-                  </p>
+                  <div className="form-group" style={{ marginBottom: '15px' }}>
+                    <label>Email</label>
+                    <input 
+                      type="text" 
+                      value={selectedStudent.email} 
+                      onChange={e => setSelectedStudent({...selectedStudent, email: e.target.value})}
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb' }} 
+                      disabled={user && user.role === 'teacher'}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                    <div className="form-group" style={{ flex: 1 }}>
+                      <label>Rol</label>
+                      <select 
+                        value={selectedStudent.role} 
+                        onChange={e => setSelectedStudent({...selectedStudent, role: e.target.value})}
+                        style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb' }}
+                        disabled={user && user.role === 'teacher'}
+                      >
+                        <option value="admin">Admin</option>
+                        <option value="manager">Menejer</option>
+                        <option value="accountant">Buxgalter</option>
+                        <option value="teacher">O'qituvchi</option>
+                        <option value="curator">Kurator / Mentor</option>
+                        <option value="student">O'quvchi</option>
+                      </select>
+                    </div>
+                    <div className="form-group" style={{ flex: 1 }}>
+                      <label>Holat</label>
+                      <select 
+                        value={selectedStudent.is_active ? 'active' : 'inactive'} 
+                        onChange={e => setSelectedStudent({...selectedStudent, is_active: e.target.value === 'active'})}
+                        style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb' }}
+                        disabled={user && user.role === 'teacher'}
+                      >
+                        <option value="active">Faol</option>
+                        <option value="inactive">Nofaol (Bo'shatilgan)</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="form-group" style={{ marginBottom: '20px' }}>
+                    <label>Yangi Parol (ixtiyoriy, agar parolini unutgan bo'lsa kiriting)</label>
+                    <input 
+                      type="password" 
+                      placeholder="Bo'sh qoldirilsa o'zgarmaydi"
+                      onChange={e => setSelectedStudent({...selectedStudent, new_password: e.target.value})}
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb' }} 
+                      disabled={user && user.role === 'teacher'}
+                    />
+                  </div>
+                  
+                  {!(user && user.role === 'teacher') && (
+                    <button className="btn-primary full-width" onClick={handleUpdateUser}>
+                      O'zgarishlarni Saqlash
+                    </button>
+                  )}
                 </div>
               )}
 
               {modalTab === 'courses' && (
                 <div>
-                  <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-                    <select 
-                      value={selectedCourseId} 
-                      onChange={e => setSelectedCourseId(e.target.value)} 
-                      style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb' }}
-                    >
-                      <option value="">-- Kursni tanlang --</option>
-                      {availableCourses.map(c => (
-                        <option key={c.id} value={c.id}>{c.title}</option>
-                      ))}
-                    </select>
-                    <button className="btn-primary" onClick={handleAssignCourse} disabled={!selectedCourseId || availableCourses.length === 0}>
-                      Biriktirish
-                    </button>
-                  </div>
+                  {!(user && user.role === 'teacher') && (
+                    <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                      <select 
+                        value={selectedCourseId} 
+                        onChange={e => setSelectedCourseId(e.target.value)} 
+                        style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb' }}
+                      >
+                        <option value="">-- Kursni tanlang --</option>
+                        {availableCourses.map(c => (
+                          <option key={c.id} value={c.id}>{c.title}</option>
+                        ))}
+                      </select>
+                      <button className="btn-primary" onClick={handleAssignCourse} disabled={!selectedCourseId || availableCourses.length === 0}>
+                        Biriktirish
+                      </button>
+                    </div>
+                  )}
                   
                   <h4>Biriktirilgan kurslar:</h4>
                   {userCourses.length === 0 ? (
@@ -352,13 +481,15 @@ const Students = () => {
                             <span style={{ fontWeight: '500' }}>{courseObj ? courseObj.title : 'Noma\'lum kurs'}</span>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                               <span style={{ fontSize: '12px', color: '#10b981', background: '#d1fae5', padding: '2px 8px', borderRadius: '12px' }}>{uc.status}</span>
-                              <button 
-                                onClick={() => handleUnassignCourse(uc.id)}
-                                style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                                title="Kursni olib tashlash"
-                              >
-                                <X size={16} />
-                              </button>
+                              {!(user && user.role === 'teacher') && (
+                                <button 
+                                  onClick={() => handleUnassignCourse(uc.id)}
+                                  style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                                  title="Kursni olib tashlash"
+                                >
+                                  <X size={16} />
+                                </button>
+                              )}
                             </div>
                           </li>
                         );

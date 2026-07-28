@@ -1,10 +1,12 @@
 import React, { useContext, useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, Bell, UserCircle, Settings, User, CreditCard, LogOut, ChevronDown } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import './Header.css';
 
 const Header = () => {
   const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileMenuRef = useRef(null);
@@ -53,6 +55,13 @@ const Header = () => {
 
         <div className="user-profile-wrapper" ref={profileMenuRef}>
           <div className="user-profile" onClick={() => setShowProfileMenu(!showProfileMenu)}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginRight: '10px' }}>
+              {user && (user.role === 'admin' || user.role === 'student') && (
+                <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#10b981', background: '#d1fae5', padding: '2px 6px', borderRadius: '4px' }}>
+                  {user.balance?.toLocaleString()} UZS
+                </span>
+              )}
+            </div>
             <UserCircle size={32} color="#9ca3af" />
             <div className="user-info">
               <span className="user-name">{user ? user.full_name : 'Foydalanuvchi'}</span>
@@ -83,15 +92,24 @@ const Header = () => {
                 </div>
               </div>
 
-              <div className="profile-dropdown-item" onClick={() => { setShowProfileMenu(false); alert("To'lovlar") }}>
-                <div className="profile-dropdown-icon text-green">
-                  <CreditCard size={20} />
+              {user && (user.role === 'admin' || user.role === 'student') && (
+                <div className="profile-dropdown-item" onClick={() => { 
+                  setShowProfileMenu(false); 
+                  if (user.role === 'admin') {
+                    navigate("/settings");
+                  } else if (user.role === 'student') {
+                    navigate("/courses");
+                  }
+                }}>
+                  <div className="profile-dropdown-icon text-green">
+                    <CreditCard size={20} />
+                  </div>
+                  <div className="profile-dropdown-text">
+                    <h5>To'lov va obunalar</h5>
+                    <p>Tariflar va hisob-kitoblar</p>
+                  </div>
                 </div>
-                <div className="profile-dropdown-text">
-                  <h5>To'lov va obunalar</h5>
-                  <p>Tariflar va hisob-kitoblar</p>
-                </div>
-              </div>
+              )}
 
               <div className="profile-dropdown-divider"></div>
 

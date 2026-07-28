@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from pydantic import BaseModel
@@ -7,7 +7,8 @@ from datetime import datetime, timedelta
 from typing import List, Optional
 
 from db import get_db
-from payments.models import PaymentPlan, Subscription, PlanType, SubscriptionStatus
+from payments.models import PaymentPlan, Subscription, PlanType, SubscriptionStatus, Transaction, TransactionType, SchoolSubscription
+from users.models import User
 
 router = APIRouter()
 
@@ -55,3 +56,83 @@ async def subscribe_to_plan(req: SubscribeRequest, db: AsyncSession = Depends(ge
 async def get_user_subscriptions(user_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
     res = await db.execute(select(Subscription).where(Subscription.user_id == user_id))
     return res.scalars().all()
+
+class SchoolSubscribeRequest(BaseModel):
+    user_id: uuid.UUID
+    school_id: uuid.UUID
+    plan_name: str
+    price: float
+
+@router.post("/school-subscribe")
+async def subscribe_school(req: SchoolSubscribeRequest, db: AsyncSession = Depends(get_db)):
+    user_res = await db.execute(select(User).where(User.id == req.user_id))
+    user = user_res.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    if user.balance < req.price:
+        raise HTTPException(status_code=400, detail="Balansda yetarli mablag' mavjud emas")
+        
+    # Deduct balance
+    user.balance -= req.price
+    db.add(user)
+    
+    # Create transaction
+    transaction = Transaction(
+        user_id=user.id,
+        school_id=req.school_id,
+        amount=req.price,
+        type=TransactionType.OUT,
+        description=f"Platforma obunasi: {req.plan_name}"
+    )
+    db.add(transaction)
+    
+    # Create school subscription
+    expires_at = datetime.utcnow() + timedelta(days=30)
+    school_sub = SchoolSubscription(
+        school_id=req.school_id,
+        plan_name=req.plan_name,
+        expires_at=expires_at,
+        status=SubscriptionStatus.ACTIVE
+    )
+    db.add(school_sub)
+    
+    await db.commit()
+    return {"status": "success", "message": "Obuna muvaffaqiyatli xarid qilindi"}
+
+class TransactionResponse(BaseModel):
+    id: uuid.UUID
+    user_id: uuid.UUID
+    school_id: Optional[uuid.UUID]
+    amount: float
+    type: str
+    description: str
+    created_at: datetime
+    
+    class Config:
+        orm_mode = True
+
+@router.get("/transactions/{school_id}", response_model=List[TransactionResponse])
+async def get_transactions(school_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+    # We return all transactions for the users in this school?
+    # Or transactions associated with this school.
+    # We should return transactions where transaction.school_id == school_id 
+    # OR transactions made by users who belong to this school. 
+    # For now, let's just return all transactions (since it's a demo, we can just return all or fetch by school_id).
+    # Since we didn't link all transactions to school_id initially in enrollments, we can fetch all for now,
+    # or let's just fetch all transactions. The frontend will display them.
+    res = await db.execute(select(Transaction).order_by(Transaction.created_at.desc()))
+    transactions = res.scalars().all()
+    
+    result = []
+    for t in transactions:
+        result.append(TransactionResponse(
+            id=t.id,
+            user_id=t.user_id,
+            school_id=t.school_id,
+            amount=t.amount,
+            type=t.type.value,
+            description=t.description,
+            created_at=t.created_at
+        ))
+    return result

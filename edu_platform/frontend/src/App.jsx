@@ -36,6 +36,7 @@ import StudentDashboard from './pages/student/StudentDashboard';
 import CourseView from './pages/student/CourseView';
 import Chat from './pages/student/Chat';
 import Settings from './pages/admin/Settings';
+import Payments from './pages/admin/Payments';
 
 const App = () => {
   return (
@@ -57,18 +58,18 @@ const App = () => {
                 <main className="page-content">
                   <Routes>
                     <Route path="/" element={<Dashboard />} />
-                    <Route path="/analytics" element={<AnalyticsDashboard />} />
+                    <Route path="/analytics" element={<RoleRoute deniedRoles={['student']}><AnalyticsDashboard /></RoleRoute>} />
                     <Route path="/chat" element={<Chat />} />
-                    <Route path="/students" element={<Students />} />
+                    <Route path="/students" element={<RoleRoute deniedRoles={['student']}><Students /></RoleRoute>} />
                     <Route path="/courses" element={<Courses />} />
-                    <Route path="/admin/courses/:id/builder" element={<CourseBuilder />} />
-                    <Route path="/admin/homeworks" element={<HomeworkReview />} />
+                    <Route path="/admin/courses/:id/builder" element={<RoleRoute deniedRoles={['student', 'curator']}><CourseBuilder /></RoleRoute>} />
+                    <Route path="/admin/homeworks" element={<RoleRoute deniedRoles={['student']}><HomeworkReview /></RoleRoute>} />
                     <Route path="/student-dashboard" element={<StudentDashboard />} />
-                    <Route path="/settings" element={<RoleRoute deniedRoles={['teacher']}><Settings /></RoleRoute>} />
+                    <Route path="/settings" element={<RoleRoute deniedRoles={['teacher', 'student', 'curator', 'manager', 'accountant']}><Settings /></RoleRoute>} />
                     
                     {/* Qolgan yo'nalishlar */}
                     <Route path="/videos" element={<div className="card"><h2>Videolar sahifasi</h2><p>Tez orada...</p></div>} />
-                    <Route path="/payments" element={<RoleRoute deniedRoles={['teacher']}><div className="card"><h2>To'lovlar sahifasi</h2><p>Tez orada...</p></div></RoleRoute>} />
+                    <Route path="/payments" element={<RoleRoute deniedRoles={['teacher', 'student', 'curator']}><Payments /></RoleRoute>} />
                     <Route path="/notifications" element={<div className="card"><h2>Bildirishnomalar</h2><p>Tez orada...</p></div>} />
                   </Routes>
                 </main>

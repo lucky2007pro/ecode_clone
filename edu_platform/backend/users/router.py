@@ -148,3 +148,21 @@ from permissions.dependencies import get_current_user
 async def get_my_profile(current_user = Depends(get_current_user)):
     """Tizimga kirgan foydalanuvchining ma'lumotlarini qaytaradi."""
     return current_user
+
+from users.crud import get_user_by_id, update_user
+from users.schema import UserUpdate
+
+@router.put("/{user_id}", response_model=UserResponse)
+async def edit_user(
+    user_id: str,
+    update_data: UserUpdate,
+    db: AsyncSession = Depends(get_db),
+    has_perm: bool = Depends(RequirePermissions([Permission.MANAGE_USERS]))
+):
+    import uuid
+    user = await get_user_by_id(db, uuid.UUID(user_id))
+    if not user:
+        raise HTTPException(status_code=404, detail="Foydalanuvchi topilmadi")
+    
+    updated_user = await update_user(db, user, update_data)
+    return updated_user

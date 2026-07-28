@@ -1,8 +1,24 @@
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from lessons.models import Lesson
-from lessons.schema import LessonCreate
+from lessons.models import Lesson, CourseModule
+from lessons.schema import LessonCreate, CourseModuleCreate
+
+
+async def get_modules_by_course(db: AsyncSession, course_id: uuid.UUID):
+    res = await db.execute(
+        select(CourseModule)
+        .where(CourseModule.course_id == course_id)
+        .order_by(CourseModule.order)
+    )
+    return res.scalars().all()
+
+async def create_module(db: AsyncSession, module_in: CourseModuleCreate):
+    module = CourseModule(**module_in.model_dump())
+    db.add(module)
+    await db.commit()
+    await db.refresh(module)
+    return module
 
 
 async def get_lessons_by_course(db: AsyncSession, course_id: uuid.UUID):

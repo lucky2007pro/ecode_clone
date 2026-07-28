@@ -96,7 +96,7 @@ const CoursesCatalog = () => {
             <button className={`pill-btn ${activeTab === 'Business' ? 'active' : ''}`} onClick={() => setActiveTab('Business')}>Business</button>
             <button className={`pill-btn ${activeTab === 'Design' ? 'active' : ''}`} onClick={() => setActiveTab('Design')}>Design</button>
           </div>
-          {(!user || user.role !== 'teacher') && (
+          {user && (user.role === 'admin' || user.role === 'manager') && (
             <button className="add-course-btn" onClick={() => setShowModal(true)}>
               <Plus size={20} />
             </button>
@@ -111,7 +111,9 @@ const CoursesCatalog = () => {
       ) : courses.length === 0 ? (
         <div className="empty-state">
           <h3>Hozircha kurslar yo'q</h3>
-          <p>Tepadagi '+' tugmasi orqali kurs qo'shing.</p>
+          {user && (user.role === 'admin' || user.role === 'manager') && (
+            <p>Tepadagi '+' tugmasi orqali kurs qo'shing.</p>
+          )}
         </div>
       ) : (
         <div className="courses-grid-new">
@@ -133,12 +135,14 @@ const CoursesCatalog = () => {
                   <h3 className="course-title">{course.title}</h3>
                   <div className="course-info">
                     <span className="lessons-count">{course.lessons_count || 0} lessons</span>
-                    <button 
-                      className="edit-btn" 
-                      onClick={(e) => { e.stopPropagation(); navigate(`/admin/courses/${course.id}/builder`); }}
-                    >
-                      Builder
-                    </button>
+                    {user && (user.role === 'admin' || user.role === 'teacher' || user.role === 'manager') && (
+                      <button 
+                        className="edit-btn" 
+                        onClick={(e) => { e.stopPropagation(); navigate(`/admin/courses/${course.id}/builder`); }}
+                      >
+                        Builder
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

@@ -9,6 +9,11 @@ from db import engine, Base
 from users.models import User
 from schools.models import School, UserSchool
 from courses.models import Course
+from lessons.models import Lesson, CourseModule
+from enrollments.models import Enrollment
+from homeworks.models import HomeworkSubmission
+from payments.models import Transaction, SchoolSubscription
+from quizzes.models import Quiz, QuizQuestion, QuizAnswer
 from sqlalchemy import text
 
 async def reset_db():

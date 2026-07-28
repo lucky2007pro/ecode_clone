@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Palette, Globe, User, Save, CheckCircle, Target, MessageCircle, Key, Briefcase } from 'lucide-react';
+import { Palette, Globe, User, Save, CheckCircle, Target, MessageCircle, Key, Briefcase, CreditCard } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
 import './Settings.css';
 
@@ -107,6 +107,33 @@ const Settings = () => {
     } catch(err) { console.error(err); }
   };
 
+  const handleSubscribePlatform = async () => {
+    if (!window.confirm("Platforma uchun 500,000 UZS to'lov qilasizmi? Balansingizdan yechiladi.")) return;
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:8000/api/v1/payments/school-subscribe`, {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+          school_id: school.id,
+          plan_name: 'Pro Tarif',
+          price: 500000
+        })
+      });
+      if (response.ok) {
+        alert("Platforma obunasi muvaffaqiyatli xarid qilindi!");
+        window.location.reload();
+      } else {
+        const errorData = await response.json();
+        alert(`Xatolik: ${errorData.detail}`);
+      }
+    } catch(err) { console.error(err); }
+  };
+
   return (
     <div className="settings-container">
       <div className="settings-header">
@@ -158,6 +185,15 @@ const Settings = () => {
             <User size={18} />
             Mening Profilim
           </button>
+          {user && user.role === 'admin' && (
+            <button 
+              className={`settings-tab ${activeTab === 'subscription' ? 'active' : ''}`}
+              onClick={() => setActiveTab('subscription')}
+            >
+              <CreditCard size={18} />
+              Platforma Obunasi
+            </button>
+          )}
         </div>
 
         <div className="settings-content">
@@ -252,6 +288,27 @@ const Settings = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          )}
+
+          {activeTab === 'subscription' && (
+            <div className="card settings-panel">
+              <div className="panel-header">
+                <h2>Platforma Obunasi</h2>
+                <p className="text-muted">Maktabingiz uchun oylik tarifni boshqaring</p>
+              </div>
+              <div style={{ marginTop: '20px' }}>
+                <div style={{padding: '20px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                  <div>
+                    <h3 style={{ margin: 0 }}>Pro Tarif</h3>
+                    <p style={{ margin: '5px 0 0', color: '#64748b' }}>Barcha imkoniyatlar (CRM, Bot, 1000 gacha o'quvchi)</p>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{fontSize: '18px', color: '#3b82f6', fontWeight: 'bold'}}>500,000 UZS / oy</div>
+                    <button className="btn-primary mt-2" onClick={handleSubscribePlatform}>Sotib olish / Yangilash</button>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 

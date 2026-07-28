@@ -3,12 +3,24 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from db import get_db
-from lessons.schema import LessonCreate, LessonResponse
-from lessons.crud import get_lessons_by_course, get_lesson_by_id, create_lesson, update_lesson, delete_lesson
+from lessons.schema import LessonCreate, LessonResponse, CourseModuleCreate, CourseModuleResponse
+from lessons.crud import get_lessons_by_course, get_lesson_by_id, create_lesson, update_lesson, delete_lesson, get_modules_by_course, create_module
 from permissions.dependencies import RequirePermissions
 from permissions.enums import Permission
 
 router = APIRouter()
+
+@router.get("/course/{course_id}/modules", response_model=List[CourseModuleResponse])
+async def list_modules(course_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+    return await get_modules_by_course(db, course_id)
+
+@router.post("/modules", response_model=CourseModuleResponse, status_code=status.HTTP_201_CREATED)
+async def add_module(
+    module_in: CourseModuleCreate,
+    db: AsyncSession = Depends(get_db),
+    _=Depends(RequirePermissions([Permission.MANAGE_COURSES]))
+):
+    return await create_module(db, module_in)
 
 
 @router.get("/course/{course_id}", response_model=List[LessonResponse])
