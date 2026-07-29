@@ -66,7 +66,8 @@ ROLE_PERMISSIONS = {
     Role.ACCOUNTANT: [
         Permission.VIEW_DASHBOARD,
         Permission.VIEW_FINANCE,
-        Permission.MANAGE_REFUNDS
+        Permission.MANAGE_REFUNDS,
+        Permission.VIEW_USERS
     ],
     Role.ADMIN: [
         p for p in Permission # Admin has all permissions

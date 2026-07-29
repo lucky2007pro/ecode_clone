@@ -35,7 +35,6 @@ async def get_school_users(school_id: uuid.UUID, db: AsyncSession = Depends(get_
         select(User.id, User.full_name, User.email, User.role, User.is_active, User.balance)
         .join(UserSchool, User.id == UserSchool.user_id)
         .where(UserSchool.school_id == school_id)
-        .where(UserSchool.status == MembershipStatus.APPROVED)
     )
     users = res.all()
     return [{"id": u.id, "full_name": u.full_name, "email": u.email, "role": u.role, "is_active": u.is_active, "balance": float(u.balance)} for u in users]

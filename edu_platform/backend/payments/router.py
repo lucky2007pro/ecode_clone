@@ -12,6 +12,7 @@ from notifications.crud import create_notification
 from permissions.dependencies import get_current_user, get_current_school_id
 from permissions.enums import Role
 from users.models import User
+from schools.models import UserSchool
 
 router = APIRouter()
 
@@ -127,7 +128,32 @@ async def my_transactions(db: AsyncSession = Depends(get_db), user=Depends(get_c
         .limit(50)
     )
     return [
-        TransactionResponse(id=t.id, amount=float(t.amount), type=t.type.value,
-                            description=t.description, created_at=t.created_at)
+        TransactionResponse(id=t.id, amount=float(t.amount), type=t.type.value if hasattr(t.type, 'value') else t.type,
+                            description=t.description or "", created_at=t.created_at)
+        for t in res.scalars().all()
+    ]
+
+
+@router.get("/transactions", response_model=List[TransactionResponse])
+async def all_school_transactions(db: AsyncSession = Depends(get_db),
+                                  school_id=Depends(get_current_school_id),
+                                  _=Depends(_require_roles(Role.ADMIN, Role.MANAGER, Role.ACCOUNTANT))):
+    user_ids_res = await db.execute(select(UserSchool.user_id).where(UserSchool.school_id == school_id))
+    user_ids = user_ids_res.scalars().all()
+
+    res = await db.execute(
+        select(Transaction)
+        .where((Transaction.school_id == school_id) | (Transaction.user_id.in_(user_ids) if user_ids else False))
+        .order_by(Transaction.created_at.desc())
+        .limit(100)
+    )
+    return [
+        TransactionResponse(
+            id=t.id, 
+            amount=float(t.amount), 
+            type=t.type.value if hasattr(t.type, 'value') else t.type,
+            description=t.description or "", 
+            created_at=t.created_at
+        )
         for t in res.scalars().all()
     ]
