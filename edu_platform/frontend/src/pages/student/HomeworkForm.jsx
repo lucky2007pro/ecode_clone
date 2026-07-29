@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Send, CheckCircle } from 'lucide-react';
-import { AuthContext } from '../../context/AuthContext';
+import { AuthContext } from '../../context/auth-context';
 import { api } from '../../api';
 import './HomeworkForm.css';
 
@@ -49,7 +49,7 @@ const HomeworkForm = ({ lessonId }) => {
     <div className="homework-form-container card">
       <h3>Uy Vazifasi</h3>
       <p className="text-muted" style={{marginBottom: '16px'}}>Dars bo'yicha amaliy vazifani shu yerga yozing yoki fayl havolasini (masalan Github, Google Drive) qoldiring.</p>
-      
+
       <form onSubmit={handleSubmit}>
         <textarea
           className="homework-textarea"
@@ -59,7 +59,7 @@ const HomeworkForm = ({ lessonId }) => {
           onChange={(e) => setText(e.target.value)}
           required
         ></textarea>
-        
+
         {error && <p style={{ color: 'var(--danger)', marginTop: '8px', fontSize: '13px' }}>{error}</p>}
 
         <div className="form-footer">

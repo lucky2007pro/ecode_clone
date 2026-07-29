@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { Users, Plus, X, UserCheck, Shield } from 'lucide-react';
-import { AuthContext } from '../../context/AuthContext';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
+import { Users, Plus, X, UserCheck } from 'lucide-react';
+import { AuthContext } from '../../context/auth-context';
 import { api } from '../../api';
 
 const Students = () => {
@@ -13,13 +13,7 @@ const Students = () => {
   const [newUser, setNewUser] = useState({ full_name: '', email: '', password: '', role: 'student' });
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (school && user) {
-      fetchStudents();
-    }
-  }, [school, user]);
-
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async () => {
     try {
       let data = await api(`/schools/${school.id}/users`);
 
@@ -49,11 +43,17 @@ const Students = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [school, user]);
+
+  useEffect(() => {
+    if (school && user) {
+      fetchStudents();
+    }
+  }, [school, user, fetchStudents]);
 
   const [allCourses, setAllCourses] = useState([]);
   const [userCourses, setUserCourses] = useState([]);
-  const [modalTab, setModalTab] = useState('info'); // 'info' or 'courses'
+  const [modalTab, setModalTab] = useState('info');
   const [selectedCourseId, setSelectedCourseId] = useState('');
   const [topupAmount, setTopupAmount] = useState('');
   const [topupDesc, setTopupDesc] = useState('');
@@ -73,6 +73,7 @@ const Students = () => {
       setSelectedStudent(prev => ({ ...prev, balance: (prev.balance || 0) + amount }));
       setTopupAmount('');
       setTopupDesc('');
+      fetchStudents();
     } catch (err) {
       setTopupError(err.message || "To'ldirishda xatolik yuz berdi");
     }
@@ -108,7 +109,7 @@ const Students = () => {
         method: 'POST',
         body: { user_id: selectedStudent.id, course_id: selectedCourseId }
       });
-      // Refresh the user's courses
+
       fetchUserCourses(selectedStudent.id);
       setSelectedCourseId('');
     } catch (err) {
@@ -146,14 +147,13 @@ const Students = () => {
       });
 
       alert("Ma'lumotlar muvaffaqiyatli saqlandi!");
-      fetchStudents(); // Ro'yxatni yangilash
+      fetchStudents();
       setShowProfileModal(false);
     } catch (err) {
       alert(err.message || "Serverga ulanishda xatolik");
     }
   };
 
-  // Faqat o'quvchiga hali biriktirilmagan kurslar ro'yxatini chiqaramiz
   const availableCourses = allCourses.filter(c => !userCourses.some(uc => uc.course_id === c.id));
 
   const handleCreateStudent = async (e) => {
@@ -224,8 +224,8 @@ const Students = () => {
               </thead>
               <tbody>
               {students.map((student) => (
-                <tr 
-                  key={student.id} 
+                <tr
+                  key={student.id}
                   className="student-row"
                   style={{ borderBottom: '1px solid #e5e7eb' }}
                   onClick={() => {
@@ -238,7 +238,7 @@ const Students = () => {
                   <td style={{ padding: '12px', fontWeight: '500' }}>{student.full_name}</td>
                   <td style={{ padding: '12px', color: '#6b7280' }}>{student.email}</td>
                   <td style={{ padding: '12px' }}>
-                    <span style={{ 
+                    <span style={{
                       padding: '4px 8px', borderRadius: '4px', fontSize: '12px',
                       background: getRoleStyle(student.role).bg,
                       color: getRoleStyle(student.role).color,
@@ -273,9 +273,9 @@ const Students = () => {
               <h2>Yangi O'quvchi / Xodim</h2>
               <button className="icon-btn" onClick={() => setShowModal(false)}><X size={20} /></button>
             </div>
-            
+
             {error && <div style={{ padding: '10px', background: '#fee2e2', color: '#b91c1c', borderRadius: '8px', marginBottom: '15px' }}>{error}</div>}
-            
+
             <form onSubmit={handleCreateStudent}>
               <div className="form-group" style={{ marginBottom: '15px' }}>
                 <label>To'liq Ism</label>
@@ -316,7 +316,7 @@ const Students = () => {
                 </div>
                 <div>
                   <h2 style={{ margin: 0, fontSize: '18px' }}>{selectedStudent.full_name}</h2>
-                  <span style={{ 
+                  <span style={{
                       padding: '2px 6px', borderRadius: '4px', fontSize: '11px',
                       background: getRoleStyle(selectedStudent.role).bg,
                       color: getRoleStyle(selectedStudent.role).color,
@@ -328,15 +328,15 @@ const Students = () => {
               </div>
               <button className="icon-btn" onClick={() => setShowProfileModal(false)}><X size={20} /></button>
             </div>
-            
+
             <div style={{ padding: '24px' }}>
               <div style={{ display: 'flex', gap: '20px', borderBottom: '1px solid #e5e7eb', marginBottom: '20px' }}>
-                <button 
+                <button
                   onClick={() => setModalTab('info')}
                   style={{ padding: '10px 0', border: 'none', background: 'none', borderBottom: modalTab === 'info' ? '2px solid var(--primary-color)' : '2px solid transparent', color: modalTab === 'info' ? 'var(--primary-color)' : '#6b7280', fontWeight: '600', cursor: 'pointer' }}>
                   Ma'lumotlar
                 </button>
-                <button 
+                <button
                   onClick={() => setModalTab('courses')}
                   style={{ padding: '10px 0', border: 'none', background: 'none', borderBottom: modalTab === 'courses' ? '2px solid var(--primary-color)' : '2px solid transparent', color: modalTab === 'courses' ? 'var(--primary-color)' : '#6b7280', fontWeight: '600', cursor: 'pointer' }}>
                   Kurslar
@@ -347,29 +347,29 @@ const Students = () => {
                 <div>
                   <div className="form-group" style={{ marginBottom: '15px' }}>
                     <label>Ism Familiya</label>
-                    <input 
-                      type="text" 
-                      value={selectedStudent.full_name} 
+                    <input
+                      type="text"
+                      value={selectedStudent.full_name}
                       onChange={e => setSelectedStudent({...selectedStudent, full_name: e.target.value})}
-                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb' }} 
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb' }}
                       disabled={user && user.role === 'teacher'}
                     />
                   </div>
                   <div className="form-group" style={{ marginBottom: '15px' }}>
                     <label>Email</label>
-                    <input 
-                      type="text" 
-                      value={selectedStudent.email} 
+                    <input
+                      type="text"
+                      value={selectedStudent.email}
                       onChange={e => setSelectedStudent({...selectedStudent, email: e.target.value})}
-                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb' }} 
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb' }}
                       disabled={user && user.role === 'teacher'}
                     />
                   </div>
                   <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
                     <div className="form-group" style={{ flex: 1 }}>
                       <label>Rol</label>
-                      <select 
-                        value={selectedStudent.role} 
+                      <select
+                        value={selectedStudent.role}
                         onChange={e => setSelectedStudent({...selectedStudent, role: e.target.value})}
                         style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb' }}
                         disabled={user && user.role === 'teacher'}
@@ -384,8 +384,8 @@ const Students = () => {
                     </div>
                     <div className="form-group" style={{ flex: 1 }}>
                       <label>Holat</label>
-                      <select 
-                        value={selectedStudent.is_active ? 'active' : 'inactive'} 
+                      <select
+                        value={selectedStudent.is_active ? 'active' : 'inactive'}
                         onChange={e => setSelectedStudent({...selectedStudent, is_active: e.target.value === 'active'})}
                         style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb' }}
                         disabled={user && user.role === 'teacher'}
@@ -397,15 +397,15 @@ const Students = () => {
                   </div>
                   <div className="form-group" style={{ marginBottom: '20px' }}>
                     <label>Yangi Parol (ixtiyoriy, agar parolini unutgan bo'lsa kiriting)</label>
-                    <input 
-                      type="password" 
+                    <input
+                      type="password"
                       placeholder="Bo'sh qoldirilsa o'zgarmaydi"
                       onChange={e => setSelectedStudent({...selectedStudent, new_password: e.target.value})}
-                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb' }} 
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb' }}
                       disabled={user && user.role === 'teacher'}
                     />
                   </div>
-                  
+
                   {!(user && user.role === 'teacher') && (
                     <button className="btn-primary full-width" onClick={handleUpdateUser}>
                       O'zgarishlarni Saqlash
@@ -449,9 +449,9 @@ const Students = () => {
                 <div>
                   {!(user && user.role === 'teacher') && (
                     <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-                      <select 
-                        value={selectedCourseId} 
-                        onChange={e => setSelectedCourseId(e.target.value)} 
+                      <select
+                        value={selectedCourseId}
+                        onChange={e => setSelectedCourseId(e.target.value)}
                         style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb' }}
                       >
                         <option value="">-- Kursni tanlang --</option>
@@ -464,7 +464,7 @@ const Students = () => {
                       </button>
                     </div>
                   )}
-                  
+
                   <h4>Biriktirilgan kurslar:</h4>
                   {userCourses.length === 0 ? (
                     <p style={{ color: '#6b7280', fontSize: '14px' }}>Hozircha kurslar biriktirilmagan.</p>
@@ -478,7 +478,7 @@ const Students = () => {
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                               <span style={{ fontSize: '12px', color: '#10b981', background: '#d1fae5', padding: '2px 8px', borderRadius: '12px' }}>{uc.status}</span>
                               {!(user && user.role === 'teacher') && (
-                                <button 
+                                <button
                                   onClick={() => handleUnassignCourse(uc.id)}
                                   style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
                                   title="Kursni olib tashlash"

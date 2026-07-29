@@ -1,10 +1,9 @@
-// Production buildda VITE_API_URL majburiy — aks holda localhostga ketib qoladi.
-// Dev rejimda backend bir xil host:8000 da ishlashi kutiladi.
+
 if (!import.meta.env.VITE_API_URL && import.meta.env.PROD) {
   throw new Error('VITE_API_URL env o\'zgaruvchisi production build uchun majburiy');
 }
 
-export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api/v1';
+export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8001/api/v1';
 export const API_ORIGIN = API_URL.replace(/\/api\/v1\/?$/, '');
 export const WS_URL = API_URL.replace(/^http/, 'ws');
 
@@ -54,7 +53,7 @@ export async function api(path, { method = 'GET', body, auth = true } = {}) {
             : String(data.detail);
       }
     } catch {
-      // Javob JSON emas — status kodi asosidagi xabar qoladi
+
     }
     throw new Error(message);
   }

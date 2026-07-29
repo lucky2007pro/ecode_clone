@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { PlayCircle, CheckCircle, Lock, ArrowLeft, HelpCircle, MessageCircle, CreditCard, BookOpen, Users, BarChart2, ChevronDown } from 'lucide-react';
-import { AuthContext } from '../../context/AuthContext';
+import { PlayCircle, CheckCircle, Lock, ArrowLeft, MessageCircle, CreditCard, BookOpen, Users, BarChart2, ChevronDown } from 'lucide-react';
+import { AuthContext } from '../../context/auth-context';
 import { api } from '../../api';
 import HomeworkForm from './HomeworkForm';
 import QuizView from './QuizView';
@@ -26,20 +26,14 @@ const CourseView = () => {
   const [quizResults, setQuizResults] = useState([]);
   const [quizTitles, setQuizTitles] = useState({});
 
-  // Ichki tab'lar uchun ma'lumotlar
-  useEffect(() => {
-    if (activeCourseTab === 'students') fetchCourseStudents();
-    if (activeCourseTab === 'analytics') fetchMyAnalytics();
-  }, [activeCourseTab, id, lessons]);
-
-  const fetchCourseStudents = async () => {
+  const fetchCourseStudents = useCallback(async () => {
     try {
       const data = await api(`/enrollments/course/${id}`);
       setCourseStudents(data);
     } catch (err) { console.error(err); }
-  };
+  }, [id]);
 
-  const fetchMyAnalytics = async () => {
+  const fetchMyAnalytics = useCallback(async () => {
     try {
       const results = await api('/quizzes/results/my');
       const quizLessons = lessons.filter(l => l.lesson_type === 'quiz');
@@ -51,19 +45,18 @@ const CourseView = () => {
       setQuizTitles(titles);
       setQuizResults(results.filter(r => titles[r.quiz_id] !== undefined));
     } catch (err) { console.error(err); }
-  };
+  }, [lessons]);
+
+  useEffect(() => {
+    if (activeCourseTab === 'students') fetchCourseStudents();
+    if (activeCourseTab === 'analytics') fetchMyAnalytics();
+  }, [activeCourseTab, id, lessons, fetchCourseStudents, fetchMyAnalytics]);
 
   const completedCount = lessons.filter(l => completedLessons.includes(l.id)).length;
   const completionPercent = lessons.length > 0 ? Math.round(completedCount * 100 / lessons.length) : 0;
 
-  useEffect(() => {
-    fetchCourseDetails();
-    fetchLessons();
-    fetchBotSettings();
-    checkEnrollment();
-  }, [id, user, school]);
+  const firstThreeLessonIds = lessons.slice(0, 3).map(l => l.id);
 
-  // Tugatilgan darslar localStorage'da saqlanadi (backend endpointi hali yo'q)
   useEffect(() => {
     if (!user) return;
     try {
@@ -78,24 +71,24 @@ const CourseView = () => {
     localStorage.setItem(`completed_lessons_${user.id}`, JSON.stringify(updated));
   };
 
-  const checkEnrollment = async () => {
+  const checkEnrollment = useCallback(async () => {
     if (!user) return;
     try {
       const enrollments = await api(`/enrollments/user/${user.id}`);
       const isEnrolled = enrollments.some(e => e.course_id === id);
       setEnrolled(isEnrolled || user.role === 'admin' || user.role === 'manager' || user.role === 'teacher');
     } catch (err) { console.error(err); }
-  };
+  }, [id, user]);
 
-  const fetchBotSettings = async () => {
+  const fetchBotSettings = useCallback(async () => {
     try {
       if (!school?.id) return;
       const data = await api(`/bot/${school.id}/get-invite`, { method: 'POST' });
       if (data.invite_link) setBotLink(data.invite_link);
     } catch(err) { console.error(err); }
-  };
+  }, [school]);
 
-  const fetchCourseDetails = async () => {
+  const fetchCourseDetails = useCallback(async () => {
     try {
       const courses = await api('/courses/');
       const found = courses.find(c => c.id === id);
@@ -103,9 +96,9 @@ const CourseView = () => {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [id]);
 
-  const fetchLessons = async () => {
+  const fetchLessons = useCallback(async () => {
     try {
       const [mods, data] = await Promise.all([
         api(`/lessons/course/${id}/modules`).catch(() => []),
@@ -124,7 +117,14 @@ const CourseView = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchCourseDetails();
+    fetchLessons();
+    fetchBotSettings();
+    checkEnrollment();
+  }, [id, user, school, fetchCourseDetails, fetchLessons, fetchBotSettings, checkEnrollment]);
 
   const toggleModule = (modId) => {
     setExpandedModules(prev => ({...prev, [modId]: !prev[modId]}));
@@ -159,7 +159,7 @@ const CourseView = () => {
 
   return (
     <div className="course-view-layout">
-      {/* Mini Sidebar on the Far Left */}
+      {}
       <div className="course-mini-sidebar">
         <button className="back-btn-mini" onClick={() => navigate('/courses')}>
           <ArrowLeft size={20} />
@@ -194,17 +194,16 @@ const CourseView = () => {
             <div className="sidebar-header">
               <h2>{course?.title || "O'quv Kursi"}</h2>
             </div>
-            
+
             <div className="lesson-nav">
-              {enrolled ? (
                 <>
                   {modules.map(mod => (
                     <div key={mod.id} style={{marginBottom: '10px'}}>
-                      <div 
+                      <div
                         className="module-header-new"
                         onClick={() => toggleModule(mod.id)}
                         style={{
-                          display: 'flex', justifyContent: 'space-between', padding: '10px 15px', 
+                          display: 'flex', justifyContent: 'space-between', padding: '10px 15px',
                           background: '#fff', borderRadius: '8px', cursor: 'pointer', border: '1px solid #e2e8f0',
                           fontWeight: '600', fontSize: '14px', color: '#1e293b'
                         }}
@@ -212,53 +211,60 @@ const CourseView = () => {
                         <span>{mod.title}</span>
                         <ChevronDown size={18} style={{ transform: expandedModules[mod.id] ? 'rotate(180deg)' : 'rotate(0deg)', transition: '0.2s' }} />
                       </div>
-                      
+
                       {expandedModules[mod.id] && (
                         <div style={{paddingLeft: '10px', marginTop: '5px'}}>
-                          {lessons.filter(l => l.module_id === mod.id).map(lesson => (
-                            <div 
-                              key={lesson.id} 
-                              className={`lesson-nav-item-new ${activeLesson?.id === lesson.id ? 'active' : ''}`}
-                              onClick={() => setActiveLesson(lesson)}
-                              style={{ padding: '8px 12px', marginBottom: '4px' }}
-                            >
-                              <div className="lesson-nav-info-new" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
-                                {completedLessons.includes(lesson.id) && <CheckCircle size={14} color="#10b981" />}
-                                <span className="lesson-title-new" style={{fontSize: '13px'}}>{lesson.title}</span>
+                          {lessons.filter(l => l.module_id === mod.id).map(lesson => {
+                            const isLocked = !enrolled && !firstThreeLessonIds.includes(lesson.id);
+                            return (
+                              <div
+                                key={lesson.id}
+                                className={`lesson-nav-item-new ${activeLesson?.id === lesson.id ? 'active' : ''} ${isLocked ? 'locked' : ''}`}
+                                onClick={() => setActiveLesson(lesson)}
+                                style={{ padding: '8px 12px', marginBottom: '4px', opacity: isLocked ? 0.7 : 1 }}
+                              >
+                                <div className="lesson-nav-info-new" style={{display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'space-between', width: '100%'}}>
+                                  <div style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+                                    {completedLessons.includes(lesson.id) && <CheckCircle size={14} color="#10b981" />}
+                                    <span className="lesson-title-new" style={{fontSize: '13px'}}>{lesson.title}</span>
+                                  </div>
+                                  {isLocked && <Lock size={14} color="#94a3b8" />}
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                     </div>
                   ))}
-                  
+
                   {/* Standalone lessons without modules */}
                   {lessons.filter(l => !l.module_id).length > 0 && (
                     <div style={{marginTop: '15px'}}>
                       <h4 style={{fontSize: '13px', color: '#64748b', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px'}}>Boshqa Darslar</h4>
-                      {lessons.filter(l => !l.module_id).map(lesson => (
-                        <div 
-                          key={lesson.id} 
-                          className={`lesson-nav-item-new ${activeLesson?.id === lesson.id ? 'active' : ''}`}
-                          onClick={() => setActiveLesson(lesson)}
-                        >
-                          <div className="lesson-nav-info-new" style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
-                            {completedLessons.includes(lesson.id) && <CheckCircle size={14} color="#10b981" />}
-                            <span className="lesson-title-new">{lesson.title}</span>
+                      {lessons.filter(l => !l.module_id).map(lesson => {
+                        const isLocked = !enrolled && !firstThreeLessonIds.includes(lesson.id);
+                        return (
+                          <div
+                            key={lesson.id}
+                            className={`lesson-nav-item-new ${activeLesson?.id === lesson.id ? 'active' : ''} ${isLocked ? 'locked' : ''}`}
+                            onClick={() => setActiveLesson(lesson)}
+                            style={{ opacity: isLocked ? 0.7 : 1 }}
+                          >
+                            <div className="lesson-nav-info-new" style={{display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'space-between', width: '100%'}}>
+                              <div style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
+                                {completedLessons.includes(lesson.id) && <CheckCircle size={14} color="#10b981" />}
+                                <span className="lesson-title-new">{lesson.title}</span>
+                              </div>
+                              {isLocked && <Lock size={14} color="#94a3b8" />}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </>
-              ) : (
-                <div style={{ padding: '20px', textAlign: 'center', color: '#64748b' }}>
-                  <Lock size={40} style={{ margin: '0 auto', marginBottom: '10px', color: '#cbd5e1' }} />
-                  <p>Darslarni ko'rish uchun kursni sotib oling.</p>
-                </div>
-              )}
-              
+
               <div className="course-info-card mt-4">
                 <h3 className="course-info-card-title">Kurs Haqida</h3>
                 <p className="course-info-card-text">{course?.description || "Bu kurs orqali siz yangi bilimlarni o'zlashtirasiz."}</p>
@@ -268,7 +274,7 @@ const CourseView = () => {
                   </a>
                 )}
               </div>
-              
+
               {(!enrolled && user && user.role === 'student') && (
                 <div className="course-info-card mt-4">
                   <h3 className="course-info-card-title">{Number(course?.price) > 0 ? 'Kursni sotib olish' : 'Kursga yozilish'}</h3>
@@ -294,26 +300,37 @@ const CourseView = () => {
 
           <div className="course-main-content">
             {activeLesson ? (
-              activeLesson.lesson_type === 'quiz' ? (
+              !enrolled && !firstThreeLessonIds.includes(activeLesson.id) ? (
+                <div className="empty-state">
+                  <Lock size={48} className="icon-muted" style={{ marginBottom: '15px' }} />
+                  <h3>Bu dars yopiq</h3>
+                  <p>Davomini ko'rish uchun kursni sotib oling.</p>
+                  {(user && user.role === 'student') && (
+                    <button className="btn-primary mt-4" onClick={handlePurchase}>
+                      {Number(course?.price) > 0 ? 'Sotib olish' : 'Kursga yozilish'}
+                    </button>
+                  )}
+                </div>
+              ) : activeLesson.lesson_type === 'quiz' ? (
                 <QuizView lessonId={activeLesson.id} />
               ) : (
                 <div className="active-lesson-container">
                   <h1 className="lesson-main-title">{activeLesson.title}</h1>
-                  
+
                   {activeLesson.lesson_type === 'video' && activeLesson.video_url && (
                     <div className="video-player-wrapper card">
                       <div className="video-aspect-ratio">
-                        <iframe 
-                          src={activeLesson.video_url.replace("watch?v=", "embed/")} 
-                          frameBorder="0" 
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        <iframe
+                          src={activeLesson.video_url.replace("watch?v=", "embed/")}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                           allowFullScreen
                           className="lesson-video"
                         ></iframe>
                       </div>
                     </div>
                   )}
-                  
+
                   {(activeLesson.content || activeLesson.lesson_type === 'text') && (
                     <div className="lesson-text-content card">
                       {activeLesson.content ? (
@@ -325,8 +342,8 @@ const CourseView = () => {
                   )}
 
                   {/* Uy vazifasi yuborish formasi */}
-                  <HomeworkForm lessonId={activeLesson.id} />
-                  
+                  {enrolled && <HomeworkForm lessonId={activeLesson.id} />}
+
                   <div className="lesson-footer">
                     <button
                       className="btn-primary"

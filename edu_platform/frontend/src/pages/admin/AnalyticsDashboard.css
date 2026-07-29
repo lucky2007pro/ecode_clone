@@ -65,7 +65,6 @@
   font-size: 18px;
 }
 
-/* Custom CSS Bar Chart since npm install failed */
 .css-bar-chart {
   display: flex;
   align-items: flex-end;

@@ -65,7 +65,7 @@
 .mini-tab.active {
   color: var(--accent-primary);
   border-right-color: var(--accent-primary);
-  background-color: rgba(249, 115, 22, 0.05); /* very light orange */
+  background-color: rgba(249, 115, 22, 0.05);
 }
 
 .course-sidebar {
@@ -120,7 +120,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  background-color: #faf7f2; /* Light beige from image */
+  background-color: #faf7f2;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -211,7 +211,7 @@
 
 .video-aspect-ratio {
   position: relative;
-  padding-bottom: 56.25%; /* 16:9 */
+  padding-bottom: 56.25%;
   height: 0;
 }
 
@@ -241,14 +241,13 @@
     flex-direction: column;
     height: auto;
   }
-  
+
   .course-sidebar {
     width: 100%;
     max-height: 300px;
   }
 }
 
-/* Ichki tab'lar (talabalar / analitika) */
 .cv-tab-container {
   max-width: 760px;
   margin: 0 auto;

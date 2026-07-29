@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BellOff, CheckCheck } from 'lucide-react';
 import { api } from '../api';
-import { timeAgo } from '../components/Header';
+import { timeAgo } from '../utils/timeAgo';
 import './NotificationsPage.css';
 
 const NotificationsPage = () => {

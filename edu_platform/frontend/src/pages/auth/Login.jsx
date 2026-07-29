@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useContext } from 'react';
-import { AuthContext } from '../../context/AuthContext';
+import { AuthContext } from '../../context/auth-context';
 import { api } from '../../api';
 import './Auth.css';
 
@@ -10,7 +10,6 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
   const handleLogin = async (e) => {
@@ -43,43 +42,43 @@ const Login = () => {
           <h2>Xush kelibsiz!</h2>
           <p>Tizimga kirish uchun ma'lumotlaringizni kiriting.</p>
         </div>
-        
+
         {error && <div className="error-message" style={{ color: 'var(--danger)', marginBottom: '16px', fontSize: '14px', textAlign: 'center', background: 'rgba(239, 68, 68, 0.1)', padding: '10px', borderRadius: '8px' }}>{error}</div>}
 
         <form className="auth-form" onSubmit={handleLogin}>
           <div className="form-group">
             <label>Email</label>
-            <input 
-              type="email" 
-              placeholder="admin@exode.uz" 
+            <input
+              type="email"
+              placeholder="admin@exode.uz"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required 
+              required
             />
           </div>
-          
+
           <div className="form-group">
             <label>Parol</label>
-            <input 
-              type="password" 
-              placeholder="••••••••" 
+            <input
+              type="password"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required 
+              required
             />
           </div>
-          
+
           <div className="form-options">
             <label className="checkbox-label">
               <input type="checkbox" /> Eslab qolish
             </label>
           </div>
-          
+
           <button type="submit" className="btn-primary full-width" disabled={loading}>
             {loading ? 'Kirilmoqda...' : 'Kirish'}
           </button>
         </form>
-        
+
         <div className="auth-footer">
           <p>Hisobingiz yo'qmi? <Link to="/register">Ro'yxatdan o'tish</Link></p>
         </div>

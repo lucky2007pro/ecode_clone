@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Plus, Video, FileText, LayoutList, ChevronDown, ChevronRight, Settings, Image as ImageIcon, File, MonitorPlay, MessageSquare, Table, Edit3, Trash2 } from 'lucide-react';
+import { Plus, Video, FileText, LayoutList, ChevronDown, ChevronRight, Settings, Image as ImageIcon, File, MonitorPlay, Table, Edit3, Trash2 } from 'lucide-react';
 import { api, API_ORIGIN } from '../../api';
 import './CourseBuilder.css';
 
 const CourseBuilder = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  
+
   const [course, setCourse] = useState(null);
   const [modules, setModules] = useState([]);
   const [lessons, setLessons] = useState([]);
@@ -15,7 +15,6 @@ const CourseBuilder = () => {
   const [activeModule, setActiveModule] = useState(null);
   const [activeLesson, setActiveLesson] = useState(null);
 
-  // Forms states
   const [showModuleForm, setShowModuleForm] = useState(false);
   const [showLessonForm, setShowLessonForm] = useState(false);
   const [newModuleTitle, setNewModuleTitle] = useState('');
@@ -29,23 +28,17 @@ const CourseBuilder = () => {
   const presentationInputRef = useRef(null);
   const contentRef = useRef(null);
 
-  // Expand/Collapse modules
   const [expandedModules, setExpandedModules] = useState({});
 
-  useEffect(() => {
-    fetchCourseDetails();
-    fetchModulesAndLessons();
-  }, [id]);
-
-  const fetchCourseDetails = async () => {
+  const fetchCourseDetails = useCallback(async () => {
     try {
       setCourse(await api(`/courses/${id}`));
     } catch(err) {
       setError(err.message || "Kurs ma'lumotlarini yuklashda xatolik");
     }
-  };
+  }, [id]);
 
-  const fetchModulesAndLessons = async () => {
+  const fetchModulesAndLessons = useCallback(async () => {
     try {
       const [mods, less] = await Promise.all([
         api(`/lessons/course/${id}/modules`).catch(() => []),
@@ -54,12 +47,11 @@ const CourseBuilder = () => {
 
       setModules(mods);
       setLessons(less);
-      
-      // Auto expand all
+
       const exp = {};
       mods.forEach(m => exp[m.id] = true);
       setExpandedModules(exp);
-      
+
       if (less.length > 0) setActiveLesson(less[0]);
 
     } catch (err) {
@@ -67,7 +59,12 @@ const CourseBuilder = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchCourseDetails();
+    fetchModulesAndLessons();
+  }, [id, fetchCourseDetails, fetchModulesAndLessons]);
 
   const handleAddModule = async () => {
     if(!newModuleTitle.trim()) return;
@@ -143,7 +140,7 @@ const CourseBuilder = () => {
     setUploading(true);
     try {
       try {
-        // Kinescope sozlangan bo'lsa — to'g'ridan-to'g'ri u yerga yuklaymiz
+
         const initData = await api('/videos/upload/init', {
           method: 'POST',
           body: { filename: file.name, title: activeLesson.title, filesize: file.size },
@@ -164,7 +161,7 @@ const CourseBuilder = () => {
         setActiveLesson({ ...activeLesson, video_url: videoUrl, lesson_type: 'video' });
         setError("Video Kinescope'ga yuklandi. Saqlash uchun 'Publish lesson'ni bosing.");
       } catch (kinescopeErr) {
-        // Kinescope sozlanmagan bo'lsa — lokal serverga yuklaymiz
+
         if (!String(kinescopeErr.message).includes('sozlanmagan')) throw kinescopeErr;
         const form = new FormData();
         form.append('file', file);
@@ -230,12 +227,12 @@ const CourseBuilder = () => {
 
   return (
     <div className="cb-container">
-      {/* SIDEBAR */}
+      {}
       <div className="cb-sidebar">
         <div className="cb-sidebar-header">
           <h2 onClick={() => navigate('/courses')} style={{cursor: 'pointer'}}>{course?.title || 'Course'}</h2>
         </div>
-        
+
         <div className="cb-search">
           <input type="text" placeholder="Search..." />
         </div>
@@ -251,12 +248,12 @@ const CourseBuilder = () => {
                 </div>
                 <Settings size={14} className="cb-icon-muted" />
               </div>
-              
+
               {expandedModules[mod.id] && (
                 <div className="cb-lessons-list">
                   {lessons.filter(l => l.module_id === mod.id).map(lesson => (
-                    <div 
-                      key={lesson.id} 
+                    <div
+                      key={lesson.id}
                       className={`cb-lesson-item ${activeLesson?.id === lesson.id ? 'active' : ''}`}
                       onClick={() => setActiveLesson(lesson)}
                     >
@@ -266,13 +263,13 @@ const CourseBuilder = () => {
                       <span className="cb-lesson-title">{lesson.title}</span>
                     </div>
                   ))}
-                  
+
                   {showLessonForm && activeModule === mod.id ? (
                     <div className="cb-add-inline">
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         autoFocus
-                        placeholder="Lesson title..." 
+                        placeholder="Lesson title..."
                         value={newLessonTitle}
                         onChange={e => setNewLessonTitle(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && handleAddLesson()}
@@ -288,13 +285,13 @@ const CourseBuilder = () => {
               )}
             </div>
           ))}
-          
+
           {showModuleForm ? (
             <div className="cb-add-inline" style={{marginTop: '15px'}}>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 autoFocus
-                placeholder="Module title..." 
+                placeholder="Module title..."
                 value={newModuleTitle}
                 onChange={e => setNewModuleTitle(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleAddModule()}
@@ -309,7 +306,7 @@ const CourseBuilder = () => {
         </div>
       </div>
 
-      {/* MAIN EDITOR */}
+      {}
       <div className="cb-main">
         {activeLesson ? (
           <>
@@ -325,9 +322,9 @@ const CourseBuilder = () => {
             </div>
 
             <div className="cb-editor-container">
-              <input 
-                className="cb-editor-title" 
-                value={activeLesson.title} 
+              <input
+                className="cb-editor-title"
+                value={activeLesson.title}
                 onChange={e => setActiveLesson({...activeLesson, title: e.target.value})}
                 placeholder="Lesson Title"
               />

@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, X } from 'lucide-react';
-import { AuthContext } from '../../context/AuthContext';
+import { AuthContext } from '../../context/auth-context';
 import { api } from '../../api';
 import './CoursesCatalog.css';
 
-// Dizayn uchun vizual karta gradientlari
 const cardThemes = [
   'linear-gradient(135deg, #FF8C00 0%, #FF5F00 100%)',
   'linear-gradient(135deg, #A855F7 0%, #7E22CE 100%)',
@@ -23,18 +22,10 @@ const CoursesCatalog = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
 
-  useEffect(() => {
-    if (user) {
-      fetchCourses();
-    }
-  }, [user]);
-
-  const fetchCourses = async () => {
+  const fetchCourses = useCallback(async () => {
     try {
       let data = await api('/courses/');
 
-      // O'qituvchi faqat o'ziga biriktirilgan kurslarni ko'radi.
-      // O'quvchi barcha kurslarni ko'radi — pulliklarini balansdan sotib olishi uchun.
       if (user && user.role === 'teacher') {
         try {
           const enrollData = await api(`/enrollments/user/${user.id}`);
@@ -51,7 +42,13 @@ const CoursesCatalog = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchCourses();
+    }
+  }, [user, fetchCourses]);
 
   const handleCreateCourse = async (e) => {
     e.preventDefault();
@@ -75,7 +72,7 @@ const CoursesCatalog = () => {
     <div className="courses-catalog-new">
       <div className="catalog-header-new">
         <h1 className="catalog-title">Course catalog</h1>
-        
+
         <div className="catalog-actions">
           {user && (user.role === 'admin' || user.role === 'manager') && (
             <button className="add-course-btn" onClick={() => setShowModal(true)}>
@@ -119,8 +116,8 @@ const CoursesCatalog = () => {
                       {Number(course.price) > 0 ? `${Number(course.price).toLocaleString('uz-UZ')} so'm` : 'Bepul'}
                     </span>
                     {user && (user.role === 'admin' || user.role === 'teacher' || user.role === 'manager') && (
-                      <button 
-                        className="edit-btn" 
+                      <button
+                        className="edit-btn"
                         onClick={(e) => { e.stopPropagation(); navigate(`/admin/courses/${course.id}/builder`); }}
                       >
                         Builder

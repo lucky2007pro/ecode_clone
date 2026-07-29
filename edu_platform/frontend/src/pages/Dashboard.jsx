@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Users, CheckCircle, Activity, TrendingUp } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { AuthContext } from '../context/AuthContext';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { AuthContext } from '../context/auth-context';
 import { api } from '../api';
 import './Dashboard.css';
 
@@ -24,8 +24,8 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
-      
-      {/* Top Metrics Row */}
+
+      {}
       <div className="metrics-grid">
         <div className="metric-card card">
           <div className="metric-header">
@@ -36,7 +36,7 @@ const Dashboard = () => {
           </div>
           <div className="metric-label">{isTeacher ? "My Students" : "Employees"}</div>
         </div>
-        
+
         <div className="metric-card card">
           <div className="metric-header">
             <div className="icon-wrapper orange-light">
@@ -46,7 +46,7 @@ const Dashboard = () => {
           </div>
           <div className="metric-label">Completed</div>
         </div>
-        
+
         <div className="metric-card card">
           <div className="metric-header">
             <div className="icon-wrapper orange-light">
@@ -56,13 +56,13 @@ const Dashboard = () => {
           </div>
           <div className="metric-label">Active</div>
         </div>
-        
+
       </div>
 
-      {/* Main Content Area */}
+      {}
       <div className="dashboard-content">
-        
-        {/* Left Side - Chart */}
+
+        {}
         <div className="chart-section card">
           <div className="chart-header">
             <div>
@@ -75,7 +75,7 @@ const Dashboard = () => {
               <TrendingUp size={16} className="icon-orange" />
             </div>
           </div>
-          
+
           <div className="chart-body">
             <ResponsiveContainer width="100%" height={300}>
               <AreaChart data={data} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
@@ -94,9 +94,9 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Right Side - Panels */}
+        {}
         <div className="right-panels">
-          
+
           <div className="panel-card card">
             <h4>Completion status</h4>
             <div className="status-labels">

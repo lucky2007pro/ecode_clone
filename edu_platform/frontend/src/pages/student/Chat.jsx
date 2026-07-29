@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Send, User } from 'lucide-react';
 import { api, WS_URL } from '../../api';
-import { AuthContext } from '../../context/AuthContext';
+import { AuthContext } from '../../context/auth-context';
 import './Chat.css';
 
 const Chat = ({ courseId = null }) => {
@@ -13,15 +13,27 @@ const Chat = ({ courseId = null }) => {
 
   const myName = user?.full_name || user?.email;
 
-  // Scroll to bottom
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
     setMessages([]);
+    const fetchHistory = async () => {
+      try {
+        const data = await api(`/messages/history${courseId ? `?course_id=${courseId}` : ''}`);
+        const formatted = data.map(m => ({
+          id: m.id,
+          sender: m.sender ?? '—',
+          text: m.content
+        }));
+        setMessages(formatted);
+      } catch (err) {
+        console.error(err);
+      }
+    };
     fetchHistory();
-    // Connect WebSocket (backend JWT ni query param orqali talab qiladi)
+
     const token = localStorage.getItem('token');
     if (!token) return;
     const url = `${WS_URL}/messages/ws?token=${token}${courseId ? `&course_id=${courseId}` : ''}`;
@@ -33,7 +45,7 @@ const Chat = ({ courseId = null }) => {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      // add new message to state
+
       setMessages(prev => [...prev, { id: Date.now(), ...data }]);
     };
 
@@ -48,27 +60,12 @@ const Chat = ({ courseId = null }) => {
     scrollToBottom();
   }, [messages]);
 
-  const fetchHistory = async () => {
-    try {
-      const data = await api(`/messages/history${courseId ? `?course_id=${courseId}` : ''}`);
-      const formatted = data.map(m => ({
-        id: m.id,
-        sender: m.sender ?? '—',
-        text: m.content
-      }));
-      setMessages(formatted);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const sendMessage = (e) => {
     e.preventDefault();
     if (!input.trim() || !ws) return;
 
     ws.send(input);
-    // Note: The websocket server is currently broadcasting to ALL including sender.
-    // If it didn't echo back, we'd add it to local state here.
+
     setInput('');
   };
 

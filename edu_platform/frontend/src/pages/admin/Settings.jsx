@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Palette, Globe, User, Save, CheckCircle, Target, MessageCircle, Key, Briefcase, CreditCard } from 'lucide-react';
-import { AuthContext } from '../../context/AuthContext';
+import { AuthContext } from '../../context/auth-context';
 import { api } from '../../api';
 import './Settings.css';
 
@@ -61,13 +61,11 @@ const Settings = () => {
 
   const schoolId = school?.id;
 
-  // When color changes, apply to the CSS variable dynamically for the preview
   const handleColorChange = (e) => {
     const color = e.target.value;
     setSchoolData({ ...schoolData, primary_color: color });
     document.documentElement.style.setProperty('--accent-primary', color);
-    
-    // Calculate a hover color slightly darker
+
     document.documentElement.style.setProperty('--accent-hover', color + 'dd');
   };
 
@@ -155,42 +153,42 @@ const Settings = () => {
 
       <div className="settings-layout">
         <div className="settings-sidebar card">
-          <button 
+          <button
             className={`settings-tab ${activeTab === 'school' ? 'active' : ''}`}
             onClick={() => setActiveTab('school')}
           >
             <Palette size={18} />
             Maktab Brendingi
           </button>
-          <button 
+          <button
             className={`settings-tab ${activeTab === 'marketing' ? 'active' : ''}`}
             onClick={() => setActiveTab('marketing')}
           >
             <Target size={18} />
             Marketing (Piksellar)
           </button>
-          <button 
+          <button
             className={`settings-tab ${activeTab === 'bot' ? 'active' : ''}`}
             onClick={() => setActiveTab('bot')}
           >
             <MessageCircle size={18} />
             Telegram Bot
           </button>
-          <button 
+          <button
             className={`settings-tab ${activeTab === 'kommo' ? 'active' : ''}`}
             onClick={() => setActiveTab('kommo')}
           >
             <Briefcase size={18} />
             Kommo CRM
           </button>
-          <button 
+          <button
             className={`settings-tab ${activeTab === 'api' ? 'active' : ''}`}
             onClick={() => setActiveTab('api')}
           >
             <Key size={18} />
             API Kalitlar
           </button>
-          <button 
+          <button
             className={`settings-tab ${activeTab === 'profile' ? 'active' : ''}`}
             onClick={() => setActiveTab('profile')}
           >
@@ -198,7 +196,7 @@ const Settings = () => {
             Mening Profilim
           </button>
           {user && user.role === 'admin' && (
-            <button 
+            <button
               className={`settings-tab ${activeTab === 'subscription' ? 'active' : ''}`}
               onClick={() => setActiveTab('subscription')}
             >
@@ -225,9 +223,9 @@ const Settings = () => {
               <form onSubmit={handleSaveSchool} className="settings-form">
                 <div className="form-group">
                   <label>Maktab Nomi</label>
-                  <input 
-                    type="text" 
-                    value={schoolData.name} 
+                  <input
+                    type="text"
+                    value={schoolData.name}
                     onChange={(e) => setSchoolData({...schoolData, name: e.target.value})}
                   />
                 </div>
@@ -236,10 +234,10 @@ const Settings = () => {
                   <label>Maxsus Domen (Custom Domain)</label>
                   <div className="input-group">
                     <Globe size={18} className="input-icon" />
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       placeholder="masalan: academy.uz"
-                      value={schoolData.custom_domain} 
+                      value={schoolData.custom_domain}
                       onChange={(e) => setSchoolData({...schoolData, custom_domain: e.target.value})}
                     />
                   </div>
@@ -248,9 +246,9 @@ const Settings = () => {
                 <div className="form-group">
                   <label>Asosiy Rang (Primary Color)</label>
                   <div className="color-picker-wrapper">
-                    <input 
-                      type="color" 
-                      value={schoolData.primary_color} 
+                    <input
+                      type="color"
+                      value={schoolData.primary_color}
                       onChange={handleColorChange}
                       className="color-picker"
                     />
@@ -274,28 +272,28 @@ const Settings = () => {
                 <h2>Mening Profilim</h2>
                 <p className="text-muted">Shaxsiy ma'lumotlaringizni tahrirlang</p>
               </div>
-              
+
               {saved && <div className="alert-success"><CheckCircle size={18} /> Saqlandi!</div>}
               {profileError && <div style={{ color: '#b91c1c', background: '#fee2e2', padding: '10px', borderRadius: '8px', marginBottom: '12px', fontSize: '13px' }}>{profileError}</div>}
               <form className="settings-form" onSubmit={handleSaveProfile}>
                 <div className="form-group">
                   <label>To'liq Ism</label>
-                  <input 
-                    type="text" 
-                    value={userData.full_name} 
+                  <input
+                    type="text"
+                    value={userData.full_name}
                     onChange={(e) => setUserData({...userData, full_name: e.target.value})}
                   />
                 </div>
                 <div className="form-group">
                   <label>Email</label>
-                  <input 
-                    type="email" 
-                    value={userData.email} 
+                  <input
+                    type="email"
+                    value={userData.email}
                     disabled
                   />
                   <p className="text-sm text-muted mt-1">Email manzilini o'zgartirish uchun yordam markaziga murojaat qiling.</p>
                 </div>
-                
+
                 <div className="form-actions">
                   <button type="submit" className="btn-primary">
                     <Save size={18} style={{marginRight: '8px'}} /> Saqlash
@@ -390,22 +388,22 @@ const Settings = () => {
                 <h2>Marketing va Piksellar</h2>
                 <p className="text-muted">Sotuv voronkasini kuzatish uchun analitika vositalarini ulang</p>
               </div>
-              
+
               {saved && <div className="alert-success"><CheckCircle size={18} /> Saqlandi!</div>}
               <form className="settings-form" onSubmit={handleSaveMarketing}>
                 <div className="form-group">
                   <label>Facebook Pixel ID</label>
-                  <input 
+                  <input
                     type="text" placeholder="Masalan: 1234567890"
-                    value={marketingData.facebook_pixel_id} 
+                    value={marketingData.facebook_pixel_id}
                     onChange={(e) => setMarketingData({...marketingData, facebook_pixel_id: e.target.value})}
                   />
                 </div>
                 <div className="form-group">
                   <label>Google Analytics (G-Tag)</label>
-                  <input 
+                  <input
                     type="text" placeholder="Masalan: G-XXXXXXX"
-                    value={marketingData.google_analytics_id} 
+                    value={marketingData.google_analytics_id}
                     onChange={(e) => setMarketingData({...marketingData, google_analytics_id: e.target.value})}
                   />
                 </div>
@@ -422,30 +420,30 @@ const Settings = () => {
                 <h2>Telegram Bot Integratsiyasi</h2>
                 <p className="text-muted">O'quvchilarni to'lovdan so'ng avtomatik yopiq kanalga qo'shish</p>
               </div>
-              
+
               {saved && <div className="alert-success"><CheckCircle size={18} /> Saqlandi!</div>}
               <form className="settings-form" onSubmit={handleSaveBot}>
                 <div className="form-group">
                   <label>Bot Token (@BotFather'dan olingan)</label>
-                  <input 
+                  <input
                     type="password" placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
-                    value={botData.bot_token} 
+                    value={botData.bot_token}
                     onChange={(e) => setBotData({...botData, bot_token: e.target.value})}
                   />
                 </div>
                 <div className="form-group">
                   <label>Yopiq kanal/guruh ID si</label>
-                  <input 
+                  <input
                     type="text" placeholder="Masalan: -100123456789"
-                    value={botData.private_channel_id} 
+                    value={botData.private_channel_id}
                     onChange={(e) => setBotData({...botData, private_channel_id: e.target.value})}
                   />
                 </div>
                 <div className="form-group">
                   <label>Foydalanuvchilarga ko'rinadigan taklifnoma linki</label>
-                  <input 
+                  <input
                     type="text" placeholder="https://t.me/+AbCdEfGhIjKlMnOp"
-                    value={botData.invite_link} 
+                    value={botData.invite_link}
                     onChange={(e) => setBotData({...botData, invite_link: e.target.value})}
                   />
                 </div>
@@ -462,12 +460,12 @@ const Settings = () => {
                 <h2>Kommo CRM Integratsiyasi</h2>
                 <p className="text-muted">Barcha Lead va Kontaktlarni avtomatik tarzda Kommo dagi voronkaga yo'naltiring</p>
               </div>
-              
+
               {saved && <div className="alert-success"><CheckCircle size={18} /> Saqlandi!</div>}
               <form className="settings-form" onSubmit={handleSaveKommo}>
                 <div className="form-group">
                   <label>Subdomain (masalan: myacademy.kommo.com)</label>
-                  <input 
+                  <input
                     type="text" placeholder="myacademy"
                     value={kommoData.subdomain}
                     onChange={(e) => setKommoData({...kommoData, subdomain: e.target.value})}
@@ -475,7 +473,7 @@ const Settings = () => {
                 </div>
                 <div className="form-group">
                   <label>Integration ID (Client ID)</label>
-                  <input 
+                  <input
                     type="text" placeholder="..."
                     value={kommoData.client_id}
                     onChange={(e) => setKommoData({...kommoData, client_id: e.target.value})}
@@ -483,7 +481,7 @@ const Settings = () => {
                 </div>
                 <div className="form-group">
                   <label>Secret Key (Client Secret)</label>
-                  <input 
+                  <input
                     type="password" placeholder="..."
                     value={kommoData.client_secret}
                     onChange={(e) => setKommoData({...kommoData, client_secret: e.target.value})}
@@ -505,13 +503,13 @@ const Settings = () => {
                 <h2>Ochiq API (Developer Keys)</h2>
                 <p className="text-muted">Tashqi tizimlar bilan integratsiya (CRM, 1C, ERP) qilish uchun API kalitlar yarating</p>
               </div>
-              
+
               <form className="settings-form" onSubmit={generateApiKey}>
                 <div className="form-group">
                   <label>Ilova / Integratsiya Nomi</label>
-                  <input 
+                  <input
                     type="text" placeholder="Masalan: Mening amoCRM integratsiyam"
-                    value={apiKeyName} 
+                    value={apiKeyName}
                     onChange={(e) => setApiKeyName(e.target.value)}
                     required
                   />

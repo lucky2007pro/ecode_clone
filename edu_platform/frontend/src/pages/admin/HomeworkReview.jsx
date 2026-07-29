@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Check, X, MessageSquare, AlertCircle } from 'lucide-react';
+import { Check, X, AlertCircle } from 'lucide-react';
 import { api } from '../../api';
 import './HomeworkReview.css';
 
@@ -7,7 +7,6 @@ const HomeworkReview = () => {
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Grading modal state
   const [activeSubmission, setActiveSubmission] = useState(null);
   const [grade, setGrade] = useState('');
   const [feedback, setFeedback] = useState('');
@@ -91,7 +90,7 @@ const HomeworkReview = () => {
                 <div className="sub-meta">
                   {sub.grade !== null && <strong>Baho: {sub.grade}</strong>}
                 </div>
-                <button 
+                <button
                   className="btn-outline btn-sm"
                   onClick={() => openGradeModal(sub)}
                 >
@@ -103,7 +102,7 @@ const HomeworkReview = () => {
         </div>
       )}
 
-      {/* Grade Modal */}
+      {}
       {activeSubmission && (
         <div className="modal-overlay">
           <div className="modal-content card">
@@ -111,20 +110,20 @@ const HomeworkReview = () => {
             <div className="student-submission-box">
               <p>{activeSubmission.submission_text}</p>
             </div>
-            
+
             <form onSubmit={handleGradeSubmit}>
               <div className="form-group">
                 <label>Holati</label>
                 <div className="status-toggle">
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className={`toggle-btn ${status === 'Approved' ? 'active-success' : ''}`}
                     onClick={() => setStatus('Approved')}
                   >
                     <Check size={16} /> Qabul qilish
                   </button>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className={`toggle-btn ${status === 'Rejected' ? 'active-danger' : ''}`}
                     onClick={() => setStatus('Rejected')}
                   >
@@ -135,8 +134,8 @@ const HomeworkReview = () => {
 
               <div className="form-group">
                 <label>Baho (0-100 yoki 1-5)</label>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   value={grade}
                   onChange={(e) => setGrade(e.target.value)}
                   placeholder="Masalan: 5 yoki 100"
@@ -146,7 +145,7 @@ const HomeworkReview = () => {
 
               <div className="form-group">
                 <label>Fikr / Xatolar</label>
-                <textarea 
+                <textarea
                   rows="3"
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}

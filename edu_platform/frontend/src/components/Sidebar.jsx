@@ -1,15 +1,27 @@
 import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Home, Layers, CreditCard, CheckSquare, Users, Settings, Sparkles, Bell } from 'lucide-react';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/auth-context';
 import './Sidebar.css';
 
 const Sidebar = () => {
   const { user } = useContext(AuthContext);
 
   const role = user?.role;
+  const getHomePath = (role) => {
+    const ROLE_HOME = {
+      student: '/student-dashboard',
+      accountant: '/payments',
+      admin: '/dashboard',
+      manager: '/dashboard',
+      teacher: '/dashboard',
+      curator: '/dashboard',
+    };
+    return ROLE_HOME[role] || '/dashboard';
+  };
+
   const menuItems = [
-    { name: 'Home', icon: <Home size={22} />, path: role === 'student' ? '/student-dashboard' : '/' },
+    { name: 'Home', icon: <Home size={22} />, path: getHomePath(role) },
     { name: 'Bildirishnomalar', icon: <Bell size={22} />, path: '/notifications' },
   ];
 
@@ -36,8 +48,8 @@ const Sidebar = () => {
       </div>
       <nav className="sidebar-nav">
         {menuItems.map((item) => (
-          <NavLink 
-            to={item.path} 
+          <NavLink
+            to={item.path}
             key={item.name}
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
           >

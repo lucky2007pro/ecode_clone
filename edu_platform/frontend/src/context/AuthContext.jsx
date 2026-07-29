@@ -1,8 +1,7 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
-
-export const AuthContext = createContext();
+import { AuthContext } from './auth-context';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -39,7 +38,17 @@ export const AuthProvider = ({ children }) => {
       const schoolData = await api('/schools/my');
       setUser(userData);
       setSchool(schoolData);
-      navigate('/');
+
+      const ROLE_HOME = {
+        student: '/student-dashboard',
+        accountant: '/payments',
+        admin: '/dashboard',
+        manager: '/dashboard',
+        teacher: '/dashboard',
+        curator: '/dashboard',
+      };
+
+      navigate(ROLE_HOME[userData.role] || '/dashboard');
     } catch (error) {
       console.error("Login vaqtida xatolik:", error);
     }

@@ -1,20 +1,10 @@
 import React, { useContext, useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Bell, UserCircle, Settings, User, CreditCard, LogOut, ChevronDown } from 'lucide-react';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/auth-context';
+import { timeAgo } from '../utils/timeAgo';
 import { api } from '../api';
 import './Header.css';
-
-// Backend created_at'ni naive UTC saqlaydi, shuning uchun 'Z' qo'shib parse qilamiz
-export const timeAgo = (dateStr) => {
-  const seconds = Math.floor((Date.now() - new Date(dateStr + 'Z').getTime()) / 1000);
-  if (seconds < 60) return 'hozirgina';
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes} daqiqa oldin`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} soat oldin`;
-  return `${Math.floor(hours / 24)} kun oldin`;
-};
 
 const Header = () => {
   const { user, logout } = useContext(AuthContext);
@@ -35,7 +25,6 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Bildirishnomalarni yuklash va har 30 soniyada yangilab turish
   useEffect(() => {
     let cancelled = false;
     const fetchNotifications = async () => {

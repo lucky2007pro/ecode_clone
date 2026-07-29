@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { HelpCircle, CheckCircle, XCircle } from 'lucide-react';
 import { api } from '../../api';
 import './QuizView.css';
@@ -12,17 +12,12 @@ const QuizView = ({ lessonId }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchQuizData();
-  }, [lessonId]);
-
-  const fetchQuizData = async () => {
+  const fetchQuizData = useCallback(async () => {
     try {
-      // Test ma'lumotlari
+
       const qData = await api(`/quizzes/lesson/${lessonId}`);
       setQuiz(qData);
 
-      // Savollar (is_correct serverda yashiringan)
       const qsData = await api(`/quizzes/${qData.id}/take`);
       setQuestions(qsData);
     } catch (err) {
@@ -30,7 +25,11 @@ const QuizView = ({ lessonId }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [lessonId]);
+
+  useEffect(() => {
+    fetchQuizData();
+  }, [lessonId, fetchQuizData]);
 
   const handleSelectAnswer = (questionId, answerId) => {
     if (submitted) return;
@@ -43,11 +42,11 @@ const QuizView = ({ lessonId }) => {
   const handleSubmit = async () => {
     setError('');
     try {
-      // Baholash serverda bajariladi va natija saqlanadi
+
       const res = await api(`/quizzes/${quiz.id}/submit`, { method: 'POST', body: { answers } });
       setResult(res);
       setSubmitted(true);
-    } catch (err) {
+    } catch {
       setError("Natijani saqlashda xatolik yuz berdi. Qayta urinib ko'ring.");
     }
   };

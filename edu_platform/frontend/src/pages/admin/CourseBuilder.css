@@ -166,7 +166,6 @@
   font-size: 13px;
 }
 
-/* MAIN EDITOR */
 .cb-main {
   flex: 1;
   background-color: #fff;
@@ -250,7 +249,7 @@
   border-radius: 16px;
   background: linear-gradient(135deg, #4b5563 0%, #1f2937 100%);
   position: relative;
-  margin-bottom: -30px; /* Overlap with toolbar */
+  margin-bottom: -30px;
   display: flex;
   align-items: center;
   justify-content: center;
