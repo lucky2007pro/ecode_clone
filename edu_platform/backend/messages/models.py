@@ -1,16 +1,28 @@
 import uuid
+
 from datetime import datetime, timezone
+
 from sqlalchemy import String, Text, ForeignKey, DateTime
+
 from sqlalchemy.orm import Mapped, mapped_column
+
 from db import Base
 
-
 class Message(Base):
+
     __tablename__ = "messages"
+
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+
     school_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("schools.id", ondelete="CASCADE"), index=True)
+
     sender_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), index=True)
-    receiver_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"), index=True, nullable=True) # None = global chat
-    course_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("courses.id", ondelete="CASCADE"), index=True, nullable=True) # None = maktab bo'yicha global chat
+
+    receiver_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"), index=True, nullable=True)
+
+    course_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("courses.id", ondelete="CASCADE"), index=True, nullable=True)
+
     content: Mapped[str] = mapped_column(Text)
+
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+
