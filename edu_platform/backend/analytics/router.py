@@ -37,11 +37,14 @@ async def get_dashboard_analytics(
     not_started, in_progress, completed = (await db.execute(completion_query)).one()
     not_started, in_progress, completed = not_started or 0, in_progress or 0, completed or 0
 
+    from sqlalchemy import literal_column
+    
+    month_expr = func.date_trunc("month", Enrollment.created_at).label("month")
     monthly_query = (
-        select(func.date_trunc("month", Enrollment.created_at).label("month"), func.count(Enrollment.id))
+        select(month_expr, func.count(Enrollment.id))
         .where(Enrollment.school_id == school_id)
-        .group_by(func.date_trunc("month", Enrollment.created_at))
-        .order_by(func.date_trunc("month", Enrollment.created_at))
+        .group_by(literal_column("month"))
+        .order_by(literal_column("month"))
     )
     monthly = [
         {"name": month.strftime("%b").upper(), "value": count}

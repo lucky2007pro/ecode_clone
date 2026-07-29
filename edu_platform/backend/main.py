@@ -2,6 +2,8 @@ import os
 from dotenv import load_dotenv
 load_dotenv()  # .env dagi o'zgaruvchilarni birinchi navbatda yuklaymiz
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -26,10 +28,19 @@ from api_keys.router import router as api_keys_router
 from api_keys.router import saas_router
 from videos.router import router as videos_router
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # DB sxemasi Alembic migratsiyalari orqali boshqariladi
+    redis = await get_redis()
+    await redis.ping()
+    yield
+    await close_redis()
+
 app = FastAPI(
     title="Exode Education & ERP Platform API",
     description="Multi-tenant ERP va Ta'lim platformasi uchun Backend API",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # CORS sozlamalari — ruxsat berilgan originlar env orqali boshqariladi
@@ -65,16 +76,6 @@ app.include_router(saas_router, prefix="/saas", tags=["SaaS External API"])
 if not os.path.exists("uploads"):
     os.makedirs("uploads")
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
-
-@app.on_event("startup")
-async def on_startup():
-    # DB sxemasi Alembic migratsiyalari orqali boshqariladi
-    redis = await get_redis()
-    await redis.ping()
-
-@app.on_event("shutdown")
-async def on_shutdown():
-    await close_redis()
 
 @app.get("/health", tags=["General"])
 async def health():

@@ -1,6 +1,6 @@
 import uuid
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from lessons.models import LessonType
 
 class CourseModuleCreate(BaseModel):
@@ -11,8 +11,7 @@ class CourseModuleCreate(BaseModel):
 class CourseModuleResponse(CourseModuleCreate):
     id: uuid.UUID
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class LessonCreate(BaseModel):
     course_id: uuid.UUID
@@ -28,5 +27,4 @@ class LessonCreate(BaseModel):
 class LessonResponse(LessonCreate):
     id: uuid.UUID
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

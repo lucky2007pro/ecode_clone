@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class QuizAnswerCreate(BaseModel):
@@ -15,8 +15,7 @@ class QuizAnswerResponse(BaseModel):
     # is_correct not exposed to students, but admin needs it. For MVP, we expose it or use a separate endpoint
     is_correct: bool 
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class QuizQuestionCreate(BaseModel):
@@ -31,8 +30,7 @@ class QuizQuestionResponse(BaseModel):
     order: int
     answers: List[QuizAnswerResponse] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class QuizCreate(BaseModel):
@@ -47,16 +45,14 @@ class QuizResponse(BaseModel):
     title: str
     passing_score: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class QuizTakeAnswer(BaseModel):
     id: uuid.UUID
     text: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class QuizQuestionTake(BaseModel):
@@ -65,8 +61,7 @@ class QuizQuestionTake(BaseModel):
     order: int
     answers: List[QuizTakeAnswer] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class QuizSubmitRequest(BaseModel):
@@ -88,5 +83,4 @@ class QuizResultResponse(BaseModel):
     total: int
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

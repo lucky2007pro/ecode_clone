@@ -1,5 +1,5 @@
 import uuid
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from permissions.enums import Role
 
 class UserBase(BaseModel):
@@ -29,8 +29,7 @@ class UserResponse(UserBase):
     id: uuid.UUID
     is_active: bool
     balance: float
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class TokenResponse(BaseModel):
     access_token: str
