@@ -18,7 +18,13 @@ if not DB_URL:
 
     raise RuntimeError("DATABASE_URL environment variable is required")
 
-engine = create_async_engine(DB_URL, echo=os.getenv("DB_ECHO", "false").lower() == "true", future=True)
+engine = create_async_engine(
+    DB_URL,
+    echo=os.getenv("DB_ECHO", "false").lower() == "true",
+    future=True,
+    pool_pre_ping=True,
+    pool_recycle=300
+)
 
 AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 

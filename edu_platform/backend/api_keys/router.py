@@ -86,7 +86,6 @@ async def saas_create_user(
 
     """
     Tashqi tizimlardan (CRM va hk) API orqali platformaga o'quvchi qo'shish.
-    (Exode.biz hujjatlaridagi misolga asoslangan).
     """
 
     res = await db.execute(select(User).where(User.email == data.email))

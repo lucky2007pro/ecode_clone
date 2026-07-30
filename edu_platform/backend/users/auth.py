@@ -15,6 +15,7 @@ load_dotenv()
 pwd_context = PasswordHash((BcryptHasher(),))
 
 SECRET_KEY = os.getenv("SECRET_KEY")
+ACCESS_TOKEN_EXPIRE_DAYS = int(os.getenv("ACCESS_TOKEN_EXPIRE_DAYS", "7"))
 
 if not SECRET_KEY:
 
@@ -22,7 +23,6 @@ if not SECRET_KEY:
 
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 
-ACCESS_TOKEN_EXPIRE_DAYS = int(os.getenv("ACCESS_TOKEN_EXPIRE_DAYS", 7))
 
 def hash_password(password: str) -> str:
 

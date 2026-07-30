@@ -1,7 +1,3 @@
-"""
-Gmail Free SMTP Transactional Email & Email OTP Verification Service.
-"""
-
 import os
 
 import random
@@ -50,17 +46,20 @@ def send_smtp_email_task(to_email: str, subject: str, body_html: str) -> bool:
 
         msg.attach(MIMEText(body_html, "html"))
 
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
-
-            server.starttls()
-
-            server.login(SMTP_USER, SMTP_PASS)
-
-            server.sendmail(SMTP_USER, to_email, msg.as_string())
-
-        logger.info(f"Gmail email muvaffaqiyatli jo'natildi -> To: {to_email}")
-
-        return True
+        try:
+            with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=5) as server:
+                server.login(SMTP_USER, SMTP_PASS)
+                server.sendmail(SMTP_USER, to_email, msg.as_string())
+            logger.info(f"Gmail email muvaffaqiyatli jo'natildi (SSL 465) -> To: {to_email}")
+            return True
+        except Exception as ssl_err:
+            logger.warning(f"SSL 465 ulanishida xatolik: {ssl_err}, 587 ga o'tilmoqda...")
+            with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=10) as server:
+                server.starttls()
+                server.login(SMTP_USER, SMTP_PASS)
+                server.sendmail(SMTP_USER, to_email, msg.as_string())
+            logger.info(f"Gmail email muvaffaqiyatli jo'natildi (TLS 587) -> To: {to_email}")
+            return True
 
     except Exception as e:
 

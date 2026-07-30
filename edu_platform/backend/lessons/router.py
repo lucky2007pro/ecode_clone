@@ -82,7 +82,7 @@ async def add_lesson(
 
 ):
 
-    """Yangi dars qo'shish (faqat admin/manager)."""
+    """Yangi dars qo'shish (faqat admin/manager/o'qituvchi)."""
 
     lesson = await create_lesson(db, lesson_in, school_id)
 

@@ -60,7 +60,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
 
 async def get_current_user_role(user=Depends(get_current_user)) -> Role:
 
-    """Foydalanuvchi roli bazadan olinadi (JWT claim'ga ishonilmaydi)."""
+    """Foydalanuvchi roli bazadan olinadi"""
 
     role = user.role
 
@@ -72,7 +72,7 @@ async def get_current_user_role(user=Depends(get_current_user)) -> Role:
 
 async def get_current_user_school_id(token: str = Depends(oauth2_scheme)) -> str:
 
-    """JWT ichidagi school_id claim'ini qaytaradi (legacy endpointlar uchun)."""
+    """JWT ichidagi school_id claim'ini qaytaradi"""
 
     try:
 
@@ -126,17 +126,21 @@ class RequirePermissions:
 
     async def __call__(self, user=Depends(get_current_user)):
 
-        role = user.role
+        role_str = str(user.role.value if hasattr(user.role, 'value') else user.role).lower()
 
-        if not isinstance(role, Role):
-
-            role = Role(role)
-
-        if role == Role.ADMIN:
+        if role_str == "admin":
 
             return True
 
-        user_permissions = ROLE_PERMISSIONS.get(role, [])
+        try:
+
+            role_enum = Role(role_str)
+
+        except ValueError:
+
+            role_enum = None
+
+        user_permissions = ROLE_PERMISSIONS.get(role_enum, []) if role_enum else []
 
         for perm in self.required_permissions:
 

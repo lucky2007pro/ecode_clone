@@ -1,7 +1,3 @@
-"""
-Gmail Email OTP va Telegram Notifications Router.
-"""
-
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status

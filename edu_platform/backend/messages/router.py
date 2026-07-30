@@ -40,7 +40,7 @@ class ConnectionManager:
 
     async def broadcast(self, school_id: uuid.UUID, text: str, sender: str, course_id: str | None):
 
-        """Faqat shu maktab va shu chat (kurs yoki global) dagi ulanishlarga xabar tarqatish."""
+        """Faqat shu maktab va shu chat (kurs) dagi ulanishlarga xabar tarqatish."""
 
         for connection, conn_school_id, _, conn_course_id in self.active_connections:
 
@@ -204,7 +204,7 @@ async def get_chat_history(
 
 ):
 
-    """Chat tarixini olish: course_id berilsa kurs chati, berilmasa global maktab chati."""
+    """Chat tarixini olish: course_id berilsa kurs chati"""
 
     from users.models import User
 
